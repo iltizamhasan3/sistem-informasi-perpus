@@ -123,5 +123,3 @@ npm run lint     # Linting
 **Iltizam Hasan** — [@iltizamhasan3](https://github.com/iltizamhasan3)
 
 ---
-
-<p align="center">Made with ❤️ for library management</p>

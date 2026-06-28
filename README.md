@@ -35,13 +35,14 @@
 
 ## 🚀 Teknologi
 
-- **Framework:** Next.js 16 (App Router)
-- **Bahasa:** TypeScript 5
-- **Styling:** Tailwind CSS 4
-- **Database:** PostgreSQL (Supabase)
-- **ORM:** Prisma 7
-- **Autentikasi:** Supabase Auth
-- **Storage:** Supabase Storage
+| Teknologi | Keterangan |
+|-----------|------------|
+| <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nextjs/nextjs-original.svg" width="20"/> **Next.js** | Framework React dengan App Router |
+| <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg" width="20"/> **TypeScript** | Bahasa pemrograman |
+| <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-original.svg" width="20"/> **Tailwind CSS** | Utility-first CSS framework |
+| <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg" width="20"/> **PostgreSQL** | Database relasional |
+| <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/supabase/supabase-original.svg" width="20"/> **Supabase** | Auth, Database & Storage |
+| <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/prisma/prisma-original.svg" width="20"/> **Prisma** | ORM (Object Relational Mapping) |
 
 ## 🗂️ Struktur Route
 

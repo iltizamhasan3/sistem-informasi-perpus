@@ -1,0 +1,38 @@
+import { prisma } from '@/lib/prisma'
+import { withSupabaseRoute } from '@/lib/supabase-server'
+
+export const GET = withSupabaseRoute({ auth: 'user' }, async () => {
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+
+  const [totalBooks, totalMembers, activeBorrows, todayTransactions, lowStockBooks, popularBooks, recentTransactions] = await Promise.all([
+    prisma.book.count(),
+    prisma.user.count({ where: { role: 'member', isActive: true } }),
+    prisma.transaction.count({ where: { status: 'borrowed' } }),
+    prisma.transaction.count({ where: { createdAt: { gte: today } } }),
+    prisma.book.findMany({ where: { stock: { lte: 2 } }, select: { id: true, title: true, stock: true }, orderBy: { stock: 'asc' }, take: 5 }),
+    prisma.transaction.groupBy({
+      by: ['bookId'],
+      _count: { id: true },
+      orderBy: { _count: { id: 'desc' } },
+      take: 5,
+    }).then(async (groups) => {
+      if (groups.length === 0) return []
+      const books = await prisma.book.findMany({
+        where: { id: { in: groups.map((g) => g.bookId) } },
+        select: { id: true, title: true, author: true },
+      })
+      return groups.map((g) => ({ ...books.find((b) => b.id === g.bookId), borrowCount: g._count.id }))
+    }),
+    prisma.transaction.findMany({
+      take: 5,
+      orderBy: { createdAt: 'desc' },
+      include: { user: { select: { name: true } }, book: { select: { title: true } } },
+    }),
+  ])
+
+  return Response.json({
+    stats: { totalBooks, totalMembers, activeBorrows, todayTransactions },
+    lowStockBooks, popularBooks, recentTransactions,
+  })
+})

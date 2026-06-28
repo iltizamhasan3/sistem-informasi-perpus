@@ -1,26 +1,24 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-page: #F5F3F1;
+  --color-primary: #4A637A;
+  --color-primary-dark: #364B5E;
+  --color-primary-light: #E4EAF1;
+  --color-secondary: #7A937A;
+  --color-secondary-dark: #5E745E;
+  --color-accent: #C9945A;
+  --color-danger: #BC6B6B;
+  --color-danger-light: #F5E6E6;
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@utility animate-fade-in {
+  animation: fade-in 0.25s ease-out;
 }

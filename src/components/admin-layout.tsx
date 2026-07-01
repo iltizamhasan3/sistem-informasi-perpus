@@ -12,13 +12,18 @@ interface Notification {
   createdAt: string
 }
 
-const navItems = [
+const adminNavItems = [
   { href: '/dashboard', label: 'Dashboard' },
   { href: '/books', label: 'Buku' },
   { href: '/members', label: 'Anggota' },
   { href: '/transactions', label: 'Transaksi' },
-  { href: '/my-borrowings', label: 'Peminjaman Saya' },
   { href: '/categories', label: 'Kategori' },
+]
+
+const memberNavItems = [
+  { href: '/my-borrowings', label: 'Peminjaman Saya' },
+  { href: '/my-bookings', label: 'Booking Saya' },
+  { href: '/catalog', label: 'Katalog' },
 ]
 
 export function AdminLayout({ children, initialUser }: { children: React.ReactNode; initialUser?: { name: string; role: string } }) {
@@ -27,6 +32,7 @@ export function AdminLayout({ children, initialUser }: { children: React.ReactNo
   const [user, setUser] = useState<{ name: string; role: string } | null>(initialUser ?? null)
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [showNotif, setShowNotif] = useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
   const notifRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -37,6 +43,7 @@ export function AdminLayout({ children, initialUser }: { children: React.ReactNo
           if (data.user) setUser(data.user)
           else router.push('/login')
         })
+        .catch(() => {})
     }
     fetchNotifications()
     const interval = setInterval(fetchNotifications, 30000)
@@ -54,9 +61,11 @@ export function AdminLayout({ children, initialUser }: { children: React.ReactNo
   }, [])
 
   async function fetchNotifications() {
-    const res = await fetch('/api/notifications')
-    const data = await res.json()
-    setNotifications(data.notifications || [])
+    try {
+      const res = await fetch('/api/notifications')
+      const data = await res.json()
+      setNotifications(data.notifications || [])
+    } catch {}
   }
 
   async function markAsRead() {
@@ -73,17 +82,34 @@ export function AdminLayout({ children, initialUser }: { children: React.ReactNo
 
   return (
     <div className="min-h-screen bg-page flex">
-      <aside className="w-64 bg-white border-r hidden md:block">
-        <div className="p-4 border-b">
-          <Link href="/dashboard" className="text-xl font-bold text-primary">
+      {/* Mobile overlay */}
+      {sidebarOpen && (
+        <div className="fixed inset-0 bg-black/30 z-40 md:hidden" onClick={() => setSidebarOpen(false)} />
+      )}
+
+      {/* Sidebar */}
+      <aside className={`
+        w-64 bg-white border-r flex-shrink-0
+        max-md:fixed max-md:inset-y-0 max-md:left-0 max-md:z-50
+        max-md:transition-transform max-md:duration-300 max-md:ease-in-out
+        ${sidebarOpen ? 'max-md:translate-x-0' : 'max-md:-translate-x-full'}
+      `}>
+        <div className="p-4 border-b flex items-center justify-between">
+          <Link href="/dashboard" className="text-xl font-bold text-primary" onClick={() => setSidebarOpen(false)}>
             SiPustaka
           </Link>
+          <button onClick={() => setSidebarOpen(false)} className="md:hidden p-1 rounded hover:bg-gray-100">
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
         </div>
         <nav className="p-2 space-y-1">
-          {navItems.map((item) => (
+          {(user?.role === 'admin' ? adminNavItems : memberNavItems).map((item) => (
             <Link
               key={item.href}
               href={item.href}
+              onClick={() => setSidebarOpen(false)}
               className={`block px-3 py-2 rounded-lg text-sm ${
                 pathname === item.href || pathname.startsWith(item.href + '/')
                   ? 'bg-primary-light text-primary font-medium'
@@ -97,9 +123,16 @@ export function AdminLayout({ children, initialUser }: { children: React.ReactNo
       </aside>
 
       <div className="flex-1 flex flex-col">
-        <header className="bg-white border-b px-6 py-3 flex items-center justify-between">
-          <div className="md:hidden font-bold text-primary">SiPustaka</div>
-          <div className="flex items-center gap-4 ml-auto">
+        <header className="bg-white border-b px-4 md:px-6 py-3 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            <button onClick={() => setSidebarOpen(true)} className="md:hidden p-1.5 rounded-lg hover:bg-gray-100">
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+            <div className="md:hidden font-bold text-primary">SiPustaka</div>
+          </div>
+          <div className="flex items-center gap-2 md:gap-4">
             {user && (
               <>
                 <div className="relative" ref={notifRef}>

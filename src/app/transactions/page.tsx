@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Pagination } from '@/components/pagination'
 import { LoadingSpinner } from '@/components/loading-spinner'
+import { Toast } from '@/components/toast'
+import { ConfirmModal } from '@/components/confirm-modal'
 
 interface Transaction {
   id: number
@@ -24,6 +26,8 @@ export default function TransactionsPage() {
   const [totalPages, setTotalPages] = useState(0)
   const [pageLoading, setPageLoading] = useState(true)
   const [error, setError] = useState('')
+  const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
+  const [returningId, setReturningId] = useState<number | null>(null)
 
   useEffect(() => { fetchTransactions().finally(() => setPageLoading(false)) }, [])
 
@@ -56,6 +60,46 @@ export default function TransactionsPage() {
     fetchTransactions(filter || undefined, p)
   }
 
+  async function handleReturn(transactionId: number) {
+    try {
+      const res = await fetch('/api/transactions/return', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ transactionId }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Gagal mengembalikan buku')
+      const msg = data.transaction.fine > 0
+        ? `Buku berhasil dikembalikan. Denda: Rp ${data.transaction.fine.toLocaleString()}`
+        : 'Buku berhasil dikembalikan!'
+      setToast({ type: 'success', message: msg })
+      fetchTransactions(filter || undefined, page)
+    } catch (err) {
+      setToast({ type: 'error', message: err instanceof Error ? err.message : 'Gagal' })
+    }
+    setReturningId(null)
+  }
+
+  async function exportCSV() {
+    try {
+      const res = await fetch(`/api/transactions?limit=all`)
+      const data = await res.json()
+      const list = data.transactions || data
+      const rows = [['Anggota', 'Email', 'Buku', 'Tgl Pinjam', 'Jatuh Tempo', 'Tgl Kembali', 'Denda', 'Status'].join(',')]
+      for (const t of list) {
+        const status = t.status === 'borrowed' ? 'Dipinjam' : t.status === 'returned' ? 'Kembali' : 'Terlambat'
+        rows.push([`"${t.user.name}"`, `"${t.user.email}"`, `"${t.book.title}"`, t.borrowDate.slice(0, 10), t.dueDate.slice(0, 10), t.returnDate ? t.returnDate.slice(0, 10) : '', t.fine, status].join(','))
+      }
+      const blob = new Blob([rows.join('\n')], { type: 'text/csv' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url; a.download = 'transaksi.csv'; a.click()
+      URL.revokeObjectURL(url)
+    } catch {
+      setToast({ type: 'error', message: 'Gagal mengekspor data' })
+    }
+  }
+
   function formatDate(d: string) {
     return new Date(d).toLocaleDateString('id-ID')
   }
@@ -64,7 +108,11 @@ export default function TransactionsPage() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-semibold">Transaksi</h2>
-        <div className="space-x-2">
+        <div className="flex gap-2">
+          <button onClick={exportCSV}
+            className="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition text-sm">
+            Export CSV
+          </button>
           <Link href="/transactions/borrow"
             className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition text-sm">
             + Pinjam Buku
@@ -98,11 +146,12 @@ export default function TransactionsPage() {
               <th className="text-left px-4 py-3 text-sm font-medium text-gray-500">Tgl Kembali</th>
               <th className="text-center px-4 py-3 text-sm font-medium text-gray-500">Denda</th>
               <th className="text-center px-4 py-3 text-sm font-medium text-gray-500">Status</th>
+              <th className="text-center px-4 py-3 text-sm font-medium text-gray-500">Aksi</th>
             </tr>
           </thead>
           <tbody>
             {pageLoading ? (
-              <tr><td colSpan={7}><LoadingSpinner /></td></tr>
+              <tr><td colSpan={8}><LoadingSpinner /></td></tr>
             ) : transactions.map((t) => (
               <tr key={t.id} className="border-t">
                 <td className="px-4 py-3">
@@ -125,16 +174,33 @@ export default function TransactionsPage() {
                     {t.status === 'borrowed' ? 'Dipinjam' : t.status === 'returned' ? 'Kembali' : 'Terlambat'}
                   </span>
                 </td>
+                <td className="px-4 py-3 text-center">
+                  {(t.status === 'borrowed' || t.status === 'overdue') && (
+                    <button onClick={() => setReturningId(t.id)}
+                      className="text-xs px-3 py-1.5 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition">
+                      Kembalikan
+                    </button>
+                  )}
+                </td>
               </tr>
             ))}
             {!pageLoading && transactions.length === 0 && (
-              <tr><td colSpan={7} className="px-4 py-8 text-center text-gray-500">Belum ada transaksi</td></tr>
+              <tr><td colSpan={8} className="px-4 py-8 text-center text-gray-500">Belum ada transaksi</td></tr>
             )}
           </tbody>
         </table>
       </div>
 
       <Pagination page={page} totalPages={totalPages} total={total} onPageChange={onPageChange} />
+
+      <ConfirmModal
+        open={returningId !== null}
+        title="Kembalikan Buku"
+        message="Yakin ingin mengembalikan buku ini?"
+        onConfirm={() => handleReturn(returningId!)}
+        onCancel={() => setReturningId(null)}
+      />
+      {toast && <Toast type={toast.type} message={toast.message} onClose={() => setToast(null)} />}
     </div>
   )
 }

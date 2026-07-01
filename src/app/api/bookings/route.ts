@@ -74,7 +74,10 @@ export const PATCH = withSupabaseRoute({ auth: 'user' }, async (req, ctx) => {
   const { id, action } = await req.json()
   if (action !== 'cancel') return Response.json({ error: 'Aksi tidak valid' }, { status: 400 })
 
-  const booking = await prisma.booking.findUnique({ where: { id: Number(id) } })
+  const booking = await prisma.booking.findUnique({
+    where: { id: Number(id) },
+    include: { book: { select: { title: true } }, user: { select: { name: true } } },
+  })
   if (!booking) return Response.json({ error: 'Booking tidak ditemukan' }, { status: 404 })
   if (booking.status !== 'active') return Response.json({ error: 'Booking sudah tidak aktif' }, { status: 400 })
   if (booking.userId !== ctx.user.id && ctx.user.role !== 'admin') {
@@ -85,6 +88,11 @@ export const PATCH = withSupabaseRoute({ auth: 'user' }, async (req, ctx) => {
     prisma.booking.update({ where: { id: booking.id }, data: { status: 'cancelled' } }),
     prisma.book.update({ where: { id: booking.bookId }, data: { stock: { increment: 1 } } }),
   ])
+
+  if (booking.userId !== ctx.user.id) {
+    await notifyUser(booking.userId, 'Booking Dibatalkan', `Booking "${booking.book.title}" telah dibatalkan oleh admin.`)
+  }
+  await notifyAdmins('Booking Dibatalkan', `${booking.user.name} membatalkan booking "${booking.book.title}".`)
 
   return Response.json({ message: 'Booking dibatalkan' })
 })

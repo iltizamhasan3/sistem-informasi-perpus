@@ -64,19 +64,19 @@ export default function ReturnPage() {
 
   return (
     <div>
-      <div className="bg-[#c8e6cd] rounded-[24px] px-6 py-5 mb-8">
-        <p className="font-mono text-sm uppercase tracking-[0.05em] text-black/40">Transaksi</p>
-        <h2 className="text-[32px] font-bold tracking-[-0.02em] leading-[1.1] text-black mt-1">Pengembalian Buku</h2>
+      <div className="bg-[#c8e6cd] rounded-[24px] p-8 md:p-12 mb-8">
+        <p className="font-mono text-sm uppercase tracking-[0.05em] text-black/40 mb-3">Transaksi</p>
+        <h1 className="text-[32px] font-bold tracking-[-0.02em] leading-[1.1] text-black">Pengembalian Buku</h1>
+        <p className="text-[18px] font-light leading-relaxed text-black/50 mt-3 max-w-xl">Kembalikan buku yang sedang dipinjam.</p>
       </div>
 
       {error && (
-        <div className="bg-[#f3c9b6]/30 text-black p-4 rounded-[12px] text-[15px] font-light border border-block-coral mb-6">
-          {error}
-        </div>
+        <div className="bg-[#f3c9b6]/30 text-black p-4 rounded-[12px] text-[15px] font-light border border-[#f3c9b6] mb-6">{error}</div>
       )}
 
       <div className="bg-white rounded-[24px] border border-[#e6e6e6] overflow-hidden">
-        <table className="w-full">
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[500px]">
           <thead>
             <tr className="bg-[#c8e6cd]/15">
               <th className="text-left px-4 py-3 text-[13px] font-light text-black/50 uppercase tracking-wide">Anggota</th>
@@ -113,7 +113,8 @@ export default function ReturnPage() {
               <tr><td colSpan={5} className="text-[15px] font-light text-black/40 text-center py-8">Tidak ada peminjaman aktif</td></tr>
             )}
           </tbody>
-        </table>
+          </table>
+        </div>
       </div>
 
       <ConfirmModal

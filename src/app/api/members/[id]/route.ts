@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma'
 import { withSupabaseRoute } from '@/lib/supabase-server'
+import { notifyUser } from '@/lib/notifications'
 
 export const GET = withSupabaseRoute<{ id: string }>({ auth: 'user' }, async (_req, ctx) => {
   if (!ctx.user || ctx.user.role !== 'admin') return Response.json({ error: 'Unauthorized' }, { status: 403 })
@@ -19,11 +20,19 @@ export const PUT = withSupabaseRoute<{ id: string }>({ auth: 'user' }, async (re
   const { id } = await ctx.params
   const { name, email, phone, address, isActive } = await req.json()
 
+  const prevMember = await prisma.user.findUnique({ where: { id: Number(id) }, select: { isActive: true } })
+
   const member = await prisma.user.update({
     where: { id: Number(id) },
     data: { name, email, phone, address, isActive },
     select: { id: true, name: true, email: true, phone: true, address: true, isActive: true },
   })
+
+  if (prevMember && prevMember.isActive !== isActive) {
+    const statusMsg = isActive ? 'diaktifkan kembali' : 'dinonaktifkan'
+    await notifyUser(member.id, 'Status Akun Berubah', `Akun perpustakaanmu telah ${statusMsg} oleh admin.`)
+  }
+
   return Response.json({ member })
 })
 

@@ -144,14 +144,14 @@ export function AdminLayout({ children, initialUser }: { children: React.ReactNo
                   </button>
                   {showNotif && (
                     <div className="absolute right-0 mt-2 w-80 bg-white border border-[#e6e6e6] rounded-[12px] shadow-sm z-50 max-h-96 overflow-y-auto">
-                      <div className="px-4 py-3 border-b border-[#e6e6e6]-soft flex items-center justify-between">
+                      <div className="px-4 py-3 border-b border-[#e6e6e6] flex items-center justify-between">
                         <span className="text-[13px] font-light text-black">Notifikasi</span>
                         {unreadCount > 0 && (
                           <button onClick={markAsRead} className="text-[12px] text-black/50 hover:text-black transition">Tandai dibaca</button>
                         )}
                       </div>
                       {notifications.length > 0 ? notifications.slice(0, 10).map((n) => (
-                        <div key={n.id} className={`px-4 py-3 border-b border-[#e6e6e6]-soft text-[14px] ${!n.isRead ? 'bg-[#c5b0f4]/8' : ''}`}>
+                        <div key={n.id} className={`px-4 py-3 border-b border-[#e6e6e6] text-[14px] ${!n.isRead ? 'bg-[#c5b0f4]/8' : ''}`}>
                           <p className="font-light text-black">{n.title}</p>
                           <p className="text-black/50 text-[13px] mt-0.5">{n.message}</p>
                           <p className="text-black/30 text-[12px] mt-1">{new Date(n.createdAt).toLocaleDateString('id-ID')}</p>

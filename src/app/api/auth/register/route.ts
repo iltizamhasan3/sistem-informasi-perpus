@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma'
 import { withSupabaseRoute } from '@/lib/supabase-server'
+import { notifyAdmins } from '@/lib/notifications'
 
 export const POST = withSupabaseRoute({ auth: 'none' }, async (req) => {
   const { name, email, password } = await req.json()
@@ -26,6 +27,8 @@ export const POST = withSupabaseRoute({ auth: 'none' }, async (req) => {
     data: { name, email, password: '', role: 'member' },
     select: { id: true, name: true, email: true, role: true },
   })
+
+  await notifyAdmins('Pendaftaran Baru', `${user.name} (${user.email}) mendaftar sebagai anggota.`)
 
   return Response.json({ message: 'Registrasi berhasil', user }, { status: 201 })
 })

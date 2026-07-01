@@ -32,6 +32,13 @@
   to   { opacity: 1; transform: translateY(0); }
 }
 
+@layer base {
+  :focus-visible {
+    outline: 2px solid #c5b0f4;
+    outline-offset: 2px;
+  }
+}
+
 @utility animate-fade-in {
   animation: fade-in 0.25s ease-out;
 }

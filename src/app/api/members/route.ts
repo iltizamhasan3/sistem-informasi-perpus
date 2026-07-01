@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma'
 import { withSupabaseRoute } from '@/lib/supabase-server'
+import { notifyUser } from '@/lib/notifications'
 
 export const GET = withSupabaseRoute({ auth: 'user' }, async (req, ctx) => {
   if (!ctx.user || ctx.user.role !== 'admin') return Response.json({ error: 'Unauthorized' }, { status: 403 })
@@ -62,5 +63,8 @@ export const POST = withSupabaseRoute({ auth: 'user' }, async (req, ctx) => {
     data: { name, email, password: '', role: 'member', phone, address },
     select: { id: true, name: true, email: true, role: true, phone: true, address: true },
   })
+
+  await notifyUser(member.id, 'Akun Dibuat', `Akun perpustakaanmu telah dibuat oleh admin. Silakan login dengan email ${member.email}.`)
+
   return Response.json({ member }, { status: 201 })
 })

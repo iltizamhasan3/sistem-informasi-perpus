@@ -1,6 +1,6 @@
 import { prisma } from '@/lib/prisma'
 import { withSupabaseRoute } from '@/lib/supabase-server'
-import { notifyAdmins } from '@/lib/notifications'
+import { notifyUser, notifyAdmins } from '@/lib/notifications'
 
 export const POST = withSupabaseRoute({ auth: 'user' }, async (req, ctx) => {
   if (!ctx.user) return Response.json({ error: 'Unauthorized' }, { status: 401 })
@@ -30,6 +30,7 @@ export const POST = withSupabaseRoute({ auth: 'user' }, async (req, ctx) => {
     include: { book: { select: { id: true, title: true } } },
   })
 
+  await notifyUser(ctx.user.id, 'Sewa E-book Berhasil', `Kamu menyewa e-book "${rental.book.title}". Baca sebelum ${rental.expiresAt.toLocaleDateString('id-ID', { hour: '2-digit', minute: '2-digit' })}.`)
   await notifyAdmins('Sewa E-book Baru', `${ctx.user.name} menyewa e-book "${rental.book.title}".`)
 
   return Response.json({ rental: { id: rental.id, expiresAt: rental.expiresAt.toISOString(), book: { title: rental.book.title } } }, { status: 201 })

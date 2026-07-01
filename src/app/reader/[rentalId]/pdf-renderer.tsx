@@ -10,7 +10,7 @@ pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/b
 export function PdfRenderer({ pdfUrl, rentalId, initialPage }: { pdfUrl: string; rentalId: number; initialPage: number }) {
   const [numPages, setNumPages] = useState(0)
   const [pageNumber, setPageNumber] = useState(initialPage)
-  const saveTimer = useRef<ReturnType<typeof setTimeout>>()
+  const saveTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined)
 
   const savePage = useCallback((page: number) => {
     clearTimeout(saveTimer.current)

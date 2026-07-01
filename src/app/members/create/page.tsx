@@ -29,7 +29,7 @@ export default function CreateMemberPage() {
 
   return (
     <div className="space-y-12">
-      <div className="bg-[#f3c9b6] rounded-[24px] p-12">
+      <div className="bg-[#f3c9b6] rounded-[24px] p-8 md:p-12">
         <p className="font-mono text-sm uppercase tracking-[0.05em] text-black/40 mb-3">Form Anggota</p>
         <h1 className="text-[32px] font-bold tracking-[-0.02em] leading-[1.1] text-black">Tambah Anggota</h1>
         <p className="text-[18px] font-light leading-relaxed text-black/50 mt-3 max-w-xl">
@@ -37,7 +37,7 @@ export default function CreateMemberPage() {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="bg-white rounded-[24px] border border-[#e6e6e6] p-12 max-w-lg space-y-7">
+      <form onSubmit={handleSubmit} className="bg-white rounded-[24px] border border-[#e6e6e6] p-6 md:p-12 mx-auto max-w-lg space-y-7">
         {error && (
           <div className="bg-[#f3c9b6] border-l-4 border-black text-black px-5 py-4 rounded-r-[8px] text-[15px] font-light leading-relaxed">
             {error}

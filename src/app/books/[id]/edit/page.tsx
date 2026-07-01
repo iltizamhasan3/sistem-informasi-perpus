@@ -95,7 +95,7 @@ export default function EditBookPage() {
 
   return (
     <div className="space-y-12">
-      <div className="bg-[#c8e6cd] rounded-[24px] p-12">
+      <div className="bg-[#c8e6cd] rounded-[24px] p-8 md:p-12">
         <p className="font-mono text-sm uppercase tracking-[0.05em] text-black/40 mb-3">Form Buku</p>
         <h1 className="text-[32px] font-bold tracking-[-0.02em] leading-[1.1] text-black">Edit Buku</h1>
         <p className="text-[18px] font-light leading-relaxed text-black/50 mt-3 max-w-xl">
@@ -103,14 +103,14 @@ export default function EditBookPage() {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="bg-white rounded-[24px] border border-[#e6e6e6] p-12 max-w-2xl space-y-8">
+      <form onSubmit={handleSubmit} className="bg-white rounded-[24px] border border-[#e6e6e6] p-6 md:p-12 mx-auto max-w-2xl space-y-8">
         {error && (
           <div className="bg-[#f3c9b6] border-l-4 border-black text-black px-5 py-4 rounded-r-[8px] text-[15px] font-light leading-relaxed">
             {error}
           </div>
         )}
 
-        <div className="grid grid-cols-2 gap-x-6 gap-y-7">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-7">
           <div className="col-span-2">
             <label className="text-[15px] font-light text-black mb-2 block">Judul <span className="text-black/20">*</span></label>
             <input type="text" required value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })}

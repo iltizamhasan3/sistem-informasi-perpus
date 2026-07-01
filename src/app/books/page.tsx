@@ -102,7 +102,7 @@ export default function BooksPage() {
 
   return (
     <div>
-      <div className="bg-[#c5b0f4] rounded-[24px] p-12 mb-8">
+      <div className="bg-[#c5b0f4] rounded-[24px] p-8 md:p-12 mb-8">
         <p className="font-mono text-sm uppercase tracking-[0.05em] text-black/40 mb-3">Buku</p>
         <h1 className="text-[32px] font-bold tracking-[-0.02em] leading-[1.1] text-black">Buku</h1>
         <p className="text-[18px] font-light leading-relaxed text-black/50 mt-3 max-w-xl">Kelola koleksi buku perpustakaan</p>
@@ -112,7 +112,7 @@ export default function BooksPage() {
         <form onSubmit={handleSearch} className="flex items-center gap-3">
           <input type="text" value={search} onChange={(e) => setSearch(e.target.value)}
             placeholder="Cari judul atau pengarang..."
-            className="w-[240px] px-[14px] py-[10px] bg-white border border-[#e6e6e6] rounded-[50px] text-[15px] font-light text-black placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-black/[0.06] focus:border-black transition" />
+            className="w-full max-w-[240px] px-[14px] py-[10px] bg-white border border-[#e6e6e6] rounded-[50px] text-[15px] font-light text-black placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-[#c5b0f4]/20 focus:border-black transition" />
           <button type="submit"
             className="px-5 py-[10px] bg-black text-white rounded-[50px] text-[14px] font-light hover:bg-gray-800 transition">Cari</button>
         </form>
@@ -127,7 +127,8 @@ export default function BooksPage() {
       </div>
 
       <div className="bg-white rounded-[24px] border border-[#e6e6e6] overflow-hidden">
-        <table className="w-full">
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[600px]">
           <thead>
             <tr className="bg-[#c5b0f4]/15">
               <th className="text-left px-4 py-3 text-[13px] font-light text-black/50 uppercase tracking-wide w-16"></th>
@@ -170,7 +171,8 @@ export default function BooksPage() {
               <tr><td colSpan={isAdmin ? 7 : 6} className="text-[15px] font-light text-black/40 text-center py-8">Belum ada buku</td></tr>
             )}
           </tbody>
-        </table>
+          </table>
+        </div>
       </div>
 
       <Pagination page={page} totalPages={totalPages} total={total} onPageChange={onPageChange} />

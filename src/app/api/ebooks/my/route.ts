@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma'
 import { withSupabaseRoute } from '@/lib/supabase-server'
+import { notifyUser } from '@/lib/notifications'
 
 export const GET = withSupabaseRoute({ auth: 'user' }, async (_req, ctx) => {
   if (!ctx.user) return Response.json({ error: 'Unauthorized' }, { status: 401 })
@@ -24,6 +25,7 @@ export const GET = withSupabaseRoute({ auth: 'user' }, async (_req, ctx) => {
     })
     for (const r of expired.filter((e) => expiredIds.includes(e.id))) {
       r.status = 'expired'
+      await notifyUser(ctx.user.id, 'Sewa E-book Berakhir', `Sewa e-book "${r.book.title}" telah berakhir.`)
     }
   }
 

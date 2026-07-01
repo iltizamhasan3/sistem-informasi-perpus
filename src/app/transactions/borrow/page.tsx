@@ -117,15 +117,16 @@ export default function BorrowPage() {
 
   return (
     <div>
-      <div className="bg-[#dceeb1] rounded-[24px] px-6 py-5 mb-8">
-        <p className="font-mono text-sm uppercase tracking-[0.05em] text-black/40">Transaksi</p>
-        <h2 className="text-[32px] font-bold tracking-[-0.02em] leading-[1.1] text-black mt-1">Peminjaman Buku</h2>
+      <div className="bg-[#dceeb1] rounded-[24px] p-8 md:p-12 mb-8">
+        <p className="font-mono text-sm uppercase tracking-[0.05em] text-black/40 mb-3">Transaksi</p>
+        <h1 className="text-[32px] font-bold tracking-[-0.02em] leading-[1.1] text-black">Peminjaman Buku</h1>
+        <p className="text-[18px] font-light leading-relaxed text-black/50 mt-3 max-w-xl">Pinjam buku baru atau konfirmasi booking anggota.</p>
       </div>
 
       {pageLoading ? <LoadingSpinner /> : (
         <div className="space-y-10">
           {userRole === 'admin' && (
-            <div className="bg-white rounded-[24px] border border-[#e6e6e6] p-8 max-w-lg">
+            <div className="bg-white rounded-[24px] border border-[#e6e6e6] p-8 mx-auto max-w-lg">
               <p className="font-mono text-sm uppercase tracking-[0.05em] text-black/40">Booking</p>
               <h3 className="text-[18px] font-light leading-relaxed text-black/50 mt-1 mb-5">Konfirmasi Kode Booking</h3>
               <div className="flex gap-2 mb-4">
@@ -156,14 +157,12 @@ export default function BorrowPage() {
             </div>
           )}
 
-          <div>
+          <div className="mx-auto max-w-lg">
             <p className="font-mono text-sm uppercase tracking-[0.05em] text-black/40">Langsung</p>
             <h3 className="text-[18px] font-light leading-relaxed text-black/50 mt-1 mb-5">Pinjam Langsung</h3>
-            <form onSubmit={handleSubmit} className="bg-white rounded-[24px] border border-[#e6e6e6] p-8 max-w-lg space-y-5">
+            <form onSubmit={handleSubmit} className="bg-white rounded-[24px] border border-[#e6e6e6] p-8 mx-auto max-w-lg space-y-5">
               {error && (
-                <div className="bg-[#f3c9b6]/30 text-black p-4 rounded-[12px] text-[15px] font-light border border-block-coral">
-                  {error}
-                </div>
+              <div className="bg-[#f3c9b6]/30 text-black p-4 rounded-[12px] text-[15px] font-light border border-[#f3c9b6]">{error}</div>
               )}
 
               {userRole === 'admin' && (

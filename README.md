@@ -119,13 +119,6 @@ npm run dev
 
 Buka [http://localhost:3000](http://localhost:3000) di browser.
 
-## 👤 Akun Demo
-
-| Role    | Email               | Password  |
-|---------|---------------------|-----------|
-| Admin   | admin@sipustaka.id  | admin123  |
-| Member  | siti@email.com      | member123 |
-
 ## 📦 Scripts
 
 ```bash

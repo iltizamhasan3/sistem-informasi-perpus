@@ -42,7 +42,7 @@ export default function BooksPage() {
       const params = new URLSearchParams()
       if (q || search) params.set('search', q || search)
       params.set('page', String(p || page))
-      const res = await fetch(`/api/books?${params}`)
+      const res = await fetch(`/api/books?${params}`, { cache: 'no-cache' })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Gagal memuat buku')
       setBooks(data.books)

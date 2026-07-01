@@ -61,22 +61,8 @@ async function main() {
   })
   await prisma.$executeRawUnsafe(`SELECT setval('"Category_id_seq"', (SELECT MAX(id) FROM "Category"))`)
 
-  await prisma.book.createMany({
-    data: [
-      { id: 1, title: 'Pemrograman Web dengan Next.js', author: 'Budi Santoso', publisher: 'Penerbit Digital', year: 2024, categoryId: 1, stock: 5, description: 'Panduan lengkap Next.js', createdAt: now, updatedAt: now },
-      { id: 2, title: 'Dasar-Dasar JavaScript', author: 'Ahmad Fauzi', publisher: 'Edu Press', year: 2023, categoryId: 1, stock: 3, description: 'Pengenalan JavaScript', createdAt: now, updatedAt: now },
-      { id: 3, title: 'Laskar Pelangi', author: 'Andrea Hirata', publisher: 'Bentang Pustaka', year: 2005, categoryId: 2, stock: 4, description: 'Novel inspiratif pendidikan', createdAt: now, updatedAt: now },
-      { id: 4, title: 'Bumi Manusia', author: 'Pramoedya Ananta Toer', publisher: 'Hasta Mitra', year: 1980, categoryId: 2, stock: 2, description: 'Novel sejarah kolonial', createdAt: now, updatedAt: now },
-      { id: 5, title: 'Sejarah Dunia yang Disembunyikan', author: 'Jonathan Black', publisher: 'Alvabet', year: 2019, categoryId: 3, stock: 2, description: 'Perspektif alternatif sejarah', createdAt: now, updatedAt: now },
-      { id: 6, title: 'Filsafat Ilmu Pengetahuan', author: 'Jujun S. Suriasumantri', publisher: 'Pustaka Sinar Harapan', year: 1990, categoryId: 3, stock: 3, description: 'Pengantar filsafat ilmu', createdAt: now, updatedAt: now },
-      { id: 7, title: 'Akhlak Tasawuf', author: 'Prof. Dr. Abuddin Nata', publisher: 'Rajawali Pers', year: 2018, categoryId: 4, stock: 4, description: 'Kajian akhlak dan tasawuf', createdAt: now, updatedAt: now },
-      { id: 8, title: 'Metodologi Penelitian Pendidikan', author: 'Prof. Dr. Sugiyono', publisher: 'Alfabeta', year: 2020, categoryId: 5, stock: 6, description: 'Metode penelitian lengkap', createdAt: now, updatedAt: now },
-      { id: 9, title: 'Clean Code', author: 'Robert C. Martin', publisher: 'Prentice Hall', year: 2008, categoryId: 1, stock: 2, description: 'Prinsip menulis kode bersih', createdAt: now, updatedAt: now },
-      { id: 10, title: 'Ronggeng Dukuh Paruk', author: 'Ahmad Tohari', publisher: 'Gramedia', year: 2003, categoryId: 2, stock: 3, description: 'Novel budaya Jawa', createdAt: now, updatedAt: now },
-    ],
-    skipDuplicates: true,
-  })
-  await prisma.$executeRawUnsafe(`SELECT setval('"Book_id_seq"', (SELECT MAX(id) FROM "Book"))`)
+  await prisma.$executeRawUnsafe(`SELECT setval('"Book_id_seq"', 1)`)
+  console.log('ℹ️  Tidak ada buku dummy. Tambahkan buku melalui halaman admin.')
 
   await prisma.$disconnect()
   console.log('✅ Seed berhasil!')

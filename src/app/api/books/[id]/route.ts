@@ -39,11 +39,32 @@ export const DELETE = withSupabaseRoute<{ id: string }>({ auth: 'user' }, async 
   if (!ctx.user || ctx.user.role !== 'admin') return Response.json({ error: 'Unauthorized' }, { status: 403 })
 
   const { id } = await ctx.params
-  const active = await prisma.transaction.findFirst({
-    where: { bookId: Number(id), status: 'borrowed' },
-  })
-  if (active) return Response.json({ error: 'Buku sedang dipinjam' }, { status: 400 })
+  const bookId = Number(id)
+  if (isNaN(bookId)) return Response.json({ error: 'ID buku tidak valid' }, { status: 400 })
 
-  await prisma.book.delete({ where: { id: Number(id) } })
+  const book = await prisma.book.findUnique({ where: { id: bookId } })
+  if (!book) return Response.json({ error: 'Buku tidak ditemukan' }, { status: 404 })
+
+  const activeLoan = await prisma.transaction.findFirst({
+    where: { bookId, status: 'borrowed' },
+  })
+  if (activeLoan) return Response.json({ error: 'Buku sedang dipinjam, tidak bisa dihapus' }, { status: 400 })
+
+  const activeBooking = await prisma.booking.findFirst({
+    where: { bookId, status: 'active' },
+  })
+  if (activeBooking) return Response.json({ error: 'Buku memiliki booking aktif, tidak bisa dihapus' }, { status: 400 })
+
+  const activeRental = await prisma.ebookRental.findFirst({
+    where: { bookId, status: 'active' },
+  })
+  if (activeRental) return Response.json({ error: 'Buku sedang dirental sebagai ebook, tidak bisa dihapus' }, { status: 400 })
+
+  await prisma.$transaction([
+    prisma.transaction.deleteMany({ where: { bookId } }),
+    prisma.booking.deleteMany({ where: { bookId } }),
+    prisma.ebookRental.deleteMany({ where: { bookId } }),
+    prisma.book.delete({ where: { id: bookId } }),
+  ])
   return Response.json({ message: 'Buku berhasil dihapus' })
 })

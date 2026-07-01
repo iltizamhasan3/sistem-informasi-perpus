@@ -44,7 +44,7 @@ export function DashboardClient({ user }: { user: { name: string; role: string }
         <div className="bg-[#f3c9b6]/30 text-black p-4 rounded-[12px] text-[15px] font-light border border-[#f3c9b6] mb-6">{dashboardError}</div>
       )}
 
-      {dashboardLoading ? <LoadingSpinner /> : (
+      {dashboardLoading ? <LoadingSpinner /> :
       <div className="space-y-8">
         <div className="bg-[#f4ecd6] rounded-[24px] p-12">
           <p className="font-mono text-sm uppercase tracking-[0.05em] text-black/40 mb-3">Dashboard</p>
@@ -136,9 +136,8 @@ export function DashboardClient({ user }: { user: { name: string; role: string }
           <p className="p-6 text-[15px] font-light text-black/40 text-center">Belum ada transaksi</p>
             )}
           </div>
-        </div>
       </div>
-      )} {/* end dashboardLoading */}
+      }
     </AdminLayout>
   )
 }

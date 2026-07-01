@@ -15,10 +15,16 @@ export const PUT = withSupabaseRoute<{ id: string }>({ auth: 'user' }, async (re
   if (!ctx.user || ctx.user.role !== 'admin') return Response.json({ error: 'Unauthorized' }, { status: 403 })
 
   const { id } = await ctx.params
+  const bookId = Number(id)
+  if (isNaN(bookId)) return Response.json({ error: 'ID buku tidak valid' }, { status: 400 })
+
+  const existing = await prisma.book.findUnique({ where: { id: bookId } })
+  if (!existing) return Response.json({ error: 'Buku tidak ditemukan' }, { status: 404 })
+
   const { title, author, publisher, year, categoryId, stock, description, coverImage, isEbook, ebookFile } = await req.json()
 
   const book = await prisma.book.update({
-    where: { id: Number(id) },
+    where: { id: bookId },
     data: {
       title, author,
       publisher: publisher || null,

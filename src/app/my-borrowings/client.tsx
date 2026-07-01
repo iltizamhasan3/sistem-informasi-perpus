@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { AdminLayout } from '@/components/admin-layout'
 import { LoadingSpinner } from '@/components/loading-spinner'
+import { Toast } from '@/components/toast'
 
 interface Transaction {
   id: number
@@ -16,12 +17,13 @@ interface Transaction {
 export function MyBorrowingsClient({ user }: { user: { name: string; role: string } }) {
   const [active, setActive] = useState<Transaction[]>([])
   const [loading, setLoading] = useState(true)
+  const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
 
   useEffect(() => {
     fetch('/api/transactions?status=borrowed&mine=true')
-      .then((r) => r.json())
+      .then((r) => { if (!r.ok) throw new Error('Gagal memuat peminjaman'); return r.json() })
       .then((data) => setActive(data.transactions ?? []))
-      .catch(() => {})
+      .catch(() => setToast({ type: 'error', message: 'Gagal memuat data peminjaman' }))
       .finally(() => setLoading(false))
   }, [])
 
@@ -29,6 +31,7 @@ export function MyBorrowingsClient({ user }: { user: { name: string; role: strin
 
   return (
     <AdminLayout initialUser={user}>
+      {toast && <Toast type={toast.type} message={toast.message} onClose={() => setToast(null)} />}
       <div className="space-y-4">
         <div className="bg-[#f3c9b6] rounded-[24px] p-6">
           <p className="font-mono text-sm uppercase tracking-[0.05em] text-black/40">Peminjaman</p>

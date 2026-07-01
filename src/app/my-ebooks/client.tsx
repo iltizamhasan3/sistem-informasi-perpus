@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { AdminLayout } from '@/components/admin-layout'
 import { LoadingSpinner } from '@/components/loading-spinner'
+import { Toast } from '@/components/toast'
 
 interface EbookRental {
   id: number
@@ -15,17 +16,19 @@ export function MyEbooksClient({ user }: { user: { name: string; role: string } 
   const router = useRouter()
   const [active, setActive] = useState<EbookRental[]>([])
   const [loading, setLoading] = useState(true)
+  const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
 
   useEffect(() => {
     fetch('/api/ebooks/my')
-      .then((r) => r.json())
+      .then((r) => { if (!r.ok) throw new Error('Gagal memuat e-book'); return r.json() })
       .then((data) => setActive(data.active ?? []))
-      .catch(() => {})
+      .catch(() => setToast({ type: 'error', message: 'Gagal memuat data e-book' }))
       .finally(() => setLoading(false))
   }, [])
 
   return (
     <AdminLayout initialUser={user}>
+      {toast && <Toast type={toast.type} message={toast.message} onClose={() => setToast(null)} />}
       <div className="space-y-4">
         <div className="bg-[#c5b0f4] rounded-[24px] p-6">
           <p className="font-mono text-sm uppercase tracking-[0.05em] text-black/40">E-book</p>

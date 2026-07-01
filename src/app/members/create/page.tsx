@@ -14,17 +14,21 @@ export default function CreateMemberPage() {
     setError('')
     setLoading(true)
 
-    const res = await fetch('/api/members', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(form),
-    })
+    try {
+      const res = await fetch('/api/members', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      })
 
-    const data = await res.json()
-    setLoading(false)
-
-    if (!res.ok) { setError(data.error); return }
-    router.push('/members')
+      const data = await res.json()
+      if (!res.ok) { setError(data.error); return }
+      router.push('/members')
+    } catch {
+      setError('Terjadi kesalahan jaringan')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (

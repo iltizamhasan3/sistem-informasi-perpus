@@ -24,45 +24,63 @@
 |-------|-----------|
 | 📖 **Katalog Buku** | Jelajahi koleksi buku dengan pencarian & filter kategori |
 | 👥 **Manajemen Anggota** | CRUD anggota perpustakaan (admin) |
-| 📚 **Manajemen Buku** | CRUD buku dengan unggah sampul |
-| 🔄 **Transaksi Peminjaman** | Pinjam & kembalikan buku dengan validasi stok |
+| 📚 **Manajemen Buku** | CRUD buku dengan unggah sampul & file PDF e-book |
+| 🔄 **Transaksi Peminjaman** | Pinjam & kembalikan buku dengan validasi stok (max 3) |
 | 💰 **Denda Otomatis** | Hitung denda keterlambatan (Rp 2.000/hari) |
 | 📊 **Dashboard** | Statistik real-time, buku populer, peringatan stok menipis |
 | 🔔 **Notifikasi** | Notifikasi in-app untuk peminjaman & pengembalian |
 | 👤 **My Borrowings** | Anggota lihat riwayat & status peminjaman sendiri |
+| 📅 **Booking Buku** | Booking buku 24 jam, konfirmasi admin, riwayat booking |
+| 📱 **E-book Reader** | Sewa e-book 2 hari, baca online via react-pdf, anti-download |
+| 💾 **Last Page Saved** | Halaman terakhir otomatis tersimpan, lanjut baca dari posisi terakhir |
 | 🔐 **Autentikasi** | Login/register via Supabase Auth (admin & member) |
 | 🖼️ **Sampul Buku** | Unggah & tampilkan sampul buku |
+| 📄 **Ekspor CSV** | Ekspor data buku, anggota, dan transaksi ke CSV |
 
 ## 🚀 Teknologi
 
 | Teknologi | Keterangan |
 |-----------|------------|
-| <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nextjs/nextjs-original.svg" width="20"/> **Next.js** | Framework React dengan App Router |
+| <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nextjs/nextjs-original.svg" width="20"/> **Next.js 16** | Framework React dengan App Router |
 | <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg" width="20"/> **TypeScript** | Bahasa pemrograman |
-| <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-original.svg" width="20"/> **Tailwind CSS** | Utility-first CSS framework |
+| <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-original.svg" width="20"/> **Tailwind CSS v4** | Utility-first CSS framework |
 | <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg" width="20"/> **PostgreSQL** | Database relasional |
-| <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/supabase/supabase-original.svg" width="20"/> **Supabase** | Auth, Database & Storage |
-| <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/prisma/prisma-original.svg" width="20"/> **Prisma** | ORM (Object Relational Mapping) |
+| <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/supabase/supabase-original.svg" width="20"/> **Supabase** | Auth, Storage & Database hosting |
+| <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/prisma/prisma-original.svg" width="20"/> **Prisma 7** | ORM (Object Relational Mapping) |
+| | **react-pdf** | PDF viewer in-browser |
 
 ## 🗂️ Struktur Route
 
+### Halaman Publik & Auth
 ```
-/                  → Halaman utama (landing page)
-/login             → Login (admin & member)
-/register          → Registrasi member baru
-/dashboard         → Dashboard admin
-/catalog           → Katalog publik (semua pengguna)
-/books             → Manajemen buku (admin)
-/books/create      → Tambah buku baru
-/books/[id]/edit   → Edit buku
-/categories        → Manajemen kategori (admin)
-/members           → Manajemen anggota (admin)
-/members/create    → Tambah anggota
-/members/[id]/edit → Edit anggota
-/transactions      → Semua transaksi (admin)
-/transactions/borrow → Form peminjaman
-/transactions/return → Form pengembalian
-/my-borrowings     → Riwayat pinjaman anggota
+/                     → Landing page
+/login                → Login (admin & member)
+/register             → Registrasi member baru
+```
+
+### Halaman Admin
+```
+/dashboard            → Dashboard admin
+/books                → Manajemen buku
+/books/create         → Tambah buku baru
+/books/[id]/edit      → Edit buku
+/categories           → Manajemen kategori
+/members              → Manajemen anggota
+/members/create       → Tambah anggota
+/members/[id]/edit    → Edit anggota
+/transactions         → Semua transaksi
+/transactions/borrow  → Form peminjaman
+/transactions/return  → Form pengembalian
+```
+
+### Halaman Member
+```
+/catalog              → Katalog publik
+/catalog/[id]         → Detail buku (booking & sewa e-book)
+/my-borrowings        → Riwayat peminjaman
+/my-bookings          → Riwayat booking
+/my-ebooks            → E-book yang disewa
+/reader/[rentalId]    → Pembaca e-book online
 ```
 
 ## ⚙️ Cara Install

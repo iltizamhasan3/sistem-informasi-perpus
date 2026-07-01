@@ -47,7 +47,6 @@
 | <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg" width="20"/> **PostgreSQL** | Database relasional |
 | <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/supabase/supabase-original.svg" width="20"/> **Supabase** | Auth, Storage & Database hosting |
 | <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/prisma/prisma-original.svg" width="20"/> **Prisma 7** | ORM (Object Relational Mapping) |
-| | **react-pdf** | PDF viewer in-browser |
 
 ## 🗂️ Struktur Route
 

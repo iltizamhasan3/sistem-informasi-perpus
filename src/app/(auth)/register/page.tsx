@@ -6,7 +6,7 @@ import Link from 'next/link'
 
 export default function RegisterPage() {
   const router = useRouter()
-  const [form, setForm] = useState({ name: '', email: '', password: '', confirmPassword: '' })
+  const [form, setForm] = useState({ name: '', email: '', password: '', confirmPassword: '', phone: '', address: '' })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -33,7 +33,7 @@ export default function RegisterPage() {
       const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: form.name, email: form.email, password: form.password }),
+        body: JSON.stringify({ name: form.name, email: form.email, password: form.password, phone: form.phone, address: form.address }),
       })
 
       const data = await res.json()
@@ -96,6 +96,20 @@ export default function RegisterPage() {
             <input type="password" required value={form.confirmPassword} onChange={(e) => setForm({ ...form, confirmPassword: e.target.value })}
               placeholder="Ulangi password"
               className="w-full px-[14px] py-3 bg-white border border-[#e6e6e6] rounded-[8px] text-[16px] font-light text-black placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-[#c5b0f4]/20 focus:border-black transition" />
+          </div>
+
+          <div>
+            <label className="text-[14px] font-light text-black mb-1.5 block">Nomor Telepon</label>
+            <input type="text" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })}
+              placeholder="Nomor telepon (opsional)"
+              className="w-full px-[14px] py-3 bg-white border border-[#e6e6e6] rounded-[8px] text-[16px] font-light text-black placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-[#c5b0f4]/20 focus:border-black transition" />
+          </div>
+
+          <div>
+            <label className="text-[14px] font-light text-black mb-1.5 block">Alamat</label>
+            <textarea value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} rows={2}
+              placeholder="Alamat lengkap (opsional)"
+              className="w-full px-[14px] py-3 bg-white border border-[#e6e6e6] rounded-[8px] text-[16px] font-light text-black placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-[#c5b0f4]/20 focus:border-black transition resize-none" />
           </div>
 
           <button type="submit" disabled={loading}

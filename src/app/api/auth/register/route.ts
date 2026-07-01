@@ -3,7 +3,7 @@ import { withSupabaseRoute } from '@/lib/supabase-server'
 import { notifyAdmins } from '@/lib/notifications'
 
 export const POST = withSupabaseRoute({ auth: 'none' }, async (req) => {
-  const { name, email, password } = await req.json()
+  const { name, email, password, phone, address } = await req.json()
   if (!name || !email || !password) return Response.json({ error: 'Semua field wajib diisi' }, { status: 400 })
   if (password.length < 6) return Response.json({ error: 'Password minimal 6 karakter' }, { status: 400 })
 
@@ -24,7 +24,7 @@ export const POST = withSupabaseRoute({ auth: 'none' }, async (req) => {
   if (authError) return Response.json({ error: authError.message }, { status: 400 })
 
   const user = await prisma.user.create({
-    data: { name, email, password: '', role: 'member' },
+    data: { name, email, password: '', role: 'member', phone: phone || null, address: address || null },
     select: { id: true, name: true, email: true, role: true },
   })
 

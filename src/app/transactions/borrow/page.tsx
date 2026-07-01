@@ -117,34 +117,38 @@ export default function BorrowPage() {
 
   return (
     <div>
-      <h2 className="text-2xl font-semibold mb-6">Peminjaman Buku</h2>
+      <div className="bg-[#dceeb1] rounded-[24px] px-6 py-5 mb-8">
+        <p className="font-mono text-sm uppercase tracking-[0.05em] text-black/40">Transaksi</p>
+        <h2 className="text-[32px] font-bold tracking-[-0.02em] leading-[1.1] text-black mt-1">Peminjaman Buku</h2>
+      </div>
 
       {pageLoading ? <LoadingSpinner /> : (
-        <div className="space-y-8">
+        <div className="space-y-10">
           {userRole === 'admin' && (
-            <div className="bg-white rounded-xl shadow-sm border p-6 max-w-lg">
-              <h3 className="font-semibold mb-4">Konfirmasi Kode Booking</h3>
-              <div className="flex gap-2 mb-3">
+            <div className="bg-white rounded-[24px] border border-[#e6e6e6] p-8 max-w-lg">
+              <p className="font-mono text-sm uppercase tracking-[0.05em] text-black/40">Booking</p>
+              <h3 className="text-[18px] font-light leading-relaxed text-black/50 mt-1 mb-5">Konfirmasi Kode Booking</h3>
+              <div className="flex gap-2 mb-4">
                 <input type="text" value={bookingCode} onChange={(e) => setBookingCode(e.target.value.toUpperCase())}
                   placeholder="Masukkan kode booking"
-                  className="flex-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary uppercase" />
+                  className="flex-1 px-[14px] py-3 bg-white border border-[#e6e6e6] rounded-[8px] text-[16px] font-light text-black placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-[#c5b0f4]/20 focus:border-black transition" />
                 <button onClick={handleSearchBooking} disabled={bookingSearching}
-                  className="px-4 py-2 bg-secondary text-white rounded-lg hover:bg-secondary-dark transition disabled:opacity-50">
+                  className="px-5 py-[10px] bg-black text-white rounded-[50px] text-[14px] font-light hover:bg-gray-800 transition disabled:opacity-40 shrink-0">
                   {bookingSearching ? 'Mencari...' : 'Cari'}
                 </button>
               </div>
-              {bookingError && <p className="text-sm text-red-600 mb-2">{bookingError}</p>}
+              {bookingError && <p className="text-[15px] font-light text-black/50 mb-3">{bookingError}</p>}
 
               {bookingData && (
-                <div className="bg-primary-light rounded-lg p-4 space-y-2">
-                  <p className="text-lg tracking-widest font-mono font-bold text-primary">{bookingData.code}</p>
-                  <div className="text-sm space-y-1">
-                    <p><span className="text-gray-500">Anggota:</span> {bookingData.user.name} ({bookingData.user.email})</p>
-                    <p><span className="text-gray-500">Buku:</span> {bookingData.book.title}</p>
-                    <p><span className="text-gray-500">Booking:</span> {new Date(bookingData.expiresAt).toLocaleDateString('id-ID', { hour: '2-digit', minute: '2-digit' })}</p>
+                <div className="bg-[#f7f7f5] rounded-[12px] p-6 space-y-3">
+                  <p className="text-lg tracking-widest font-mono font-bold text-black">{bookingData.code}</p>
+                  <div className="text-[15px] font-light text-black space-y-1">
+                    <p><span className="text-black/40">Anggota:</span> {bookingData.user.name} ({bookingData.user.email})</p>
+                    <p><span className="text-black/40">Buku:</span> {bookingData.book.title}</p>
+                    <p><span className="text-black/40">Booking:</span> {new Date(bookingData.expiresAt).toLocaleDateString('id-ID', { hour: '2-digit', minute: '2-digit' })}</p>
                   </div>
                   <button onClick={() => setConfirmBooking(true)} disabled={confirming}
-                    className="mt-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition text-sm disabled:opacity-50">
+                    className="px-5 py-[10px] bg-black text-white rounded-[50px] text-[14px] font-light hover:bg-gray-800 transition disabled:opacity-40">
                     Konfirmasi & Buat Transaksi
                   </button>
                 </div>
@@ -152,16 +156,21 @@ export default function BorrowPage() {
             </div>
           )}
 
-          <div className="border-t pt-6">
-            <h3 className="font-semibold mb-4 text-gray-500">Pinjam Langsung</h3>
-            <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm border p-6 max-w-lg space-y-4">
-              {error && <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm">{error}</div>}
+          <div>
+            <p className="font-mono text-sm uppercase tracking-[0.05em] text-black/40">Langsung</p>
+            <h3 className="text-[18px] font-light leading-relaxed text-black/50 mt-1 mb-5">Pinjam Langsung</h3>
+            <form onSubmit={handleSubmit} className="bg-white rounded-[24px] border border-[#e6e6e6] p-8 max-w-lg space-y-5">
+              {error && (
+                <div className="bg-[#f3c9b6]/30 text-black p-4 rounded-[12px] text-[15px] font-light border border-block-coral">
+                  {error}
+                </div>
+              )}
 
               {userRole === 'admin' && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Anggota</label>
+                  <label className="text-[15px] font-light text-black mb-2 block">Anggota</label>
                   <select value={memberId} onChange={(e) => setMemberId(e.target.value)}
-                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                    className="w-full px-[14px] py-3 bg-white border border-[#e6e6e6] rounded-[8px] text-[16px] font-light text-black focus:outline-none focus:ring-2 focus:ring-[#c5b0f4]/20 focus:border-black transition">
                     <option value="">Pilih anggota</option>
                     {members.map((m) => <option key={m.id} value={m.id}>{m.name} ({m.email})</option>)}
                   </select>
@@ -169,9 +178,9 @@ export default function BorrowPage() {
               )}
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Buku</label>
+                <label className="text-[15px] font-light text-black mb-2 block">Buku</label>
                 <select value={bookId} onChange={(e) => setBookId(e.target.value)}
-                  className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
+                  className="w-full px-[14px] py-3 bg-white border border-[#e6e6e6] rounded-[8px] text-[16px] font-light text-black focus:outline-none focus:ring-2 focus:ring-[#c5b0f4]/20 focus:border-black transition">
                   <option value="">Pilih buku</option>
                   {books.filter((b) => b.stock > 0).map((b) => (
                     <option key={b.id} value={b.id}>{b.title} - {b.author} (stok: {b.stock})</option>
@@ -181,11 +190,13 @@ export default function BorrowPage() {
 
               <div className="flex gap-3 pt-2">
                 <button type="submit" disabled={loading || !bookId || (userRole === 'admin' && !memberId)}
-                  className="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition disabled:opacity-50">
+                  className="px-5 py-[10px] bg-black text-white rounded-[50px] text-[14px] font-light hover:bg-gray-800 transition disabled:opacity-40">
                   {loading ? 'Memproses...' : 'Pinjam Buku'}
                 </button>
                 <button type="button" onClick={() => router.push('/transactions')}
-                  className="px-6 py-2 border rounded-lg hover:bg-gray-50 transition">Batal</button>
+                  className="px-5 py-[10px] bg-white text-black rounded-[50px] text-[14px] font-light border border-[#e6e6e6] hover:bg-[#f7f7f5] transition">
+                  Batal
+                </button>
               </div>
             </form>
           </div>

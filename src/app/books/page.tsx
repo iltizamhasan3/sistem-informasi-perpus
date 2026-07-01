@@ -28,8 +28,12 @@ export default function BooksPage() {
   const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
   const [deleteId, setDeleteId] = useState<number | null>(null)
   const [deleting, setDeleting] = useState(false)
+  const [isAdmin, setIsAdmin] = useState(false)
 
   useEffect(() => {
+    fetch('/api/auth/me').then(r => r.json()).then(data => {
+      if (data.user?.role === 'admin') setIsAdmin(true)
+    }).catch(() => {})
     fetchBooks().finally(() => setPageLoading(false))
   }, [])
 
@@ -61,6 +65,25 @@ export default function BooksPage() {
     fetchBooks(search)
   }
 
+  async function exportCSV() {
+    try {
+      const res = await fetch(`/api/books?limit=all`)
+      const data = await res.json()
+      const list = data.books || data
+      const rows = [['Judul', 'Pengarang', 'Penerbit', 'Kategori', 'Stok', 'Dipinjam'].join(',')]
+      for (const b of list) {
+        rows.push([`"${b.title}"`, `"${b.author}"`, `"${b.publisher || ''}"`, `"${b.category.name}"`, b.stock, b._count?.transactions || 0].join(','))
+      }
+      const blob = new Blob([rows.join('\n')], { type: 'text/csv' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url; a.download = 'buku.csv'; a.click()
+      URL.revokeObjectURL(url)
+    } catch {
+      setToast({ type: 'error', message: 'Gagal mengekspor data' })
+    }
+  }
+
   async function handleDelete(id: number) {
     setDeleting(true)
     try {
@@ -79,90 +102,72 @@ export default function BooksPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-semibold">Daftar Buku</h2>
-        <Link
-          href="/books/create"
-          className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition text-sm"
-        >
-          + Tambah Buku
-        </Link>
+      <div className="bg-[#c5b0f4] rounded-[24px] p-12 mb-8">
+        <p className="font-mono text-sm uppercase tracking-[0.05em] text-black/40 mb-3">Buku</p>
+        <h1 className="text-[32px] font-bold tracking-[-0.02em] leading-[1.1] text-black">Buku</h1>
+        <p className="text-[18px] font-light leading-relaxed text-black/50 mt-3 max-w-xl">Kelola koleksi buku perpustakaan</p>
       </div>
 
-      <form onSubmit={handleSearch} className="flex gap-2 mb-6">
-        <input
-          type="text"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Cari judul atau pengarang..."
-          className="flex-1 max-w-md px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-        />
-        <button
-          type="submit"
-          className="px-4 py-2 bg-gray-100 border rounded-lg hover:bg-gray-200 transition text-sm"
-        >
-          Cari
-        </button>
-      </form>
+      <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+        <form onSubmit={handleSearch} className="flex items-center gap-3">
+          <input type="text" value={search} onChange={(e) => setSearch(e.target.value)}
+            placeholder="Cari judul atau pengarang..."
+            className="w-[240px] px-[14px] py-[10px] bg-white border border-[#e6e6e6] rounded-[50px] text-[15px] font-light text-black placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-black/[0.06] focus:border-black transition" />
+          <button type="submit"
+            className="px-5 py-[10px] bg-black text-white rounded-[50px] text-[14px] font-light hover:bg-gray-800 transition">Cari</button>
+        </form>
+        {isAdmin && (
+          <div className="flex gap-2">
+            <button onClick={exportCSV}
+              className="px-5 py-[10px] bg-white text-black rounded-[50px] text-[14px] font-light border border-[#e6e6e6] hover:bg-[#f7f7f5] transition">Export CSV</button>
+            <Link href="/books/create"
+              className="px-5 py-[10px] bg-black text-white rounded-[50px] text-[14px] font-light hover:bg-gray-800 transition">+ Tambah Buku</Link>
+          </div>
+        )}
+      </div>
 
-      <div className="bg-white rounded-xl shadow-sm border overflow-x-auto">
+      <div className="bg-white rounded-[24px] border border-[#e6e6e6] overflow-hidden">
         <table className="w-full">
-          <thead className="bg-primary-light">
-            <tr>
-              <th className="w-12 px-2 py-3"></th>
-              <th className="text-left px-4 py-3 text-sm font-medium text-gray-500">Judul</th>
-              <th className="text-left px-4 py-3 text-sm font-medium text-gray-500">Pengarang</th>
-              <th className="text-left px-4 py-3 text-sm font-medium text-gray-500">Kategori</th>
-              <th className="text-center px-4 py-3 text-sm font-medium text-gray-500">Stok</th>
-              <th className="text-center px-4 py-3 text-sm font-medium text-gray-500">Dipinjam</th>
-              <th className="text-right px-4 py-3 text-sm font-medium text-gray-500">Aksi</th>
+          <thead>
+            <tr className="bg-[#c5b0f4]/15">
+              <th className="text-left px-4 py-3 text-[13px] font-light text-black/50 uppercase tracking-wide w-16"></th>
+              <th className="text-left px-4 py-3 text-[13px] font-light text-black/50 uppercase tracking-wide">Judul</th>
+              <th className="text-left px-4 py-3 text-[13px] font-light text-black/50 uppercase tracking-wide">Pengarang</th>
+              <th className="text-left px-4 py-3 text-[13px] font-light text-black/50 uppercase tracking-wide">Kategori</th>
+              <th className="text-center px-4 py-3 text-[13px] font-light text-black/50 uppercase tracking-wide">Stok</th>
+              <th className="text-center px-4 py-3 text-[13px] font-light text-black/50 uppercase tracking-wide">Dipinjam</th>
+              {isAdmin && <th className="text-right px-4 py-3 text-[13px] font-light text-black/50 uppercase tracking-wide">Aksi</th>}
             </tr>
           </thead>
           <tbody>
             {pageLoading ? (
-              <tr><td colSpan={7}><LoadingSpinner /></td></tr>
+              <tr><td colSpan={isAdmin ? 7 : 6}><LoadingSpinner /></td></tr>
             ) : books.map((book) => (
-              <tr key={book.id} className="border-t">
-                <td className="px-2 py-3">
+              <tr key={book.id} className="border-b border-[#f1f1f1] hover:bg-[#c5b0f4]/8 transition">
+                <td className="px-4 py-3">
                   {book.coverImage ? (
-                    <img src={book.coverImage} alt="" className="w-10 h-14 object-cover rounded" />
+                    <img src={book.coverImage} alt="" className="w-10 h-14 object-cover border border-[#e6e6e6] rounded-[8px]" />
                   ) : (
-                    <div className="w-10 h-14 bg-gray-100 rounded flex items-center justify-center text-xs text-gray-400">-</div>
+                    <div className="w-10 h-14 bg-[#f7f7f5] rounded-[8px] flex items-center justify-center text-[13px] font-light text-black/20">-</div>
                   )}
                 </td>
-                <td className="px-4 py-3 font-medium">{book.title}</td>
-                <td className="px-4 py-3 text-sm text-gray-600">{book.author}</td>
-                <td className="px-4 py-3 text-sm text-gray-500">{book.category.name}</td>
+                <td className="px-4 py-3 text-[15px] font-light text-black">{book.title}</td>
+                <td className="px-4 py-3 text-[15px] font-light text-black/50">{book.author}</td>
+                <td className="px-4 py-3 text-[15px] font-light text-black/50">{book.category.name}</td>
                 <td className="px-4 py-3 text-center">
-                  <span className={`text-sm ${book.stock <= 2 ? 'text-red-600 font-medium' : ''}`}>
-                    {book.stock}
-                  </span>
+                  <span className={`inline-flex px-3 py-1 rounded-[50px] text-[13px] font-light ${book.stock <= 2 ? 'bg-[#f3c9b6] text-black' : 'bg-[#c8e6cd] text-black'}`}>{book.stock}</span>
                 </td>
-                <td className="px-4 py-3 text-center text-sm text-gray-500">
-                  {book._count.transactions}
-                </td>
-                <td className="px-4 py-3 text-right space-x-2">
-                  <Link
-                    href={`/books/${book.id}/edit`}
-                    className="text-sm text-primary hover:underline"
-                  >
-                    Edit
-                  </Link>
-                  <button
-                    onClick={() => setDeleteId(book.id)}
-                    className="text-sm text-red-600 hover:underline"
-                  >
-                    Hapus
-                  </button>
-                </td>
+                <td className="px-4 py-3 text-center text-[15px] font-light text-black/50">{book._count.transactions}</td>
+                {isAdmin && (
+                  <td className="px-4 py-3 text-right space-x-3">
+                    <Link href={`/books/${book.id}/edit`} className="text-[14px] font-light text-[#60619C]/60 hover:text-[#60619C] transition">Edit</Link>
+                    <button onClick={() => setDeleteId(book.id)} className="text-[14px] font-light text-[#60619C]/60 hover:text-[#60619C] transition">Hapus</button>
+                  </td>
+                )}
               </tr>
             ))}
             {!pageLoading && books.length === 0 && (
-              <tr>
-                <td colSpan={7} className="px-4 py-8 text-center text-gray-500">
-                  Belum ada buku
-                </td>
-              </tr>
+              <tr><td colSpan={isAdmin ? 7 : 6} className="text-[15px] font-light text-black/40 text-center py-8">Belum ada buku</td></tr>
             )}
           </tbody>
         </table>

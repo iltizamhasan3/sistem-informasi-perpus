@@ -5,9 +5,16 @@ export const GET = withSupabaseRoute({ auth: 'user' }, async (req, ctx) => {
   if (!ctx.user || ctx.user.role !== 'admin') return Response.json({ error: 'Unauthorized' }, { status: 403 })
 
   const { searchParams } = new URL(req.url)
+  const search = searchParams.get('search') || ''
   const page = searchParams.get('page')
 
-  const where = { role: 'member' as const }
+  const where: Record<string, unknown> = { role: 'member' as const }
+  if (search) {
+    where.OR = [
+      { name: { contains: search, mode: 'insensitive' } },
+      { email: { contains: search, mode: 'insensitive' } },
+    ]
+  }
 
   if (page) {
     const limit = 20
@@ -22,7 +29,7 @@ export const GET = withSupabaseRoute({ auth: 'user' }, async (req, ctx) => {
       }),
       prisma.user.count({ where }),
     ])
-    return Response.json({ members, meta: { page: Number(page), total, totalPages: Math.ceil(total / limit) } })
+    return Response.json({ members, meta: { page: Number(page), total, totalPages: Math.ceil(total / limit) } }, { headers: { 'Cache-Control': 'private, max-age=30, stale-while-revalidate=120' } })
   }
 
   const members = await prisma.user.findMany({
@@ -30,7 +37,7 @@ export const GET = withSupabaseRoute({ auth: 'user' }, async (req, ctx) => {
     select: { id: true, name: true, email: true, phone: true, isActive: true, createdAt: true, _count: { select: { transactions: true } } },
     orderBy: { createdAt: 'desc' },
   })
-  return Response.json({ members })
+  return Response.json({ members }, { headers: { 'Cache-Control': 'private, max-age=30, stale-while-revalidate=120' } })
 })
 
 export const POST = withSupabaseRoute({ auth: 'user' }, async (req, ctx) => {

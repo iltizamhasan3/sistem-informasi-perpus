@@ -64,46 +64,53 @@ export default function ReturnPage() {
 
   return (
     <div>
-      <h2 className="text-2xl font-semibold mb-6">Pengembalian Buku</h2>
+      <div className="bg-[#c8e6cd] rounded-[24px] px-6 py-5 mb-8">
+        <p className="font-mono text-sm uppercase tracking-[0.05em] text-black/40">Transaksi</p>
+        <h2 className="text-[32px] font-bold tracking-[-0.02em] leading-[1.1] text-black mt-1">Pengembalian Buku</h2>
+      </div>
 
-      {error && <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm mb-4">{error}</div>}
+      {error && (
+        <div className="bg-[#f3c9b6]/30 text-black p-4 rounded-[12px] text-[15px] font-light border border-block-coral mb-6">
+          {error}
+        </div>
+      )}
 
-      <div className="bg-white rounded-xl shadow-sm border overflow-x-auto">
+      <div className="bg-white rounded-[24px] border border-[#e6e6e6] overflow-hidden">
         <table className="w-full">
-          <thead className="bg-primary-light">
-            <tr>
-              <th className="text-left px-4 py-3 text-sm font-medium text-gray-500">Anggota</th>
-              <th className="text-left px-4 py-3 text-sm font-medium text-gray-500">Buku</th>
-              <th className="text-left px-4 py-3 text-sm font-medium text-gray-500">Tgl Pinjam</th>
-              <th className="text-left px-4 py-3 text-sm font-medium text-gray-500">Jatuh Tempo</th>
-              <th className="text-right px-4 py-3 text-sm font-medium text-gray-500">Aksi</th>
+          <thead>
+            <tr className="bg-[#c8e6cd]/15">
+              <th className="text-left px-4 py-3 text-[13px] font-light text-black/50 uppercase tracking-wide">Anggota</th>
+              <th className="text-left px-4 py-3 text-[13px] font-light text-black/50 uppercase tracking-wide">Buku</th>
+              <th className="text-left px-4 py-3 text-[13px] font-light text-black/50 uppercase tracking-wide">Tgl Pinjam</th>
+              <th className="text-left px-4 py-3 text-[13px] font-light text-black/50 uppercase tracking-wide">Jatuh Tempo</th>
+              <th className="text-right px-4 py-3 text-[13px] font-light text-black/50 uppercase tracking-wide">Aksi</th>
             </tr>
           </thead>
           <tbody>
             {pageLoading ? (
               <tr><td colSpan={5}><LoadingSpinner /></td></tr>
             ) : transactions.map((t) => (
-              <tr key={t.id} className="border-t">
-                <td className="px-4 py-3">
-                  <div className="font-medium text-sm">{t.user.name}</div>
-                  <div className="text-xs text-gray-500">{t.user.email}</div>
+              <tr key={t.id}>
+                <td className="px-4 py-3 text-[15px] font-light text-black border-b border-[#f1f1f1]">
+                  <div className="text-[15px] font-light text-black">{t.user.name}</div>
+                  <div className="text-[13px] font-light text-black/40">{t.user.email}</div>
                 </td>
-                <td className="px-4 py-3">
-                  <div className="font-medium text-sm">{t.book.title}</div>
-                  <div className="text-xs text-gray-500">{t.book.author}</div>
+                <td className="px-4 py-3 text-[15px] font-light text-black border-b border-[#f1f1f1]">
+                  <div className="text-[15px] font-light text-black">{t.book.title}</div>
+                  <div className="text-[13px] font-light text-black/40">{t.book.author}</div>
                 </td>
-                <td className="px-4 py-3 text-sm">{formatDate(t.borrowDate)}</td>
-                <td className="px-4 py-3 text-sm">{formatDate(t.dueDate)}</td>
-                <td className="px-4 py-3 text-right">
+                <td className="px-4 py-3 text-[15px] font-light text-black border-b border-[#f1f1f1]">{formatDate(t.borrowDate)}</td>
+                <td className="px-4 py-3 text-[15px] font-light text-black border-b border-[#f1f1f1]">{formatDate(t.dueDate)}</td>
+                <td className="px-4 py-3 text-right border-b border-[#f1f1f1]">
                   <button onClick={() => setReturnId(t.id)} disabled={loading}
-                    className="px-3 py-1.5 bg-secondary text-white text-sm rounded-lg hover:bg-secondary-dark transition disabled:opacity-50">
+                    className="px-5 py-[10px] bg-white text-black rounded-[50px] text-[14px] font-light border border-[#e6e6e6] hover:bg-[#f7f7f5] transition disabled:opacity-40">
                     {loading && returnId === t.id ? 'Memproses...' : 'Kembalikan'}
                   </button>
                 </td>
               </tr>
             ))}
             {!pageLoading && transactions.length === 0 && (
-              <tr><td colSpan={5} className="px-4 py-8 text-center text-gray-500">Tidak ada peminjaman aktif</td></tr>
+              <tr><td colSpan={5} className="text-[15px] font-light text-black/40 text-center py-8">Tidak ada peminjaman aktif</td></tr>
             )}
           </tbody>
         </table>

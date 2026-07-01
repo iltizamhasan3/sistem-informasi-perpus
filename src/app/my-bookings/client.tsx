@@ -3,155 +3,170 @@
 import { useEffect, useState } from 'react'
 import { AdminLayout } from '@/components/admin-layout'
 import { LoadingSpinner } from '@/components/loading-spinner'
-import { Toast } from '@/components/toast'
 import { ConfirmModal } from '@/components/confirm-modal'
+import { Toast } from '@/components/toast'
 
-interface Booking {
+interface BookingItem {
   id: number
   code: string
   status: string
-  expiresAt: string
   createdAt: string
-  user: { id: number; name: string; email: string }
+  expiresAt: string
   book: { id: number; title: string; author: string }
 }
 
 export function MyBookingsClient({ user }: { user: { name: string; role: string } }) {
-  const [bookings, setBookings] = useState<Booking[]>([])
+  const [items, setItems] = useState<BookingItem[]>([])
   const [loading, setLoading] = useState(true)
-  const [tab, setTab] = useState<'active' | 'history'>('active')
-  const [cancelId, setCancelId] = useState<number | null>(null)
+  const [cancelTarget, setCancelTarget] = useState<BookingItem | null>(null)
+  const [cancelling, setCancelling] = useState(false)
   const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
+
+  function fetchBookings() {
+    setLoading(true)
+    fetch('/api/bookings')
+      .then((r) => r.json())
+      .then((data) => setItems(data.bookings ?? []))
+      .catch(() => {})
+      .finally(() => setLoading(false))
+  }
 
   useEffect(() => { fetchBookings() }, [])
 
-  async function fetchBookings() {
-    setLoading(true)
+  async function handleCancel() {
+    if (!cancelTarget) return
+    setCancelling(true)
     try {
-      const res = await fetch('/api/bookings')
-      const data = await res.json()
-      setBookings(data.bookings ?? [])
-    } catch {}
-    setLoading(false)
-  }
-
-  async function handleCancel(id: number) {
-    try {
-      const res = await fetch(`/api/bookings`, {
+      const res = await fetch('/api/bookings', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id, action: 'cancel' }),
+        body: JSON.stringify({ id: cancelTarget.id, action: 'cancel' }),
       })
-      if (!res.ok) {
-        const data = await res.json()
-        throw new Error(data.error || 'Gagal membatalkan booking')
-      }
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Gagal membatalkan booking')
       setToast({ type: 'success', message: 'Booking berhasil dibatalkan' })
+      setCancelTarget(null)
       fetchBookings()
     } catch (err) {
       setToast({ type: 'error', message: err instanceof Error ? err.message : 'Gagal' })
+    } finally {
+      setCancelling(false)
     }
-    setCancelId(null)
   }
 
-  function copyCode(code: string) {
-    navigator.clipboard.writeText(code)
-    setToast({ type: 'success', message: 'Kode booking disalin: ' + code })
+  async function copyCode(code: string) {
+    try {
+      await navigator.clipboard.writeText(code)
+      setToast({ type: 'success', message: 'Kode booking disalin' })
+    } catch {
+      setToast({ type: 'error', message: 'Gagal menyalin kode' })
+    }
   }
 
-  const active = bookings.filter((b) => b.status === 'active')
-  const history = bookings.filter((b) => b.status !== 'active')
+  const activeBookings = items.filter((b) => b.status === 'active')
+  const historyBookings = items.filter((b) => b.status !== 'active')
 
   return (
     <AdminLayout initialUser={user}>
-      <div className="space-y-6">
-        <h2 className="text-2xl font-semibold">Booking Saya</h2>
-
-        <div className="flex gap-2 border-b">
-          <button onClick={() => setTab('active')} className={`px-4 py-2 text-sm font-medium border-b-2 transition ${tab === 'active' ? 'border-primary text-primary' : 'border-transparent text-gray-500'}`}>
-            Aktif ({active.length})
-          </button>
-          <button onClick={() => setTab('history')} className={`px-4 py-2 text-sm font-medium border-b-2 transition ${tab === 'history' ? 'border-primary text-primary' : 'border-transparent text-gray-500'}`}>
-            Riwayat ({history.length})
-          </button>
+      <div className="space-y-8">
+        <div className="bg-[#f4ecd6] rounded-[24px] p-6">
+          <p className="font-mono text-sm uppercase tracking-[0.05em] text-black/40">Riwayat</p>
+          <h1 className="text-[32px] font-bold tracking-[-0.02em] leading-[1.1] text-black mt-1">Booking &amp; Riwayat</h1>
         </div>
 
         {loading ? <LoadingSpinner /> : (
           <>
-            {tab === 'active' && (
-              <div className="space-y-3">
-                {active.length === 0 ? (
-                  <p className="text-gray-500 text-sm py-8 text-center">Tidak ada booking aktif</p>
-                ) : active.map((b) => {
-                  const expired = new Date(b.expiresAt) < new Date()
-                  return (
-                    <div key={b.id} className="bg-white border rounded-xl p-4 flex items-center justify-between gap-4">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-1">
-                          <span className="text-lg tracking-widest font-mono font-bold text-primary">{b.code}</span>
-                          <button onClick={() => copyCode(b.code)} className="text-xs bg-gray-100 hover:bg-gray-200 px-2 py-0.5 rounded transition">Salin</button>
+            {activeBookings.length > 0 && (
+              <div>
+                <h2 className="text-[18px] font-bold text-black mb-3">Booking Aktif</h2>
+                <div className="space-y-3">
+                  {activeBookings.map((b) => (
+                    <div key={b.id} className="bg-white rounded-[12px] border border-[#e6e6e6] p-5">
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="inline-flex px-2 py-0.5 rounded-[50px] text-[11px] font-light bg-[#c5b0f4] text-black">
+                              Booking
+                            </span>
+                            <span className="inline-flex px-2 py-0.5 rounded-[50px] text-[11px] font-light bg-[#dceeb1] text-black">
+                              Menunggu
+                            </span>
+                          </div>
+                          <h3 className="text-[16px] font-bold text-black">{b.book.title}</h3>
+                          <p className="text-[14px] font-light text-black/50 mt-0.5">{b.book.author}</p>
                         </div>
-                        <p className="font-medium">{b.book.title}</p>
-                        <p className="text-sm text-gray-500">{b.book.author}</p>
-                        <p className="text-xs text-gray-400 mt-1">
-                          Dibuat {new Date(b.createdAt).toLocaleDateString('id-ID', { hour: '2-digit', minute: '2-digit' })}
-                          {' — '}Berlaku sampai {new Date(b.expiresAt).toLocaleDateString('id-ID', { hour: '2-digit', minute: '2-digit' })}
-                          {expired && <span className="text-red-600 ml-2 font-medium">(Expired)</span>}
-                        </p>
                       </div>
-                      <button onClick={() => setCancelId(b.id)} className="text-sm text-danger hover:underline shrink-0">Batalkan</button>
+                      <div className="mt-3 flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <span className="text-[20px] font-mono font-bold tracking-widest text-black">{b.code}</span>
+                          <button onClick={() => copyCode(b.code)}
+                            className="px-3 py-1.5 bg-white text-black rounded-[50px] text-[12px] font-light border border-[#e6e6e6] hover:bg-[#f7f7f5] transition">
+                            Salin
+                          </button>
+                        </div>
+                        <button onClick={() => setCancelTarget(b)}
+                          className="px-4 py-1.5 bg-white text-black/50 rounded-[50px] text-[12px] font-light border border-[#e6e6e6] hover:text-black hover:bg-[#f3c9b6]/30 transition">
+                          Batalkan
+                        </button>
+                      </div>
+                      <div className="mt-2 text-[12px] font-light text-black/40">
+ Berlaku hingga {new Date(b.expiresAt).toLocaleDateString('id-ID', { hour: '2-digit', minute: '2-digit' })}
+                      </div>
                     </div>
-                  )
-                })}
+                  ))}
+                </div>
               </div>
             )}
 
-            {tab === 'history' && (
-              <div className="bg-white border rounded-xl overflow-x-auto">
-                {history.length === 0 ? (
-                  <p className="text-gray-500 text-sm py-8 text-center">Belum ada riwayat booking</p>
-                ) : (
-                  <table className="w-full">
-                    <thead className="bg-primary-light">
-                      <tr>
-                        <th className="text-left px-4 py-2 text-sm font-medium text-gray-500">Kode</th>
-                        <th className="text-left px-4 py-2 text-sm font-medium text-gray-500">Buku</th>
-                        <th className="text-left px-4 py-2 text-sm font-medium text-gray-500">Dibuat</th>
-                        <th className="text-left px-4 py-2 text-sm font-medium text-gray-500">Status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {history.map((b) => (
-                        <tr key={b.id} className="border-t">
-                          <td className="px-4 py-3 font-mono text-sm font-medium">{b.code}</td>
-                          <td className="px-4 py-3 text-sm">{b.book.title}</td>
-                          <td className="px-4 py-3 text-sm text-gray-500">{new Date(b.createdAt).toLocaleDateString('id-ID')}</td>
-                          <td className="px-4 py-3">
-                            <span className={`text-xs px-2 py-0.5 rounded-full ${
-                              b.status === 'completed' ? 'bg-green-100 text-green-700' :
-                              b.status === 'expired' ? 'bg-danger-light text-danger' :
-                              'bg-gray-100 text-gray-600'
-                            }`}>
-                              {b.status === 'completed' ? 'Selesai' : b.status === 'expired' ? 'Expired' : 'Dibatalkan'}
+            <div>
+              <h2 className="text-[18px] font-bold text-black mb-3">Riwayat</h2>
+              {historyBookings.length === 0 ? (
+                <p className="text-[15px] font-light text-black/40 text-center py-8">Belum ada riwayat</p>
+              ) : (
+                <div className="space-y-3">
+                  {historyBookings.map((b) => (
+                    <div key={b.id} className="bg-white rounded-[12px] border border-[#e6e6e6] p-5">
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="inline-flex px-2 py-0.5 rounded-[50px] text-[11px] font-light bg-[#c5b0f4] text-black">
+                              Booking
                             </span>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                )}
-              </div>
-            )}
+                          </div>
+                          <h3 className="text-[16px] font-bold text-black">{b.book.title}</h3>
+                          <p className="text-[14px] font-light text-black/50 mt-0.5">{b.book.author}</p>
+                        </div>
+                        <span className={`inline-flex px-3 py-1 rounded-[50px] text-[13px] font-light shrink-0 ${
+                          b.status === 'completed' ? 'bg-[#c8e6cd] text-black' :
+                          b.status === 'expired' ? 'bg-[#f3c9b6] text-black' :
+                          'bg-[#f7f7f5] text-black/50'
+                        }`}>
+                          {b.status === 'completed' ? 'Selesai' : b.status === 'expired' ? 'Expired' : 'Dibatalkan'}
+                        </span>
+                      </div>
+                      <div className="mt-3">
+                        <span className="text-[13px] font-light text-black/40">
+                          {new Date(b.createdAt).toLocaleDateString('id-ID')}
+                        </span>
+                        {b.code && (
+                          <span className="ml-3 text-[12px] font-mono text-black/30">{b.code}</span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
           </>
         )}
       </div>
 
       <ConfirmModal
-        open={cancelId !== null}
+        open={cancelTarget !== null}
         title="Batalkan Booking"
-        message="Yakin ingin membatalkan booking ini? Stok buku akan dikembalikan."
-        onConfirm={() => handleCancel(cancelId!)}
-        onCancel={() => setCancelId(null)}
+        message={`Yakin ingin membatalkan booking untuk "${cancelTarget?.book?.title}"?`}
+        onConfirm={handleCancel}
+        onCancel={() => { if (!cancelling) setCancelTarget(null) }}
       />
       {toast && <Toast type={toast.type} message={toast.message} onClose={() => setToast(null)} />}
     </AdminLayout>

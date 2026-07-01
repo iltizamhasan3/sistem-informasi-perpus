@@ -19,19 +19,22 @@ interface Member {
 
 export default function MembersPage() {
   const [members, setMembers] = useState<Member[]>([])
+  const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
   const [total, setTotal] = useState(0)
   const [totalPages, setTotalPages] = useState(0)
   const [pageLoading, setPageLoading] = useState(true)
   const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
+  const [exporting, setExporting] = useState(false)
   const [deleteId, setDeleteId] = useState<number | null>(null)
   const [deleting, setDeleting] = useState(false)
 
   useEffect(() => { fetchMembers().finally(() => setPageLoading(false)) }, [])
 
-  async function fetchMembers(p?: number) {
+  async function fetchMembers(q?: string, p?: number) {
     try {
       const params = new URLSearchParams()
+      if (q || search) params.set('search', q || search)
       params.set('page', String(p || page))
       const res = await fetch(`/api/members?${params}`)
       const data = await res.json()
@@ -48,7 +51,34 @@ export default function MembersPage() {
   }
 
   function onPageChange(p: number) {
-    fetchMembers(p)
+    fetchMembers(search, p)
+  }
+
+  function handleSearch(e: React.FormEvent) {
+    e.preventDefault()
+    fetchMembers(search)
+  }
+
+  async function exportCSV() {
+    setExporting(true)
+    try {
+      const res = await fetch(`/api/members?limit=all`)
+      const data = await res.json()
+      const list = data.members || data
+      const rows = [['Nama', 'Email', 'Telepon', 'Status', 'Transaksi'].join(',')]
+      for (const m of list) {
+        rows.push([`"${m.name}"`, `"${m.email}"`, `"${m.phone || ''}"`, m.isActive ? 'Aktif' : 'Nonaktif', m._count?.transactions || 0].join(','))
+      }
+      const blob = new Blob([rows.join('\n')], { type: 'text/csv' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url; a.download = 'anggota.csv'; a.click()
+      URL.revokeObjectURL(url)
+    } catch {
+      setToast({ type: 'error', message: 'Gagal mengekspor data' })
+    } finally {
+      setExporting(false)
+    }
   }
 
   async function toggleActive(id: number, current: boolean) {
@@ -85,51 +115,67 @@ export default function MembersPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-semibold">Anggota</h2>
-        <Link href="/members/create"
-          className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition text-sm">
-          + Tambah Anggota
-        </Link>
+      <div className="bg-[#efd4d4] rounded-[24px] p-12 mb-8">
+        <p className="font-mono text-sm uppercase tracking-[0.05em] text-black/40 mb-3">Anggota</p>
+        <h1 className="text-[32px] font-bold tracking-[-0.02em] leading-[1.1] text-black">Anggota</h1>
+        <p className="text-[18px] font-light leading-relaxed text-black/50 mt-3 max-w-xl">Kelola data anggota perpustakaan</p>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border overflow-x-auto">
+      <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+        <form onSubmit={handleSearch} className="flex items-center gap-3">
+          <input type="text" value={search} onChange={(e) => setSearch(e.target.value)}
+            placeholder="Cari nama atau email..."
+            className="w-[240px] px-[14px] py-[10px] bg-white border border-[#e6e6e6] rounded-[50px] text-[15px] font-light text-black placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-black/[0.06] focus:border-black transition" />
+          <button type="submit"
+            className="px-5 py-[10px] bg-black text-white rounded-[50px] text-[14px] font-light hover:bg-gray-800 transition">Cari</button>
+        </form>
+        <div className="flex gap-2">
+          <button onClick={exportCSV} disabled={exporting}
+            className="px-5 py-[10px] bg-white text-black rounded-[50px] text-[14px] font-light border border-[#e6e6e6] hover:bg-[#f7f7f5] transition disabled:opacity-40">
+            {exporting ? 'Mengekspor...' : 'Export CSV'}
+          </button>
+          <Link href="/members/create"
+            className="px-5 py-[10px] bg-black text-white rounded-[50px] text-[14px] font-light hover:bg-gray-800 transition">+ Tambah Anggota</Link>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-[24px] border border-[#e6e6e6] overflow-hidden">
         <table className="w-full">
-          <thead className="bg-primary-light">
-            <tr>
-              <th className="text-left px-4 py-3 text-sm font-medium text-gray-500">Nama</th>
-              <th className="text-left px-4 py-3 text-sm font-medium text-gray-500">Email</th>
-              <th className="text-left px-4 py-3 text-sm font-medium text-gray-500">Telepon</th>
-              <th className="text-center px-4 py-3 text-sm font-medium text-gray-500">Status</th>
-              <th className="text-center px-4 py-3 text-sm font-medium text-gray-500">Transaksi</th>
-              <th className="text-right px-4 py-3 text-sm font-medium text-gray-500">Aksi</th>
+          <thead>
+            <tr className="bg-[#efd4d4]/15">
+              <th className="text-left px-4 py-3 text-[13px] font-light text-black/50 uppercase tracking-wide">Nama</th>
+              <th className="text-left px-4 py-3 text-[13px] font-light text-black/50 uppercase tracking-wide">Email</th>
+              <th className="text-left px-4 py-3 text-[13px] font-light text-black/50 uppercase tracking-wide">Telepon</th>
+              <th className="text-center px-4 py-3 text-[13px] font-light text-black/50 uppercase tracking-wide">Status</th>
+              <th className="text-center px-4 py-3 text-[13px] font-light text-black/50 uppercase tracking-wide">Transaksi</th>
+              <th className="text-right px-4 py-3 text-[13px] font-light text-black/50 uppercase tracking-wide">Aksi</th>
             </tr>
           </thead>
           <tbody>
             {pageLoading ? (
               <tr><td colSpan={6}><LoadingSpinner /></td></tr>
             ) : members.map((m) => (
-              <tr key={m.id} className="border-t">
-                <td className="px-4 py-3 font-medium">{m.name}</td>
-                <td className="px-4 py-3 text-sm text-gray-600">{m.email}</td>
-                <td className="px-4 py-3 text-sm text-gray-500">{m.phone || '-'}</td>
+              <tr key={m.id} className="border-b border-[#f1f1f1] hover:bg-[#c5b0f4]/8 transition">
+                <td className="px-4 py-3 text-[15px] font-light text-black">{m.name}</td>
+                <td className="px-4 py-3 text-[15px] font-light text-black/50">{m.email}</td>
+                <td className="px-4 py-3 text-[15px] font-light text-black/50">{m.phone || '-'}</td>
                 <td className="px-4 py-3 text-center">
                   <button onClick={() => toggleActive(m.id, m.isActive)}
-                    className={`text-xs px-2 py-1 rounded-full ${
-                      m.isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                    className={`inline-flex px-3 py-1 rounded-[50px] text-[13px] font-light ${
+                      m.isActive ? 'bg-[#c8e6cd] text-black' : 'bg-[#f3c9b6] text-black'
                     }`}>
                     {m.isActive ? 'Aktif' : 'Nonaktif'}
                   </button>
                 </td>
-                <td className="px-4 py-3 text-center text-sm text-gray-500">{m._count.transactions}</td>
-                <td className="px-4 py-3 text-right space-x-2">
-                  <Link href={`/members/${m.id}/edit`} className="text-sm text-primary hover:underline">Edit</Link>
-                  <button onClick={() => setDeleteId(m.id)} className="text-sm text-red-600 hover:underline">Hapus</button>
+                <td className="px-4 py-3 text-center text-[15px] font-light text-black/50">{m._count.transactions}</td>
+                <td className="px-4 py-3 text-right space-x-3">
+                  <Link href={`/members/${m.id}/edit`} className="text-[14px] font-light text-[#60619C]/60 hover:text-[#60619C] transition">Edit</Link>
+                  <button onClick={() => setDeleteId(m.id)} className="text-[14px] font-light text-[#60619C]/60 hover:text-[#60619C] transition">Hapus</button>
                 </td>
               </tr>
             ))}
             {!pageLoading && members.length === 0 && (
-              <tr><td colSpan={6} className="px-4 py-8 text-center text-gray-500">Belum ada anggota</td></tr>
+              <tr><td colSpan={6} className="text-[15px] font-light text-black/40 text-center py-8">Belum ada anggota</td></tr>
             )}
           </tbody>
         </table>

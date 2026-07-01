@@ -27,7 +27,7 @@ export default function CategoriesPage() {
 
   async function fetchCategories() {
     try {
-      const res = await fetch('/api/categories')
+      const res = await fetch('/api/categories', { cache: 'no-store' })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Gagal memuat kategori')
       setCategories(data.categories)
@@ -76,59 +76,49 @@ export default function CategoriesPage() {
 
   return (
     <div>
-      <h2 className="text-2xl font-semibold mb-6">Kategori Buku</h2>
+      <div className="bg-[#c8e6cd] rounded-[24px] p-12 mb-8">
+        <p className="font-mono text-sm uppercase tracking-[0.05em] text-black/40 mb-3">Kategori</p>
+        <h1 className="text-[32px] font-bold tracking-[-0.02em] leading-[1.1] text-black">Kategori Buku</h1>
+        <p className="text-[18px] font-light leading-relaxed text-black/50 mt-3 max-w-xl">Kelola kategori buku perpustakaan</p>
+      </div>
 
-      {error && <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm mb-4">{error}</div>}
+      {error && (
+        <div className="px-4 py-3 text-[15px] font-light text-black bg-[#f3c9b6] rounded-[8px] mb-6">{error}</div>
+      )}
 
-      <form onSubmit={handleCreate} className="flex gap-2 mb-6">
-        <input
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+      <form onSubmit={handleCreate} className="flex items-center gap-3 mb-6">
+        <input type="text" value={name} onChange={(e) => setName(e.target.value)}
           placeholder="Nama kategori baru"
-          className="flex-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-        />
-        <button
-          type="submit"
-          disabled={loading || !name.trim()}
-          className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition disabled:opacity-50"
-        >
+          className="w-[240px] px-[14px] py-[10px] bg-white border border-[#e6e6e6] rounded-[50px] text-[15px] font-light text-black placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-[#c5b0f4]/20 focus:border-black transition" />
+        <button type="submit" disabled={loading || !name.trim()}
+          className="px-5 py-[10px] bg-black text-white rounded-[50px] text-[14px] font-light hover:bg-gray-800 transition disabled:opacity-40">
           {loading ? 'Menyimpan...' : 'Tambah'}
         </button>
       </form>
 
-      <div className="bg-white rounded-xl shadow-sm border overflow-x-auto">
+      <div className="bg-white rounded-[24px] border border-[#e6e6e6] overflow-hidden">
         <table className="w-full">
-          <thead className="bg-primary-light">
-            <tr>
-              <th className="text-left px-4 py-3 text-sm font-medium text-gray-500">Nama</th>
-              <th className="text-left px-4 py-3 text-sm font-medium text-gray-500">Jumlah Buku</th>
-              <th className="text-right px-4 py-3 text-sm font-medium text-gray-500">Aksi</th>
+          <thead>
+            <tr className="bg-[#c8e6cd]/15">
+              <th className="text-left px-4 py-3 text-[13px] font-light text-black/50 uppercase tracking-wide">Nama</th>
+              <th className="text-left px-4 py-3 text-[13px] font-light text-black/50 uppercase tracking-wide">Jumlah Buku</th>
+              <th className="text-right px-4 py-3 text-[13px] font-light text-black/50 uppercase tracking-wide">Aksi</th>
             </tr>
           </thead>
           <tbody>
             {pageLoading ? (
               <tr><td colSpan={3}><LoadingSpinner /></td></tr>
             ) : categories.map((cat) => (
-              <tr key={cat.id} className="border-t">
-                <td className="px-4 py-3">{cat.name}</td>
-                <td className="px-4 py-3 text-sm text-gray-500">{cat._count.books} buku</td>
+              <tr key={cat.id} className="border-b border-[#f1f1f1] hover:bg-[#c5b0f4]/8 transition">
+                <td className="px-4 py-3 text-[15px] font-light text-black">{cat.name}</td>
+                <td className="px-4 py-3 text-[15px] font-light text-black/50">{cat._count.books} buku</td>
                 <td className="px-4 py-3 text-right">
-                  <button
-                    onClick={() => setDeleteId(cat.id)}
-                    className="text-sm text-red-600 hover:underline"
-                  >
-                    Hapus
-                  </button>
+                  <button onClick={() => setDeleteId(cat.id)} className="text-[14px] font-light text-[#60619C]/60 hover:text-[#60619C] transition">Hapus</button>
                 </td>
               </tr>
             ))}
             {!pageLoading && categories.length === 0 && (
-              <tr>
-                <td colSpan={3} className="px-4 py-8 text-center text-gray-500">
-                  Belum ada kategori
-                </td>
-              </tr>
+              <tr><td colSpan={3} className="text-[15px] font-light text-black/40 text-center py-8">Belum ada kategori</td></tr>
             )}
           </tbody>
         </table>

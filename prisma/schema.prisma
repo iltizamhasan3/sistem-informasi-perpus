@@ -22,6 +22,7 @@ model User {
   transactions  Transaction[]
   notifications Notification[]
   bookings      Booking[]
+  ebookRentals  EbookRental[]
 }
 
 model Category {
@@ -42,12 +43,30 @@ model Book {
   stock       Int      @default(1)
   coverImage  String?
   description String?
+  isEbook     Boolean  @default(false)
+  ebookFile   String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  category     Category      @relation(fields: [categoryId], references: [id])
-  transactions Transaction[]
-  bookings     Booking[]
+  category      Category       @relation(fields: [categoryId], references: [id])
+  transactions  Transaction[]
+  bookings      Booking[]
+  ebookRentals  EbookRental[]
+}
+
+model EbookRental {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  bookId      Int
+  status      String   @default("active")
+  currentPage Int      @default(1)
+  rentedAt    DateTime @default(now())
+  expiresAt   DateTime
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+  book Book @relation(fields: [bookId], references: [id])
 }
 
 model Transaction {

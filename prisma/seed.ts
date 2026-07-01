@@ -47,6 +47,7 @@ async function main() {
     })),
     skipDuplicates: true,
   })
+  await prisma.$executeRawUnsafe(`SELECT setval('"User_id_seq"', (SELECT MAX(id) FROM "User"))`)
 
   await prisma.category.createMany({
     data: [
@@ -58,6 +59,7 @@ async function main() {
     ],
     skipDuplicates: true,
   })
+  await prisma.$executeRawUnsafe(`SELECT setval('"Category_id_seq"', (SELECT MAX(id) FROM "Category"))`)
 
   await prisma.book.createMany({
     data: [
@@ -74,6 +76,7 @@ async function main() {
     ],
     skipDuplicates: true,
   })
+  await prisma.$executeRawUnsafe(`SELECT setval('"Book_id_seq"', (SELECT MAX(id) FROM "Book"))`)
 
   await prisma.$disconnect()
   console.log('✅ Seed berhasil!')

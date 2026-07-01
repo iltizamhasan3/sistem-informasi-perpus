@@ -18,11 +18,6 @@ export const POST = withSupabaseRoute({ auth: 'user' }, async (req, ctx) => {
     { auth: { autoRefreshToken: false, persistSession: false } },
   )
 
-  const { data: bucket } = await supabase.storage.getBucket('covers')
-  if (!bucket) {
-    await supabase.storage.createBucket('covers', { public: true })
-  }
-
   const { error } = await supabase.storage.from('covers').upload(fileName, file, {
     contentType: file.type,
     upsert: false,

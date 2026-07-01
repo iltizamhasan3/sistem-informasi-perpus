@@ -3,16 +3,14 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { AdminLayout } from '@/components/admin-layout'
+import { LoadingSpinner } from '@/components/loading-spinner'
 
 interface Book {
   id: number
   title: string
   author: string
-  publisher: string | null
-  year: number | null
-  description: string | null
-  stock: number
   coverImage: string | null
+  stock: number
   category: { name: string }
 }
 
@@ -27,14 +25,11 @@ export default function CatalogPage() {
   const [search, setSearch] = useState('')
   const [categoryId, setCategoryId] = useState('')
   const [user, setUser] = useState<{ id: number; name: string; role: string } | null>(null)
-  const [bookingId, setBookingId] = useState<number | null>(null)
-  const [bookingCode, setBookingCode] = useState<string | null>(null)
-  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     Promise.all([
-      fetch('/api/categories').then((r) => r.json()),
+      fetch('/api/categories', { cache: 'no-store' }).then((r) => r.json()),
       fetch('/api/auth/me').then((r) => r.json()),
     ]).then(([cats, auth]) => {
       setCategories(cats.categories)
@@ -61,99 +56,57 @@ export default function CatalogPage() {
     fetchBooks()
   }
 
-  async function handleBooking(bookId: number) {
-    setBookingId(bookId)
-    setMessage(null)
-    setBookingCode(null)
-    try {
-      const res = await fetch('/api/bookings', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ bookId }),
-      })
-      const data = await res.json()
-      if (!res.ok) {
-        setMessage({ type: 'error', text: data.error || 'Gagal booking' })
-      } else {
-        setBookingCode(data.booking.code)
-        setMessage({ type: 'success', text: `Booking berhasil! Kode: ${data.booking.code}` })
-        fetchBooks()
-      }
-    } catch {
-      setMessage({ type: 'error', text: 'Terjadi kesalahan' })
-    } finally {
-      setBookingId(null)
-    }
-  }
-
   const content = (
-    <main className="max-w-6xl mx-auto px-4 py-8">
-      <h2 className="text-2xl font-semibold mb-6">Katalog Buku</h2>
+    <main className="max-w-6xl mx-auto px-4 py-6">
+          <div className="bg-[#dceeb1] rounded-[24px] p-6 mb-6">
+        <p className="font-mono text-sm uppercase tracking-[0.05em] text-black/40 mb-1">Katalog Buku</p>
+        <h1 className="text-[32px] font-bold tracking-[-0.02em] leading-[1.1] text-black mb-4">Jelajahi Koleksi Buku</h1>
 
-      <div className="flex flex-col sm:flex-row gap-3 mb-6">
-        <form onSubmit={handleSearch} className="flex-1 flex gap-2">
-          <input type="text" value={search} onChange={(e) => setSearch(e.target.value)}
-            placeholder="Cari judul atau pengarang..."
-            className="flex-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary" />
-          <button type="submit"
-            className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition text-sm">Cari</button>
-        </form>
-        <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)}
-          className="px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary">
-          <option value="">Semua Kategori</option>
-          {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-        </select>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <form onSubmit={handleSearch} className="flex-1 flex gap-2">
+            <input type="text" value={search} onChange={(e) => setSearch(e.target.value)}
+              placeholder="Cari judul atau pengarang..."
+              className="w-full px-[14px] py-3 bg-white border border-[#e6e6e6] rounded-[8px] text-[16px] font-light text-black placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-[#c5b0f4]/20 focus:border-black transition" />
+            <button type="submit"
+              className="px-5 py-[10px] bg-black text-white rounded-[50px] text-[14px] font-light hover:bg-gray-800 transition shrink-0">Cari</button>
+          </form>
+          <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)}
+            className="w-full sm:w-auto px-[14px] py-3 bg-white border border-[#e6e6e6] rounded-[8px] text-[16px] font-light text-black focus:outline-none focus:ring-2 focus:ring-[#c5b0f4]/20 focus:border-black transition">
+            <option value="">Semua Kategori</option>
+            {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+          </select>
+        </div>
       </div>
 
-      {message && (
-        <div className={`col-span-full mb-4 px-4 py-3 rounded-lg text-sm ${message.type === 'success' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-600 border border-red-200'}`}>
-          {message.text}
-          {bookingCode && (
-            <div className="mt-2">
-              <span className="text-lg tracking-widest font-mono font-bold bg-green-100 px-3 py-1 rounded">{bookingCode}</span>
-              <p className="mt-1 text-xs text-green-600">Tunjukkan kode ini ke admin di perpustakaan untuk mengambil buku. Booking berlaku 24 jam.</p>
-            </div>
-          )}
-          <button onClick={() => { setMessage(null); setBookingCode(null) }} className="float-right font-bold">&times;</button>
-        </div>
-      )}
-
-      {loading ? (
-        <div className="flex justify-center py-12"><div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin" /></div>
-      ) : (
-      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      {loading ? <LoadingSpinner /> : (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         {books.map((book) => (
-          <div key={book.id} className="bg-white rounded-xl shadow-sm border p-5 hover:shadow-md transition">
-            {book.coverImage && (
-              <img src={book.coverImage} alt={book.title} className="w-full h-40 object-contain mb-3 rounded" />
-            )}
-            <div className="flex items-start justify-between mb-2">
-              <h3 className="font-semibold text-lg leading-tight">{book.title}</h3>
-              <span className="text-xs bg-primary-light text-primary px-2 py-0.5 rounded shrink-0 ml-2">
-                {book.category.name}
-              </span>
-            </div>
-            <p className="text-sm text-gray-600 mb-1">{book.author}</p>
-            {book.publisher && <p className="text-xs text-gray-500 mb-1">{book.publisher}{book.year ? ` (${book.year})` : ''}</p>}
-            {book.description && <p className="text-xs text-gray-500 mt-2 line-clamp-2">{book.description}</p>}
-            <div className="mt-3 flex items-center justify-between">
-              <span className={`text-sm font-medium ${book.stock > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                {book.stock > 0 ? `Tersedia (${book.stock})` : 'Stok Habis'}
-              </span>
-              {book.stock > 0 && user?.role === 'member' && (
-                <button onClick={() => handleBooking(book.id)} disabled={bookingId === book.id}
-                  className="text-xs bg-primary text-white px-3 py-1.5 rounded-lg hover:bg-primary-dark transition disabled:opacity-50">
-                  {bookingId === book.id ? 'Memproses...' : 'Booking'}
-                </button>
-              )}
-              {book.stock > 0 && !user && (
-                <Link href="/login" className="text-xs text-primary hover:underline">Masuk untuk booking</Link>
+          <Link key={book.id} href={`/catalog/${book.id}`} className="bg-white rounded-[24px] border border-[#e6e6e6] overflow-hidden transition hover:bg-[#f7f7f5]">
+            <div className="aspect-[3/4] bg-[#f7f7f5] flex items-center justify-center">
+              {book.coverImage ? (
+                <img src={book.coverImage} alt={book.title} className="w-full h-full object-cover" />
+              ) : (
+                <span className="text-[32px] text-black/20 font-light">?</span>
               )}
             </div>
-          </div>
+            <div className="p-4">
+              <span className="inline-flex px-2 py-0.5 rounded-[50px] text-[11px] font-light bg-[#f7f7f5] text-black/60 mb-2">{book.category.name}</span>
+              <h3 className="text-[15px] font-bold text-black line-clamp-2">{book.title}</h3>
+              <p className="text-[13px] font-light text-black/40 mt-1">{book.author}</p>
+              {book.stock > 0 ? (
+                <span className="inline-flex px-2.5 py-0.5 rounded-[50px] text-[12px] font-light mt-2 bg-[#c8e6cd] text-black">
+                  Tersedia ({book.stock})
+                </span>
+              ) : (
+                <span className="inline-flex px-2.5 py-0.5 rounded-[50px] text-[12px] font-light mt-2 bg-[#f3c9b6] text-black">
+                  Stok Habis
+                </span>
+              )}
+            </div>
+          </Link>
         ))}
         {!loading && books.length === 0 && (
-          <p className="col-span-full text-center text-gray-500 py-12">Buku tidak ditemukan</p>
+          <p className="col-span-full text-[15px] font-light text-black/40 text-center py-8">Buku tidak ditemukan</p>
         )}
       </div>
       )}
@@ -165,13 +118,16 @@ export default function CatalogPage() {
   }
 
   return (
-    <div className="min-h-screen bg-page">
-      <nav className="bg-white border-b px-4 py-3">
+    <div className="min-h-screen bg-[#f7f7f5]">
+      <nav className="bg-white border-b border-[#e6e6e6] px-4 py-2">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <Link href="/" className="text-xl font-bold text-primary">SiPustaka</Link>
-          <div className="flex items-center gap-3">
-            <Link href="/login" className="text-sm text-primary hover:underline">Masuk</Link>
-            <Link href="/register" className="text-sm bg-primary text-white px-3 py-1.5 rounded-lg hover:bg-primary-dark">Daftar</Link>
+          <Link href="/" className="inline-flex items-center gap-2">
+            <span className="bg-black text-white rounded-full px-2.5 py-0.5 text-sm font-black tracking-wider">S</span>
+            <span className="text-black text-[15px] font-light">SiPustaka</span>
+          </Link>
+          <div className="flex items-center gap-2">
+            <Link href="/login" className="px-5 py-[10px] text-black rounded-[50px] text-[14px] font-light hover:bg-[#f7f7f5] transition">Masuk</Link>
+            <Link href="/register" className="px-5 py-[10px] bg-black text-white rounded-[50px] text-[14px] font-light hover:bg-gray-800 transition">Daftar</Link>
           </div>
         </div>
       </nav>

@@ -106,70 +106,74 @@ export default function TransactionsPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-semibold">Transaksi</h2>
+      <div className="bg-[#efd4d4] rounded-[24px] p-12 mb-8">
+        <p className="font-mono text-sm uppercase tracking-[0.05em] text-black/40 mb-3">Transaksi</p>
+        <h1 className="text-[32px] font-bold tracking-[-0.02em] leading-[1.1] text-black">Transaksi</h1>
+        <p className="text-[18px] font-light leading-relaxed text-black/50 mt-3 max-w-xl">Kelola peminjaman dan pengembalian buku</p>
+      </div>
+
+      <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+        <div className="flex items-center gap-2">
+          {['', 'borrowed', 'returned', 'overdue'].map((s) => (
+            <button key={s} onClick={() => handleFilter(s)}
+              className={`px-5 py-[10px] rounded-[50px] text-[14px] font-light transition ${
+                filter === s
+                  ? 'bg-[#c5b0f4] text-black border border-[#c5b0f4]'
+                  : 'bg-white text-black border border-[#e6e6e6] hover:bg-[#c5b0f4]/10'
+              }`}>
+              {s === '' ? 'Semua' : s === 'borrowed' ? 'Dipinjam' : s === 'returned' ? 'Dikembalikan' : 'Terlambat'}
+            </button>
+          ))}
+        </div>
         <div className="flex gap-2">
           <button onClick={exportCSV}
-            className="px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition text-sm">
-            Export CSV
-          </button>
+            className="px-5 py-[10px] bg-white text-black rounded-[50px] text-[14px] font-light border border-[#e6e6e6] hover:bg-[#f7f7f5] transition">Export CSV</button>
           <Link href="/transactions/borrow"
-            className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition text-sm">
-            + Pinjam Buku
-          </Link>
+            className="px-5 py-[10px] bg-black text-white rounded-[50px] text-[14px] font-light hover:bg-gray-800 transition">+ Pinjam Buku</Link>
           <Link href="/transactions/return"
-            className="px-4 py-2 bg-secondary text-white rounded-lg hover:bg-secondary-dark transition text-sm">
-            Kembalikan Buku
-          </Link>
+            className="px-5 py-[10px] bg-white text-black rounded-[50px] text-[14px] font-light border border-[#e6e6e6] hover:bg-[#f7f7f5] transition">Kembalikan Buku</Link>
         </div>
       </div>
 
-      <div className="flex gap-2 mb-6">
-        {['', 'borrowed', 'returned', 'overdue'].map((s) => (
-          <button key={s} onClick={() => handleFilter(s)}
-            className={`px-3 py-1.5 text-sm rounded-lg border transition ${
-              filter === s ? 'bg-primary text-white border-primary' : 'bg-white hover:bg-gray-50'
-            }`}>
-            {s === '' ? 'Semua' : s === 'borrowed' ? 'Dipinjam' : s === 'returned' ? 'Dikembalikan' : 'Terlambat'}
-          </button>
-        ))}
-      </div>
+      {error && (
+        <div className="px-4 py-3 text-[15px] font-light text-black bg-[#f3c9b6] rounded-[8px] mb-6">{error}</div>
+      )}
 
-      <div className="bg-white rounded-xl shadow-sm border overflow-x-auto">
+      <div className="bg-white rounded-[24px] border border-[#e6e6e6] overflow-hidden">
         <table className="w-full">
-          <thead className="bg-primary-light">
-            <tr>
-              <th className="text-left px-4 py-3 text-sm font-medium text-gray-500">Anggota</th>
-              <th className="text-left px-4 py-3 text-sm font-medium text-gray-500">Buku</th>
-              <th className="text-left px-4 py-3 text-sm font-medium text-gray-500">Tgl Pinjam</th>
-              <th className="text-left px-4 py-3 text-sm font-medium text-gray-500">Jatuh Tempo</th>
-              <th className="text-left px-4 py-3 text-sm font-medium text-gray-500">Tgl Kembali</th>
-              <th className="text-center px-4 py-3 text-sm font-medium text-gray-500">Denda</th>
-              <th className="text-center px-4 py-3 text-sm font-medium text-gray-500">Status</th>
-              <th className="text-center px-4 py-3 text-sm font-medium text-gray-500">Aksi</th>
+          <thead>
+            <tr className="bg-[#efd4d4]/15">
+              <th className="text-left px-4 py-3 text-[13px] font-light text-black/50 uppercase tracking-wide">Anggota</th>
+              <th className="text-left px-4 py-3 text-[13px] font-light text-black/50 uppercase tracking-wide">Buku</th>
+              <th className="text-left px-4 py-3 text-[13px] font-light text-black/50 uppercase tracking-wide">Tgl Pinjam</th>
+              <th className="text-left px-4 py-3 text-[13px] font-light text-black/50 uppercase tracking-wide">Jatuh Tempo</th>
+              <th className="text-left px-4 py-3 text-[13px] font-light text-black/50 uppercase tracking-wide">Tgl Kembali</th>
+              <th className="text-center px-4 py-3 text-[13px] font-light text-black/50 uppercase tracking-wide">Denda</th>
+              <th className="text-center px-4 py-3 text-[13px] font-light text-black/50 uppercase tracking-wide">Status</th>
+              <th className="text-center px-4 py-3 text-[13px] font-light text-black/50 uppercase tracking-wide">Aksi</th>
             </tr>
           </thead>
           <tbody>
             {pageLoading ? (
               <tr><td colSpan={8}><LoadingSpinner /></td></tr>
             ) : transactions.map((t) => (
-              <tr key={t.id} className="border-t">
+              <tr key={t.id} className="border-b border-[#f1f1f1] hover:bg-[#c5b0f4]/8 transition">
                 <td className="px-4 py-3">
-                  <div className="font-medium text-sm">{t.user.name}</div>
-                  <div className="text-xs text-gray-500">{t.user.email}</div>
+                  <div className="text-[15px] font-light text-black">{t.user.name}</div>
+                  <div className="text-[13px] font-light text-black/40">{t.user.email}</div>
                 </td>
                 <td className="px-4 py-3">
-                  <div className="font-medium text-sm">{t.book.title}</div>
-                  <div className="text-xs text-gray-500">{t.book.author}</div>
+                  <div className="text-[15px] font-light text-black">{t.book.title}</div>
+                  <div className="text-[13px] font-light text-black/40">{t.book.author}</div>
                 </td>
-                <td className="px-4 py-3 text-sm">{formatDate(t.borrowDate)}</td>
-                <td className="px-4 py-3 text-sm">{formatDate(t.dueDate)}</td>
-                <td className="px-4 py-3 text-sm">{t.returnDate ? formatDate(t.returnDate) : '-'}</td>
-                <td className="px-4 py-3 text-center text-sm">Rp {t.fine.toLocaleString()}</td>
+                <td className="px-4 py-3 text-[15px] font-light text-black/50">{formatDate(t.borrowDate)}</td>
+                <td className="px-4 py-3 text-[15px] font-light text-black/50">{formatDate(t.dueDate)}</td>
+                <td className="px-4 py-3 text-[15px] font-light text-black/50">{t.returnDate ? formatDate(t.returnDate) : '-'}</td>
+                <td className="px-4 py-3 text-center text-[15px] font-light text-black">Rp {t.fine.toLocaleString()}</td>
                 <td className="px-4 py-3 text-center">
-                  <span className={`text-xs px-2 py-1 rounded-full ${
-                    t.status === 'borrowed' ? 'bg-primary-light text-primary-dark' :
-                    t.status === 'returned' ? 'bg-green-100 text-green-700' : 'bg-danger-light text-danger'
+                  <span className={`inline-flex px-3 py-1 rounded-[50px] text-[13px] font-light ${
+                    t.status === 'borrowed' ? 'bg-[#c5b0f4] text-black' :
+                    t.status === 'returned' ? 'bg-[#c8e6cd] text-black' : 'bg-[#f3c9b6] text-black'
                   }`}>
                     {t.status === 'borrowed' ? 'Dipinjam' : t.status === 'returned' ? 'Kembali' : 'Terlambat'}
                   </span>
@@ -177,7 +181,7 @@ export default function TransactionsPage() {
                 <td className="px-4 py-3 text-center">
                   {(t.status === 'borrowed' || t.status === 'overdue') && (
                     <button onClick={() => setReturningId(t.id)}
-                      className="text-xs px-3 py-1.5 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition">
+                      className="px-5 py-[10px] bg-black text-white rounded-[50px] text-[14px] font-light hover:bg-gray-800 transition">
                       Kembalikan
                     </button>
                   )}
@@ -185,7 +189,7 @@ export default function TransactionsPage() {
               </tr>
             ))}
             {!pageLoading && transactions.length === 0 && (
-              <tr><td colSpan={8} className="px-4 py-8 text-center text-gray-500">Belum ada transaksi</td></tr>
+              <tr><td colSpan={8} className="text-[15px] font-light text-black/40 text-center py-8">Belum ada transaksi</td></tr>
             )}
           </tbody>
         </table>

@@ -1,7 +1,8 @@
 import { prisma } from '@/lib/prisma'
 import { withSupabaseRoute } from '@/lib/supabase-server'
 
-export const GET = withSupabaseRoute({ auth: 'user' }, async () => {
+export const GET = withSupabaseRoute({ auth: 'user' }, async (_req, ctx) => {
+  if (ctx.user?.role !== 'admin') return Response.json({ error: 'Forbidden' }, { status: 403 })
   const today = new Date()
   today.setHours(0, 0, 0, 0)
 
@@ -34,5 +35,5 @@ export const GET = withSupabaseRoute({ auth: 'user' }, async () => {
   return Response.json({
     stats: { totalBooks, totalMembers, activeBorrows, todayTransactions },
     lowStockBooks, popularBooks, recentTransactions,
-  })
+  }, { headers: { 'Cache-Control': 'private, max-age=30, stale-while-revalidate=120' } })
 })

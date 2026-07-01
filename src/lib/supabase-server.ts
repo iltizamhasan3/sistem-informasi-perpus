@@ -20,14 +20,27 @@ export function withSupabaseRoute<T extends Record<string, string> = {}>(
   handler: (req: Request, ctx: ExtendedCtx<T>) => Response | Promise<Response>,
 ) {
   return async (req: Request, routeCtx: NextCtx<T>) => {
-    const authReq = req.clone()
+    let proxyReq: Request = req
 
-    let proxyReq: Request = authReq
-    if (!proxyReq.headers.get('authorization')) {
-      const cookieToken = extractTokenFromCookie(proxyReq)
+    if (!req.headers.get('authorization')) {
+      const cookieToken = extractTokenFromCookie(req)
       if (cookieToken) {
-        proxyReq = new Request(proxyReq, {
-          headers: { ...Object.fromEntries(proxyReq.headers), authorization: `Bearer ${cookieToken}` },
+        const url = req.url
+        const method = req.method
+        const headers = Object.fromEntries(req.headers)
+        const contentType = req.headers.get('content-type') || ''
+        let body: BodyInit | undefined
+        const forwardedHeaders: Record<string, string> = { ...headers, authorization: `Bearer ${cookieToken}` }
+        if (contentType.includes('multipart/form-data')) {
+          body = await req.formData()
+          delete forwardedHeaders['content-type']
+        } else if (method !== 'GET' && method !== 'HEAD') {
+          body = await req.text()
+        }
+        proxyReq = new Request(url, {
+          method,
+          headers: forwardedHeaders,
+          ...(body !== undefined ? { body } : {}),
         })
       }
     }
@@ -45,6 +58,11 @@ export function withSupabaseRoute<T extends Record<string, string> = {}>(
       })
     }
 
-    return handler(req, { ...ctx!, user, params: routeCtx.params })
+    try {
+      return await handler(proxyReq, { ...ctx!, user, params: routeCtx.params })
+    } catch (e) {
+      console.error('withSupabaseRoute handler error:', e)
+      return Response.json({ error: e instanceof Error ? e.message : 'Internal server error' }, { status: 500 })
+    }
   }
 }

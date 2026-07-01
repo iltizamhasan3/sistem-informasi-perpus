@@ -8,14 +8,14 @@ export const GET = withSupabaseRoute<{ id: string }>({ auth: 'user' }, async (_r
     include: { category: true },
   })
   if (!book) return Response.json({ error: 'Buku tidak ditemukan' }, { status: 404 })
-  return Response.json({ book })
+  return Response.json({ book }, { headers: { 'Cache-Control': 'public, max-age=30, stale-while-revalidate=120' } })
 })
 
 export const PUT = withSupabaseRoute<{ id: string }>({ auth: 'user' }, async (req, ctx) => {
   if (!ctx.user || ctx.user.role !== 'admin') return Response.json({ error: 'Unauthorized' }, { status: 403 })
 
   const { id } = await ctx.params
-  const { title, author, publisher, year, categoryId, stock, description, coverImage } = await req.json()
+  const { title, author, publisher, year, categoryId, stock, description, coverImage, isEbook, ebookFile } = await req.json()
 
   const book = await prisma.book.update({
     where: { id: Number(id) },
@@ -27,6 +27,8 @@ export const PUT = withSupabaseRoute<{ id: string }>({ auth: 'user' }, async (re
       stock: Number(stock) || 1,
       description: description || null,
       coverImage: coverImage || null,
+      isEbook: isEbook !== undefined ? Boolean(isEbook) : undefined,
+      ebookFile: ebookFile !== undefined ? ebookFile : undefined,
     },
     include: { category: true },
   })

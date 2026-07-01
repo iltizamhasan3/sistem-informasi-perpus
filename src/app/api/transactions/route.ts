@@ -6,9 +6,11 @@ export const GET = withSupabaseRoute({ auth: 'user' }, async (req, ctx) => {
   const status = searchParams.get('status')
   const userId = searchParams.get('userId')
   const page = searchParams.get('page')
+  const mine = searchParams.get('mine')
 
   const where: Record<string, unknown> = {}
-  if (ctx.user?.role === 'member') where.userId = ctx.user.id
+  if (mine === 'true') where.userId = ctx.user!.id
+  else if (ctx.user?.role === 'member') where.userId = ctx.user.id
   else if (userId) where.userId = Number(userId)
   if (status) where.status = status
 

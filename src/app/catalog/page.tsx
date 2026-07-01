@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { AdminLayout } from '@/components/admin-layout'
 import { LoadingSpinner } from '@/components/loading-spinner'
+import { Pagination } from '@/components/pagination'
+import { Toast } from '@/components/toast'
 
 interface Book {
   id: number
@@ -24,8 +26,12 @@ export default function CatalogPage() {
   const [categories, setCategories] = useState<Category[]>([])
   const [search, setSearch] = useState('')
   const [categoryId, setCategoryId] = useState('')
+  const [page, setPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(0)
+  const [total, setTotal] = useState(0)
   const [user, setUser] = useState<{ id: number; name: string; role: string } | null>(null)
   const [loading, setLoading] = useState(true)
+  const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
 
   useEffect(() => {
     Promise.all([
@@ -41,19 +47,35 @@ export default function CatalogPage() {
     fetchBooks()
   }, [categoryId])
 
-  async function fetchBooks(q?: string) {
+  async function fetchBooks(q?: string, p?: number) {
     const params = new URLSearchParams()
     if (q || search) params.set('search', q || search)
     if (categoryId) params.set('categoryId', categoryId)
+    params.set('page', String(p || page))
 
-    const res = await fetch(`/api/books?${params}`)
-    const data = await res.json()
-    setBooks(data.books)
+    try {
+      const res = await fetch(`/api/books?${params}`)
+      if (!res.ok) throw new Error('Gagal memuat buku')
+      const data = await res.json()
+      setBooks(data.books)
+      if (data.meta) {
+        setPage(data.meta.page)
+        setTotalPages(data.meta.totalPages)
+        setTotal(data.meta.total)
+      }
+    } catch {
+      setToast({ type: 'error', message: 'Gagal memuat data buku' })
+    }
   }
 
   function handleSearch(e: React.FormEvent) {
     e.preventDefault()
-    fetchBooks()
+    setPage(1)
+    fetchBooks(search, 1)
+  }
+
+  function onPageChange(p: number) {
+    fetchBooks(search, p)
   }
 
   const content = (
@@ -108,17 +130,19 @@ export default function CatalogPage() {
         {!loading && books.length === 0 && (
           <p className="col-span-full text-[15px] font-light text-black/40 text-center py-8">Buku tidak ditemukan</p>
         )}
+        {!loading && <Pagination page={page} totalPages={totalPages} total={total} onPageChange={onPageChange} />}
       </div>
       )}
     </main>
   )
 
   if (user) {
-    return <AdminLayout initialUser={user}>{content}</AdminLayout>
+    return <AdminLayout initialUser={user}>{toast && <Toast type={toast.type} message={toast.message} onClose={() => setToast(null)} />}{content}</AdminLayout>
   }
 
   return (
     <div className="min-h-screen bg-[#f7f7f5]">
+      {toast && <Toast type={toast.type} message={toast.message} onClose={() => setToast(null)} />}
       <nav className="bg-white border-b border-[#e6e6e6] px-4 py-2">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <Link href="/" className="inline-flex items-center gap-2">

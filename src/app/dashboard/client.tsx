@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { AdminLayout } from '@/components/admin-layout'
+import { LoadingSpinner } from '@/components/loading-spinner'
+import { Toast } from '@/components/toast'
 
 interface DashboardData {
   stats: { totalBooks: number; totalMembers: number; activeBorrows: number; todayTransactions: number }
@@ -13,9 +15,14 @@ interface DashboardData {
 
 export function DashboardClient({ user }: { user: { name: string; role: string } }) {
   const [data, setData] = useState<DashboardData | null>(null)
+  const [dashboardLoading, setDashboardLoading] = useState(true)
+  const [dashboardError, setDashboardError] = useState('')
 
   useEffect(() => {
-    fetch('/api/dashboard').then((r) => r.json()).then(setData).catch(() => {})
+    fetch('/api/dashboard')
+      .then((r) => { if (!r.ok) throw new Error('Gagal memuat dashboard'); return r.json() })
+      .then((d) => { setData(d); setDashboardLoading(false) })
+      .catch((e) => { setDashboardError(e.message); setDashboardLoading(false) })
   }, [])
 
   const cards = [
@@ -33,6 +40,11 @@ export function DashboardClient({ user }: { user: { name: string; role: string }
 
   return (
     <AdminLayout initialUser={user}>
+      {dashboardError && (
+        <div className="bg-[#f3c9b6]/30 text-black p-4 rounded-[12px] text-[15px] font-light border border-[#f3c9b6] mb-6">{dashboardError}</div>
+      )}
+
+      {dashboardLoading ? <LoadingSpinner /> : (
       <div className="space-y-8">
         <div className="bg-[#f4ecd6] rounded-[24px] p-12">
           <p className="font-mono text-sm uppercase tracking-[0.05em] text-black/40 mb-3">Dashboard</p>
@@ -121,10 +133,12 @@ export function DashboardClient({ user }: { user: { name: string; role: string }
               </table>
             </div>
           ) : (
-            <p className="p-6 text-[15px] font-light text-black/40 text-center">Belum ada transaksi</p>
-          )}
+          <p className="p-6 text-[15px] font-light text-black/40 text-center">Belum ada transaksi</p>
+            )}
+          </div>
         </div>
       </div>
+      )} {/* end dashboardLoading */}
     </AdminLayout>
   )
 }

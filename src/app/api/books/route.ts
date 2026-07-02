@@ -8,7 +8,7 @@ export const GET = withSupabaseRoute({ auth: 'user' }, async (req) => {
   const categoryId = searchParams.get('categoryId')
   const page = searchParams.get('page')
 
-  const where: Prisma.BookWhereInput = {}
+  const where: Prisma.BookWhereInput = { deletedAt: null }
   if (search) {
     where.OR = [
       { title: { contains: search, mode: 'insensitive' } },

@@ -1,4 +1,5 @@
 import { withSupabaseRoute } from '@/lib/supabase-server'
+import { getSupabaseAdmin } from '@/lib/supabase-admin'
 
 export const POST = withSupabaseRoute({ auth: 'user' }, async (req, ctx) => {
   if (!ctx.user || ctx.user.role !== 'admin') {
@@ -8,15 +9,14 @@ export const POST = withSupabaseRoute({ auth: 'user' }, async (req, ctx) => {
   const formData = await req.formData()
   const file = formData.get('file') as File | null
   if (!file) return Response.json({ error: 'File tidak ditemukan' }, { status: 400 })
+  if (!file.type.startsWith('image/')) {
+    return Response.json({ error: 'Hanya file gambar yang diizinkan' }, { status: 400 })
+  }
 
   const ext = file.name.split('.').pop() || 'jpg'
   const fileName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
 
-  const supabase = (await import('@supabase/supabase-js')).createClient(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_SECRET_KEY!,
-    { auth: { autoRefreshToken: false, persistSession: false } },
-  )
+  const supabase = getSupabaseAdmin()
 
   const { error } = await supabase.storage.from('covers').upload(fileName, file, {
     contentType: file.type,

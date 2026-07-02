@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma'
 import { withSupabaseRoute } from '@/lib/supabase-server'
+import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { notifyAdmins } from '@/lib/notifications'
 import { checkRateLimit } from '@/lib/rate-limit'
 
@@ -15,11 +16,7 @@ export const POST = withSupabaseRoute({ auth: 'none' }, async (req) => {
   const existing = await prisma.user.findUnique({ where: { email } })
   if (existing) return Response.json({ error: 'Email sudah terdaftar' }, { status: 400 })
 
-  const supabase = (await import('@supabase/supabase-js')).createClient(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_SECRET_KEY!,
-    { auth: { autoRefreshToken: false, persistSession: false } },
-  )
+  const supabase = getSupabaseAdmin()
 
   const { data: authData, error: authError } = await supabase.auth.admin.createUser({
     email,
@@ -28,12 +25,21 @@ export const POST = withSupabaseRoute({ auth: 'none' }, async (req) => {
   })
   if (authError) return Response.json({ error: authError.message }, { status: 400 })
 
-  const user = await prisma.user.create({
-    data: { name, email, password: '', role: 'member', phone: phone || null, address: address || null },
-    select: { id: true, name: true, email: true, role: true },
-  })
+  try {
+    const user = await prisma.user.create({
+      data: { name, email, role: 'member', phone: phone || null, address: address || null },
+      select: { id: true, name: true, email: true, role: true },
+    })
 
-  await notifyAdmins('Pendaftaran Baru', `${user.name} (${user.email}) mendaftar sebagai anggota.`)
+    await notifyAdmins('Pendaftaran Baru', `${user.name} (${user.email}) mendaftar sebagai anggota.`)
 
-  return Response.json({ message: 'Registrasi berhasil', user }, { status: 201 })
+    return Response.json({ message: 'Registrasi berhasil', user }, { status: 201 })
+  } catch (dbError) {
+    if (authData?.user?.id) {
+      await supabase.auth.admin.deleteUser(authData.user.id).catch((err) => {
+        console.error('Failed to rollback Supabase user during registration:', err)
+      })
+    }
+    throw dbError
+  }
 })

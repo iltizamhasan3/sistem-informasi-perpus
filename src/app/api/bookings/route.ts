@@ -1,56 +1,63 @@
 import { prisma } from '@/lib/prisma'
 import { withSupabaseRoute } from '@/lib/supabase-server'
-import { generateBookingCode, expireExpiredBookings } from '@/lib/booking'
+import { generateBookingCode } from '@/lib/booking'
 import { notifyUser, notifyAdmins } from '@/lib/notifications'
 import type { Prisma } from '@/generated/prisma'
 
 export const POST = withSupabaseRoute({ auth: 'user' }, async (req, ctx) => {
   if (!ctx.user) return Response.json({ error: 'Unauthorized' }, { status: 401 })
 
+  const userId = ctx.user.id
   const { bookId } = await req.json()
-
-  const book = await prisma.book.findUnique({ where: { id: Number(bookId) } })
-  if (!book) return Response.json({ error: 'Buku tidak ditemukan' }, { status: 404 })
-  if (book.stock < 1) return Response.json({ error: 'Stok buku habis' }, { status: 400 })
-
-  const existingBooking = await prisma.booking.findFirst({
-    where: { userId: ctx.user.id, bookId: Number(bookId), status: 'active' },
-  })
-  if (existingBooking) return Response.json({ error: 'Kamu sudah booking buku ini' }, { status: 400 })
-
-  const activeCount = await prisma.booking.count({
-    where: { userId: ctx.user.id, status: 'active' },
-  })
-  const borrowedCount = await prisma.transaction.count({
-    where: { userId: ctx.user.id, status: 'borrowed' },
-  })
-  if (activeCount + borrowedCount >= 3) {
-    return Response.json({ error: 'Kamu sudah mencapai batas maksimal 3 buku (booking + pinjaman)' }, { status: 400 })
-  }
-
   const code = await generateBookingCode()
   const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000)
 
-  const [booking] = await prisma.$transaction([
-    prisma.booking.create({
-      data: { code, userId: ctx.user.id, bookId: Number(bookId), expiresAt },
-      include: { book: { select: { id: true, title: true } } },
-    }),
-    prisma.book.update({
-      where: { id: Number(bookId) },
+  const result = await prisma.$transaction(async (tx) => {
+    const book = await tx.book.findUnique({ where: { id: Number(bookId) } })
+    if (!book) return { error: 'Buku tidak ditemukan', status: 404 }
+
+    const existingBooking = await tx.booking.findFirst({
+      where: { userId, bookId: Number(bookId), status: 'active' },
+    })
+    if (existingBooking) return { error: 'Kamu sudah booking buku ini', status: 400 }
+
+    const activeCount = await tx.booking.count({
+      where: { userId, status: 'active' },
+    })
+    const borrowedCount = await tx.transaction.count({
+      where: { userId, status: 'borrowed' },
+    })
+    if (activeCount + borrowedCount >= 3) {
+      return { error: 'Kamu sudah mencapai batas maksimal 3 buku (booking + pinjaman)', status: 400 }
+    }
+
+    const { count } = await tx.book.updateMany({
+      where: { id: Number(bookId), stock: { gt: 0 } },
       data: { stock: { decrement: 1 } },
-    }),
-  ])
+    })
+    if (count === 0) return { error: 'Stok buku habis', status: 400 }
 
-  await notifyUser(ctx.user.id, 'Booking Berhasil', `Kode booking "${booking.code}" untuk "${booking.book.title}". Segera ambil buku di perpustakaan sebelum ${booking.expiresAt.toLocaleDateString('id-ID', { hour: '2-digit', minute: '2-digit' })}.`)
+    const [booking] = await Promise.all([
+      tx.booking.create({
+        data: { code, userId, bookId: Number(bookId), expiresAt },
+        include: { book: { select: { id: true, title: true } } },
+      }),
+    ])
 
-  return Response.json({ booking: { code: booking.code, book: { title: booking.book.title }, expiresAt: booking.expiresAt.toISOString() } }, { status: 201 })
+    return { booking }
+  })
+
+  if ('error' in result) {
+    return Response.json({ error: result.error }, { status: result.status })
+  }
+
+  await notifyUser(ctx.user.id, 'Booking Berhasil', `Kode booking "${result.booking.code}" untuk "${result.booking.book.title}". Segera ambil buku di perpustakaan sebelum ${result.booking.expiresAt.toLocaleDateString('id-ID', { hour: '2-digit', minute: '2-digit' })}.`)
+
+  return Response.json({ booking: { code: result.booking.code, book: { title: result.booking.book.title }, expiresAt: result.booking.expiresAt.toISOString() } }, { status: 201 })
 })
 
 export const GET = withSupabaseRoute({ auth: 'user' }, async (req, ctx) => {
   if (!ctx.user) return Response.json({ error: 'Unauthorized' }, { status: 401 })
-
-  await expireExpiredBookings()
 
   const { searchParams } = new URL(req.url)
   const status = searchParams.get('status') || undefined

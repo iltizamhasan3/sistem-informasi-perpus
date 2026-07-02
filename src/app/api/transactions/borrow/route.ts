@@ -5,39 +5,48 @@ import { notifyUser, notifyAdmins } from '@/lib/notifications'
 
 export const POST = withSupabaseRoute({ auth: 'user' }, async (req, ctx) => {
   if (!ctx.user) return Response.json({ error: 'Unauthorized' }, { status: 401 })
+  if (ctx.user.role !== 'admin') {
+    return Response.json({ error: 'Hanya admin yang dapat memproses peminjaman langsung' }, { status: 403 })
+  }
 
   const { bookId, memberId } = await req.json()
   const targetUserId = memberId || ctx.user.id
 
-  const book = await prisma.book.findUnique({ where: { id: Number(bookId) } })
-  if (!book) return Response.json({ error: 'Buku tidak ditemukan' }, { status: 404 })
-  if (book.stock < 1) return Response.json({ error: 'Stok buku habis' }, { status: 400 })
+  const result = await prisma.$transaction(async (tx) => {
+    const activeCount = await tx.transaction.count({
+      where: { userId: targetUserId, status: 'borrowed' },
+    })
+    if (activeCount >= 3) return { error: 'Anggota sudah meminjam maksimal 3 buku' }
 
-  const activeCount = await prisma.transaction.count({
-    where: { userId: targetUserId, status: 'borrowed' },
-  })
-  if (activeCount >= 3) return Response.json({ error: 'Anggota sudah meminjam maksimal 3 buku' }, { status: 400 })
-
-  const [transaction] = await prisma.$transaction([
-    prisma.transaction.create({
-      data: {
-        userId: targetUserId,
-        bookId: Number(bookId),
-        dueDate: new Date(Date.now() + BORROW_DURATION_DAYS * 24 * 60 * 60 * 1000),
-      },
-      include: {
-        user: { select: { id: true, name: true } },
-        book: { select: { id: true, title: true } },
-      },
-    }),
-    prisma.book.update({
-      where: { id: Number(bookId) },
+    const { count } = await tx.book.updateMany({
+      where: { id: Number(bookId), stock: { gt: 0 } },
       data: { stock: { decrement: 1 } },
-    }),
-  ])
+    })
+    if (count === 0) return { error: 'Stok buku habis' }
 
-  await notifyUser(targetUserId, 'Peminjaman Buku', `Kamu meminjam "${transaction.book.title}". Kembalikan sebelum ${transaction.dueDate.toLocaleDateString('id-ID')}.`)
-  await notifyAdmins('Peminjaman Baru', `${transaction.user.name} meminjam "${transaction.book.title}".`)
+    const [transaction] = await Promise.all([
+      tx.transaction.create({
+        data: {
+          userId: targetUserId,
+          bookId: Number(bookId),
+          dueDate: new Date(Date.now() + BORROW_DURATION_DAYS * 24 * 60 * 60 * 1000),
+        },
+        include: {
+          user: { select: { id: true, name: true } },
+          book: { select: { id: true, title: true } },
+        },
+      }),
+    ])
 
-  return Response.json({ transaction }, { status: 201 })
+    return { transaction }
+  })
+
+  if ('error' in result) {
+    return Response.json({ error: result.error }, { status: 400 })
+  }
+
+  await notifyUser(targetUserId, 'Peminjaman Buku', `Kamu meminjam "${result.transaction.book.title}". Kembalikan sebelum ${result.transaction.dueDate.toLocaleDateString('id-ID')}.`)
+  await notifyAdmins('Peminjaman Baru', `${result.transaction.user.name} meminjam "${result.transaction.book.title}".`)
+
+  return Response.json({ transaction: result.transaction }, { status: 201 })
 })

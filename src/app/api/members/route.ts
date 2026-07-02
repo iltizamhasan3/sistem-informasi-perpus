@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma'
 import { withSupabaseRoute } from '@/lib/supabase-server'
+import { getSupabaseAdmin } from '@/lib/supabase-admin'
 import { notifyUser } from '@/lib/notifications'
 import type { Prisma } from '@/generated/prisma'
 
@@ -10,7 +11,7 @@ export const GET = withSupabaseRoute({ auth: 'user' }, async (req, ctx) => {
   const search = searchParams.get('search') || ''
   const page = searchParams.get('page')
 
-  const where: Prisma.UserWhereInput = { role: 'member' }
+  const where: Prisma.UserWhereInput = { role: 'member', deletedAt: null }
   if (search) {
     where.OR = [
       { name: { contains: search, mode: 'insensitive' } },
@@ -51,21 +52,26 @@ export const POST = withSupabaseRoute({ auth: 'user' }, async (req, ctx) => {
   const existing = await prisma.user.findUnique({ where: { email } })
   if (existing) return Response.json({ error: 'Email sudah terdaftar' }, { status: 400 })
 
-  const supabase = (await import('@supabase/supabase-js')).createClient(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_SECRET_KEY!,
-    { auth: { autoRefreshToken: false, persistSession: false } },
-  )
+  const supabase = getSupabaseAdmin()
 
-  const { error: authError } = await supabase.auth.admin.createUser({ email, password, email_confirm: true })
+  const { data: authData, error: authError } = await supabase.auth.admin.createUser({ email, password, email_confirm: true })
   if (authError) return Response.json({ error: authError.message }, { status: 400 })
 
-  const member = await prisma.user.create({
-    data: { name, email, password: '', role: 'member', phone, address },
-    select: { id: true, name: true, email: true, role: true, phone: true, address: true },
-  })
+  try {
+    const member = await prisma.user.create({
+      data: { name, email, role: 'member', phone, address },
+      select: { id: true, name: true, email: true, role: true, phone: true, address: true },
+    })
 
-  await notifyUser(member.id, 'Akun Dibuat', `Akun perpustakaanmu telah dibuat oleh admin. Silakan login dengan email ${member.email}.`)
+    await notifyUser(member.id, 'Akun Dibuat', `Akun perpustakaanmu telah dibuat oleh admin. Silakan login dengan email ${member.email}.`)
 
-  return Response.json({ member }, { status: 201 })
+    return Response.json({ member }, { status: 201 })
+  } catch (dbError) {
+    if (authData?.user?.id) {
+      await supabase.auth.admin.deleteUser(authData.user.id).catch((err) => {
+        console.error('Failed to rollback Supabase user during member creation:', err)
+      })
+    }
+    throw dbError
+  }
 })

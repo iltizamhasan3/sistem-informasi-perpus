@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma'
 import { withSupabaseRoute } from '@/lib/supabase-server'
+import { getSupabaseAdmin } from '@/lib/supabase-admin'
 
 export const GET = withSupabaseRoute<{ rentalId: string }>({ auth: 'user' }, async (_req, ctx) => {
   if (!ctx.user) return Response.json({ error: 'Unauthorized' }, { status: 401 })
@@ -18,11 +19,7 @@ export const GET = withSupabaseRoute<{ rentalId: string }>({ auth: 'user' }, asy
   }
   if (!rental.book.ebookFile) return Response.json({ error: 'File e-book tidak ditemukan' }, { status: 404 })
 
-  const supabase = (await import('@supabase/supabase-js')).createClient(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_SECRET_KEY!,
-    { auth: { autoRefreshToken: false, persistSession: false } },
-  )
+  const supabase = getSupabaseAdmin()
 
   const { data: signedUrl, error } = await supabase.storage
     .from('ebooks')

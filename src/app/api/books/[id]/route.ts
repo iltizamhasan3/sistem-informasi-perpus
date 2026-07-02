@@ -7,7 +7,7 @@ export const GET = withSupabaseRoute<{ id: string }>({ auth: 'user' }, async (_r
     where: { id: Number(id) },
     include: { category: true },
   })
-  if (!book) return Response.json({ error: 'Buku tidak ditemukan' }, { status: 404 })
+  if (!book || book.deletedAt) return Response.json({ error: 'Buku tidak ditemukan' }, { status: 404 })
   return Response.json({ book }, { headers: { 'Cache-Control': 'public, max-age=30, stale-while-revalidate=120' } })
 })
 
@@ -66,11 +66,9 @@ export const DELETE = withSupabaseRoute<{ id: string }>({ auth: 'user' }, async 
   })
   if (activeRental) return Response.json({ error: 'Buku sedang dirental sebagai ebook, tidak bisa dihapus' }, { status: 400 })
 
-  await prisma.$transaction([
-    prisma.transaction.deleteMany({ where: { bookId } }),
-    prisma.booking.deleteMany({ where: { bookId } }),
-    prisma.ebookRental.deleteMany({ where: { bookId } }),
-    prisma.book.delete({ where: { id: bookId } }),
-  ])
+  await prisma.book.update({
+    where: { id: bookId },
+    data: { deletedAt: new Date() },
+  })
   return Response.json({ message: 'Buku berhasil dihapus' })
 })

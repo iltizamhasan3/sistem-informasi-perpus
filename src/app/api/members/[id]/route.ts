@@ -8,9 +8,9 @@ export const GET = withSupabaseRoute<{ id: string }>({ auth: 'user' }, async (_r
   const { id } = await ctx.params
   const member = await prisma.user.findUnique({
     where: { id: Number(id) },
-    select: { id: true, name: true, email: true, phone: true, address: true, isActive: true, role: true },
+    select: { id: true, name: true, email: true, phone: true, address: true, isActive: true, role: true, deletedAt: true },
   })
-  if (!member || member.role !== 'member') return Response.json({ error: 'Anggota tidak ditemukan' }, { status: 404 })
+  if (!member || member.role !== 'member' || member.deletedAt) return Response.json({ error: 'Anggota tidak ditemukan' }, { status: 404 })
   return Response.json({ member })
 })
 
@@ -55,12 +55,9 @@ export const DELETE = withSupabaseRoute<{ id: string }>({ auth: 'user' }, async 
   })
   if (activeLoan) return Response.json({ error: 'Anggota masih memiliki peminjaman aktif' }, { status: 400 })
 
-  await prisma.$transaction([
-    prisma.transaction.deleteMany({ where: { userId } }),
-    prisma.booking.deleteMany({ where: { userId } }),
-    prisma.ebookRental.deleteMany({ where: { userId } }),
-    prisma.notification.deleteMany({ where: { userId } }),
-    prisma.user.delete({ where: { id: userId } }),
-  ])
+  await prisma.user.update({
+    where: { id: userId },
+    data: { deletedAt: new Date(), isActive: false },
+  })
   return Response.json({ message: 'Anggota berhasil dihapus' })
 })

@@ -11,7 +11,8 @@ model User {
   id        Int      @id @default(autoincrement())
   name      String
   email     String   @unique
-  password  String
+  password  String?
+  deletedAt DateTime?
   role      String   @default("member")
   phone     String?
   address   String?
@@ -45,6 +46,7 @@ model Book {
   description String?
   isEbook     Boolean  @default(false)
   ebookFile   String?
+  deletedAt   DateTime?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 

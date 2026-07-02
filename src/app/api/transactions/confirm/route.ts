@@ -29,31 +29,42 @@ export const POST = withSupabaseRoute({ auth: 'user' }, async (req, ctx) => {
     return Response.json({ error: 'Booking sudah expired' }, { status: 400 })
   }
 
-  const now = new Date()
-  const dueDate = new Date(now.getTime() + BORROW_DURATION_DAYS * 24 * 60 * 60 * 1000)
-
-  const [transaction] = await prisma.$transaction([
-    prisma.transaction.create({
-      data: {
-        userId: booking.userId,
-        bookId: booking.bookId,
-        bookingId: booking.id,
-        borrowDate: now,
-        dueDate,
-      },
-      include: {
-        user: { select: { id: true, name: true } },
-        book: { select: { id: true, title: true } },
-      },
-    }),
-    prisma.booking.update({
-      where: { id: booking.id },
+  const result = await prisma.$transaction(async (tx) => {
+    const { count } = await tx.booking.updateMany({
+      where: { id: booking.id, status: 'active' },
       data: { status: 'completed' },
-    }),
-  ])
+    })
+    if (count === 0) return { error: 'Booking sudah tidak aktif' }
 
-  await notifyUser(booking.userId, 'Peminjaman Berhasil', `"${booking.book.title}" berhasil dipinjam. Kembalikan sebelum ${dueDate.toLocaleDateString('id-ID')}.`)
-  await notifyAdmins('Transaksi Baru', `Booking ${bookingCode} dikonfirmasi, "${booking.book.title}" dipinjam oleh ${transaction.user.name}.`)
+    const now = new Date()
+    const dueDate = new Date(now.getTime() + BORROW_DURATION_DAYS * 24 * 60 * 60 * 1000)
 
-  return Response.json({ transaction }, { status: 201 })
+    const [transaction] = await Promise.all([
+      tx.transaction.create({
+        data: {
+          userId: booking.userId,
+          bookId: booking.bookId,
+          bookingId: booking.id,
+          borrowDate: now,
+          dueDate,
+        },
+        include: {
+          user: { select: { id: true, name: true } },
+          book: { select: { id: true, title: true } },
+        },
+      }),
+    ])
+
+    return { transaction, dueDate }
+  })
+
+  if ('error' in result) {
+    const status = result.error === 'Booking sudah tidak aktif' ? 400 : 500
+    return Response.json({ error: result.error }, { status })
+  }
+
+  await notifyUser(booking.userId, 'Peminjaman Berhasil', `"${booking.book.title}" berhasil dipinjam. Kembalikan sebelum ${result.dueDate.toLocaleDateString('id-ID')}.`)
+  await notifyAdmins('Transaksi Baru', `Booking ${bookingCode} dikonfirmasi, "${booking.book.title}" dipinjam oleh ${result.transaction.user.name}.`)
+
+  return Response.json({ transaction: result.transaction }, { status: 201 })
 })

@@ -1,4 +1,5 @@
 import { withSupabaseRoute } from '@/lib/supabase-server'
+import { getSupabaseAdmin } from '@/lib/supabase-admin'
 
 export const POST = withSupabaseRoute({ auth: 'user' }, async (req, ctx) => {
   if (!ctx.user || ctx.user.role !== 'admin') return Response.json({ error: 'Unauthorized' }, { status: 403 })
@@ -10,11 +11,7 @@ export const POST = withSupabaseRoute({ auth: 'user' }, async (req, ctx) => {
 
   const fileName = `ebooks/${Date.now()}-${Math.random().toString(36).slice(2)}.pdf`
 
-  const supabase = (await import('@supabase/supabase-js')).createClient(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_SECRET_KEY!,
-    { auth: { autoRefreshToken: false, persistSession: false } },
-  )
+  const supabase = getSupabaseAdmin()
 
   const { error } = await supabase.storage.from('ebooks').upload(fileName, file, {
     contentType: 'application/pdf',

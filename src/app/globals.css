@@ -23,7 +23,8 @@
   --color-on-primary: #FFFFFF;
   --color-hairline: #5A5F8C;
   --color-danger: #E60012;
-  --font-sans: Arial, Helvetica, sans-serif;
+  --font-sans: var(--font-inter), Arial, Helvetica, sans-serif;
+  --font-display: var(--font-outfit), sans-serif;
   --font-mono: "Courier New", monospace;
 }
 
@@ -102,5 +103,36 @@
   .halftone-dots {
     background-image: radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 1px);
     background-size: 4px 4px;
+  }
+  .glass-card {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.04);
+  }
+  .glass-header {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-bottom: 1px solid rgba(230, 230, 230, 0.5);
+  }
+  .hover-scale-card {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .hover-scale-card:hover {
+    transform: translateY(-6px) scale(1.015);
+    box-shadow: 0 20px 40px -15px rgba(0,0,0,0.08);
+    border-color: rgba(96, 97, 156, 0.2);
+  }
+  .btn-gradient {
+    background: linear-gradient(135deg, #3d4f97 0%, #60619c 100%);
+    color: white;
+    transition: all 0.25s ease;
+  }
+  .btn-gradient:hover {
+    background: linear-gradient(135deg, #2c3a72 0%, #4f5082 100%);
+    box-shadow: 0 4px 14px rgba(96, 97, 156, 0.3);
+    transform: translateY(-1px);
   }
 }

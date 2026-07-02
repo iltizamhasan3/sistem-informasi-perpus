@@ -5,7 +5,7 @@ type Config = Parameters<typeof createSupabaseContext>[1]
 type Ctx = Awaited<ReturnType<typeof createSupabaseContext>>['data']
 type UserRow = { id: number; name: string; email: string; role: string; isActive: boolean } | null
 
-type NextCtx<T = {}> = { params: Promise<T> }
+type NextCtx<T = Record<string, never>> = { params: Promise<T> }
 type ExtendedCtx<T> = NonNullable<Ctx> & { user: UserRow } & NextCtx<T>
 
 function extractTokenFromCookie(req: Request): string | null {
@@ -28,7 +28,7 @@ function isValidOrigin(req: Request): boolean {
   return !!(origin && check(origin)) || !!(referer && check(referer))
 }
 
-export function withSupabaseRoute<T extends Record<string, string> = {}>(
+export function withSupabaseRoute<T extends Record<string, string> = Record<string, never>>(
   config: Config,
   handler: (req: Request, ctx: ExtendedCtx<T>) => Response | Promise<Response>,
 ) {

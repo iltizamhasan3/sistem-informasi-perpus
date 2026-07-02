@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { AdminLayout } from '@/components/admin-layout'
-import { LoadingSpinner } from '@/components/loading-spinner'
 import { Toast } from '@/components/toast'
 import { ListSkeleton } from '@/components/skeleton'
 
@@ -14,11 +13,19 @@ interface EbookRental {
   book: { id: number; title: string; author: string; coverImage: string | null }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function MyEbooksClient({ user }: { user: { name: string; role: string } }) {
   const router = useRouter()
   const [active, setActive] = useState<EbookRental[]>([])
   const [loading, setLoading] = useState(true)
   const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
+  const [now, setNow] = useState<number | null>(null)
+
+  useEffect(() => {
+    setTimeout(() => setNow(Date.now()), 0)
+    const timer = setInterval(() => setNow(Date.now()), 60000)
+    return () => clearInterval(timer)
+  }, [])
 
   useEffect(() => {
     fetch('/api/ebooks/my')
@@ -42,7 +49,7 @@ export function MyEbooksClient({ user }: { user: { name: string; role: string } 
             {active.length === 0 ? (
               <p className="text-[15px] font-light text-black/40 text-center py-8">Tidak ada e-book aktif</p>
             ) : active.map((r) => {
-              const remaining = Math.max(0, new Date(r.expiresAt).getTime() - Date.now())
+              const remaining = now ? Math.max(0, new Date(r.expiresAt).getTime() - now) : 0
               const h = Math.floor(remaining / (1000 * 60 * 60))
               const m = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60))
               return (

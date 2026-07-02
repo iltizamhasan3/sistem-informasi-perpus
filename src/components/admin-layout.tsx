@@ -37,12 +37,16 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const notifRef = useRef<HTMLDivElement>(null)
 
+  async function fetchNotifications() {
+    try { const res = await fetch('/api/notifications'); const data = await res.json(); setNotifications(data.notifications || []) } catch {}
+  }
+
   useEffect(() => {
     if (!loading && !user) router.push('/login')
   }, [user, loading, router])
 
   useEffect(() => {
-    fetchNotifications()
+    setTimeout(() => { fetchNotifications() }, 0)
     const interval = setInterval(fetchNotifications, 30000)
     return () => clearInterval(interval)
   }, [])
@@ -54,10 +58,6 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
-
-  async function fetchNotifications() {
-    try { const res = await fetch('/api/notifications'); const data = await res.json(); setNotifications(data.notifications || []) } catch {}
-  }
 
   async function markAsRead() {
     await fetch('/api/notifications/read', { method: 'PUT' })

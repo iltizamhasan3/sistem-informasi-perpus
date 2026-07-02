@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react'
 import { AdminLayout } from '@/components/admin-layout'
-import { LoadingSpinner } from '@/components/loading-spinner'
 import { Toast } from '@/components/toast'
 import { ListSkeleton } from '@/components/skeleton'
 
@@ -15,6 +14,7 @@ interface Transaction {
   book: { id: number; title: string; author: string }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function MyBorrowingsClient({ user }: { user: { name: string; role: string } }) {
   const [active, setActive] = useState<Transaction[]>([])
   const [loading, setLoading] = useState(true)

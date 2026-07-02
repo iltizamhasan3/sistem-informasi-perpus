@@ -5,7 +5,6 @@ import { useParams } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { AdminLayout } from '@/components/admin-layout'
-import { LoadingSpinner } from '@/components/loading-spinner'
 import { useUser } from '@/lib/auth-context'
 import { Skeleton } from '@/components/skeleton'
 

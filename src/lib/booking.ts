@@ -17,13 +17,23 @@ async function expireExpiredBookings(): Promise<number> {
   })
   if (expired.length === 0) return 0
 
-  await prisma.$transaction(
-    expired.map((b) => [
-      prisma.booking.update({ where: { id: b.id }, data: { status: 'expired' } }),
-      prisma.book.update({ where: { id: b.bookId }, data: { stock: { increment: 1 } } }),
-    ]).flat()
-  )
-  return expired.length
+  let successCount = 0
+  await prisma.$transaction(async (tx) => {
+    for (const b of expired) {
+      const { count } = await tx.booking.updateMany({
+        where: { id: b.id, status: 'active' },
+        data: { status: 'expired' },
+      })
+      if (count > 0) {
+        successCount++
+        await tx.book.update({
+          where: { id: b.bookId },
+          data: { stock: { increment: 1 } },
+        })
+      }
+    }
+  })
+  return successCount
 }
 
 export { generateBookingCode, expireExpiredBookings }

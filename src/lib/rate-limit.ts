@@ -3,6 +3,25 @@ const attempts = new Map<string, { count: number; resetAt: number }>()
 const WINDOW_MS = 60_000
 const MAX_ATTEMPTS = 10
 
+// Pembersihan berkala entri usang untuk mencegah memory leak
+if (typeof globalThis !== 'undefined') {
+  const globalAny = globalThis as unknown as { __rateLimitInterval?: ReturnType<typeof setInterval> }
+  if (!globalAny.__rateLimitInterval) {
+    globalAny.__rateLimitInterval = setInterval(() => {
+      const now = Date.now()
+      for (const [ip, entry] of attempts.entries()) {
+        if (now > entry.resetAt) {
+          attempts.delete(ip)
+        }
+      }
+    }, 5 * 60 * 1000) // Setiap 5 menit
+    const intervalObj = globalAny.__rateLimitInterval
+    if (intervalObj && typeof intervalObj === 'object' && 'unref' in intervalObj) {
+      (intervalObj as unknown as { unref: () => void }).unref()
+    }
+  }
+}
+
 export function checkRateLimit(ip: string): { allowed: boolean; remaining: number } {
   const now = Date.now()
   const entry = attempts.get(ip)

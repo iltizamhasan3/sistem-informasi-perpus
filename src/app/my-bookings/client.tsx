@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react'
 import { AdminLayout } from '@/components/admin-layout'
-import { LoadingSpinner } from '@/components/loading-spinner'
 import { ConfirmModal } from '@/components/confirm-modal'
 import { Toast } from '@/components/toast'
 import { ListSkeleton } from '@/components/skeleton'
@@ -16,6 +15,7 @@ interface BookingItem {
   book: { id: number; title: string; author: string }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function MyBookingsClient({ user }: { user: { name: string; role: string } }) {
   const [items, setItems] = useState<BookingItem[]>([])
   const [loading, setLoading] = useState(true)
@@ -24,7 +24,6 @@ export function MyBookingsClient({ user }: { user: { name: string; role: string 
   const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
 
   function fetchBookings() {
-    setLoading(true)
     fetch('/api/bookings')
       .then((r) => r.json())
       .then((data) => setItems(data.bookings ?? []))
@@ -47,6 +46,7 @@ export function MyBookingsClient({ user }: { user: { name: string; role: string 
       if (!res.ok) throw new Error(data.error || 'Gagal membatalkan booking')
       setToast({ type: 'success', message: 'Booking berhasil dibatalkan' })
       setCancelTarget(null)
+      setLoading(true)
       fetchBookings()
     } catch (err) {
       setToast({ type: 'error', message: err instanceof Error ? err.message : 'Gagal' })

@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Pagination } from '@/components/pagination'
-import { LoadingSpinner } from '@/components/loading-spinner'
 import { ConfirmModal } from '@/components/confirm-modal'
 import { Toast } from '@/components/toast'
 import { useUser } from '@/lib/auth-context'
@@ -37,6 +36,7 @@ export default function BooksPage() {
 
   useEffect(() => {
     fetchBooks().finally(() => setPageLoading(false))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   async function fetchBooks(q?: string, p?: number) {

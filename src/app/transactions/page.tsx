@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Pagination } from '@/components/pagination'
-import { LoadingSpinner } from '@/components/loading-spinner'
 import { Toast } from '@/components/toast'
 import { ConfirmModal } from '@/components/confirm-modal'
 import { TableSkeleton } from '@/components/skeleton'
@@ -30,7 +29,10 @@ export default function TransactionsPage() {
   const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
   const [returningId, setReturningId] = useState<number | null>(null)
 
-  useEffect(() => { fetchTransactions().finally(() => setPageLoading(false)) }, [])
+  useEffect(() => {
+    fetchTransactions().finally(() => setPageLoading(false))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   async function fetchTransactions(status?: string, p?: number) {
     try {

@@ -5,6 +5,9 @@ import { notifyUser, notifyAdmins } from '@/lib/notifications'
 
 export const POST = withSupabaseRoute({ auth: 'user' }, async (req, ctx) => {
   if (!ctx.user) return Response.json({ error: 'Unauthorized' }, { status: 401 })
+  if (ctx.user.role !== 'admin') {
+    return Response.json({ error: 'Hanya admin yang dapat memverifikasi pengembalian buku' }, { status: 403 })
+  }
 
   const { transactionId } = await req.json()
 
@@ -14,9 +17,6 @@ export const POST = withSupabaseRoute({ auth: 'user' }, async (req, ctx) => {
   })
   if (!transaction) return Response.json({ error: 'Transaksi tidak ditemukan' }, { status: 404 })
   if (transaction.status === 'returned') return Response.json({ error: 'Buku sudah dikembalikan' }, { status: 400 })
-  if (ctx.user.role === 'member' && transaction.userId !== ctx.user.id) {
-    return Response.json({ error: 'Unauthorized' }, { status: 403 })
-  }
 
   const now = new Date()
   const fine = calculateFine(transaction.dueDate, now)

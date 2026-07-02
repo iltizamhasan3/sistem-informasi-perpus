@@ -13,7 +13,11 @@ export const POST = withSupabaseRoute({ auth: 'user' }, async (req, ctx) => {
   if (!book.isEbook || !book.ebookFile) return Response.json({ error: 'Buku ini tidak memiliki e-book' }, { status: 400 })
 
   const activeRental = await prisma.ebookRental.findFirst({
-    where: { userId: ctx.user.id, status: 'active' },
+    where: {
+      userId: ctx.user.id,
+      status: 'active',
+      expiresAt: { gt: new Date() },
+    },
   })
   if (activeRental) return Response.json({ error: 'Kamu sudah memiliki sewa e-book aktif. Selesaikan atau tunggu expired dahulu.' }, { status: 400 })
 

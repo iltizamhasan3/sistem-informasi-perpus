@@ -11,7 +11,7 @@ const CDNS = [
 ]
 pdfjs.GlobalWorkerOptions.workerSrc = CDNS[0]
 
-function useFallbackWorker() {
+function setupFallbackWorker() {
   if (CDNS[1]) {
     pdfjs.GlobalWorkerOptions.workerSrc = CDNS[1]
     CDNS[1] = ''
@@ -45,7 +45,7 @@ export function PdfRenderer({ pdfUrl, rentalId, initialPage }: { pdfUrl: string;
         {error ? (
           <div className="flex flex-col items-center gap-3 py-12 px-8">
             <p className="text-[15px] font-light text-black/60">{error}</p>
-            <button onClick={() => { useFallbackWorker(); setError('') }}
+            <button onClick={() => { setupFallbackWorker(); setError('') }}
               className="px-5 py-[10px] bg-black text-white rounded-[50px] text-[14px] font-light hover:bg-gray-800 transition">
               Coba CDN alternatif
             </button>

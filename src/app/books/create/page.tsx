@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 
 interface Category { id: number; name: string }
 
@@ -142,7 +143,7 @@ export default function CreateBookPage() {
             <p className="text-[14px] text-gray-400 font-light mt-2">{coverFile ? coverFile.name : 'Belum ada file dipilih'}</p>
             {coverPreview && (
               <div className="mt-4 p-3 bg-[#f7f7f5] rounded-[8px] inline-block">
-                <img src={coverPreview} className="h-36 object-contain rounded-[6px]" />
+                <Image src={coverPreview} alt="Pratinjau Sampul Buku Baru" width={100} height={144} className="h-36 w-auto object-contain rounded-[6px]" />
               </div>
             )}
           </div>

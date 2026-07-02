@@ -3,8 +3,6 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { AdminLayout } from '@/components/admin-layout'
-import { LoadingSpinner } from '@/components/loading-spinner'
-import { Toast } from '@/components/toast'
 import { CardSkeleton, Skeleton } from '@/components/skeleton'
 
 interface DashboardData {

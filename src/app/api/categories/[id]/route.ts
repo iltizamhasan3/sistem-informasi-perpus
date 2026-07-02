@@ -6,7 +6,7 @@ export const DELETE = withSupabaseRoute<{ id: string }>({ auth: 'user' }, async 
 
   const { id } = await ctx.params
   const bookCount = await prisma.book.count({ where: { categoryId: Number(id) } })
-  if (bookCount > 0) return Response.json({ error: 'Kategori masih memiliki buku' }, { status: 400 })
+  if (bookCount > 0) return Response.json({ error: 'Kategori masih memiliki buku (termasuk buku terarsip/soft-deleted)' }, { status: 400 })
 
   await prisma.category.delete({ where: { id: Number(id) } })
   return Response.json({ message: 'Kategori berhasil dihapus' })

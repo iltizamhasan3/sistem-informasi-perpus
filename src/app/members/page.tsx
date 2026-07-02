@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { Pagination } from '@/components/pagination'
-import { LoadingSpinner } from '@/components/loading-spinner'
 import { ConfirmModal } from '@/components/confirm-modal'
 import { Toast } from '@/components/toast'
 import { TableSkeleton } from '@/components/skeleton'
@@ -30,7 +29,10 @@ export default function MembersPage() {
   const [deleteId, setDeleteId] = useState<number | null>(null)
   const [deleting, setDeleting] = useState(false)
 
-  useEffect(() => { fetchMembers().finally(() => setPageLoading(false)) }, [])
+  useEffect(() => {
+    fetchMembers().finally(() => setPageLoading(false))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   async function fetchMembers(q?: string, p?: number) {
     try {

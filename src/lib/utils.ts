@@ -16,9 +16,15 @@ export function formatRupiah(amount: number) {
 const fineRate = Number(process.env.FINE_RATE) || 2000
 
 export function calculateFine(dueDate: Date, returnDate?: Date | null) {
-  const end = returnDate || new Date()
-  const diffTime = end.getTime() - new Date(dueDate).getTime()
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+  const end = new Date(returnDate || new Date())
+  const due = new Date(dueDate)
+  
+  // Normalisasi waktu ke tengah malam agar membandingkan tanggal kalender secara murni
+  end.setHours(0, 0, 0, 0)
+  due.setHours(0, 0, 0, 0)
+  
+  const diffTime = end.getTime() - due.getTime()
+  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
   return diffDays > 0 ? diffDays * fineRate : 0
 }
 

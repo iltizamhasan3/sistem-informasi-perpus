@@ -2,6 +2,7 @@ import { prisma } from '@/lib/prisma'
 import { withSupabaseRoute } from '@/lib/supabase-server'
 import { generateBookingCode, expireExpiredBookings } from '@/lib/booking'
 import { notifyUser, notifyAdmins } from '@/lib/notifications'
+import type { Prisma } from '@/generated/prisma'
 
 export const POST = withSupabaseRoute({ auth: 'user' }, async (req, ctx) => {
   if (!ctx.user) return Response.json({ error: 'Unauthorized' }, { status: 401 })
@@ -51,8 +52,9 @@ export const GET = withSupabaseRoute({ auth: 'user' }, async (req, ctx) => {
 
   await expireExpiredBookings()
 
-  const status = new URL(req.url).searchParams.get('status') || undefined
-  const where: Record<string, unknown> = {}
+  const { searchParams } = new URL(req.url)
+  const status = searchParams.get('status') || undefined
+  const where: Prisma.BookingWhereInput = {}
   if (status) where.status = status
   if (ctx.user.role !== 'admin') where.userId = ctx.user.id
 

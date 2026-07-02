@@ -6,6 +6,7 @@ import { Pagination } from '@/components/pagination'
 import { LoadingSpinner } from '@/components/loading-spinner'
 import { Toast } from '@/components/toast'
 import { ConfirmModal } from '@/components/confirm-modal'
+import { TableSkeleton } from '@/components/skeleton'
 
 interface Transaction {
   id: number
@@ -154,7 +155,7 @@ export default function TransactionsPage() {
           </thead>
           <tbody>
             {pageLoading ? (
-              <tr><td colSpan={8}><LoadingSpinner /></td></tr>
+              <tr><td colSpan={8}><TableSkeleton rows={5} cols={8} /></td></tr>
             ) : transactions.map((t) => (
               <tr key={t.id} className="border-b border-[#f1f1f1] hover:bg-[#c5b0f4]/8 transition">
                 <td className="px-4 py-3">

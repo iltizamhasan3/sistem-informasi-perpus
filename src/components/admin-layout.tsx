@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
+import { useUser } from '@/lib/auth-context'
 
 interface Notification {
   id: number
@@ -27,26 +28,24 @@ const memberNavItems = [
   { href: '/my-bookings', label: 'Riwayat' },
 ]
 
-export function AdminLayout({ children, initialUser }: { children: React.ReactNode; initialUser?: { name: string; role: string } }) {
+export function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const router = useRouter()
-  const [user, setUser] = useState<{ name: string; role: string } | null>(initialUser ?? null)
+  const { user, loading } = useUser()
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [showNotif, setShowNotif] = useState(false)
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const notifRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    if (!initialUser) {
-      fetch('/api/auth/me')
-        .then((res) => res.json())
-        .then((data) => { if (data.user) setUser(data.user); else router.push('/login') })
-        .catch(() => {})
-    }
+    if (!loading && !user) router.push('/login')
+  }, [user, loading, router])
+
+  useEffect(() => {
     fetchNotifications()
     const interval = setInterval(fetchNotifications, 30000)
     return () => clearInterval(interval)
-  }, [router, initialUser])
+  }, [])
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {

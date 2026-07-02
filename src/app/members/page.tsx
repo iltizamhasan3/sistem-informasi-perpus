@@ -6,6 +6,7 @@ import { Pagination } from '@/components/pagination'
 import { LoadingSpinner } from '@/components/loading-spinner'
 import { ConfirmModal } from '@/components/confirm-modal'
 import { Toast } from '@/components/toast'
+import { TableSkeleton } from '@/components/skeleton'
 
 interface Member {
   id: number
@@ -154,7 +155,7 @@ export default function MembersPage() {
           </thead>
           <tbody>
             {pageLoading ? (
-              <tr><td colSpan={6}><LoadingSpinner /></td></tr>
+              <tr><td colSpan={6}><TableSkeleton rows={5} cols={6} /></td></tr>
             ) : members.map((m) => (
               <tr key={m.id} className="border-b border-[#f1f1f1] hover:bg-[#c5b0f4]/8 transition">
                 <td className="px-4 py-3 text-[15px] font-light text-black">{m.name}</td>

@@ -1,8 +1,13 @@
 import { prisma } from '@/lib/prisma'
 import { withSupabaseRoute } from '@/lib/supabase-server'
 import { notifyAdmins } from '@/lib/notifications'
+import { checkRateLimit } from '@/lib/rate-limit'
 
 export const POST = withSupabaseRoute({ auth: 'none' }, async (req) => {
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
+  const { allowed } = checkRateLimit(ip)
+  if (!allowed) return Response.json({ error: 'Terlalu banyak percobaan. Coba lagi nanti.' }, { status: 429 })
+
   const { name, email, password, phone, address } = await req.json()
   if (!name || !email || !password) return Response.json({ error: 'Semua field wajib diisi' }, { status: 400 })
   if (password.length < 6) return Response.json({ error: 'Password minimal 6 karakter' }, { status: 400 })

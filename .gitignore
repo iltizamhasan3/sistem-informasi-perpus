@@ -45,7 +45,6 @@ dev.db
 # agent / tooling artifacts
 .agents/
 skills-lock.json
-proxy.ts
 
 # prisma generated
 /src/generated/prisma

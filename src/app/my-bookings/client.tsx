@@ -5,6 +5,7 @@ import { AdminLayout } from '@/components/admin-layout'
 import { LoadingSpinner } from '@/components/loading-spinner'
 import { ConfirmModal } from '@/components/confirm-modal'
 import { Toast } from '@/components/toast'
+import { ListSkeleton } from '@/components/skeleton'
 
 interface BookingItem {
   id: number
@@ -63,18 +64,38 @@ export function MyBookingsClient({ user }: { user: { name: string; role: string 
     }
   }
 
+  async function exportCSV() {
+    try {
+      const res = await fetch('/api/bookings?limit=all')
+      const data = await res.json()
+      const list = data.bookings || data
+      const rows = [['Kode', 'Anggota', 'Email', 'Buku', 'Status', 'Tgl Booking', 'Berlaku'].join(',')]
+      for (const b of list) {
+        const status = b.status === 'active' ? 'Aktif' : b.status === 'completed' ? 'Selesai' : b.status === 'expired' ? 'Expired' : 'Dibatalkan'
+        rows.push([`"${b.code}"`, `"${b.user?.name || ''}"`, `"${b.user?.email || ''}"`, `"${b.book.title}"`, status, b.createdAt.slice(0, 10), b.expiresAt.slice(0, 10)].join(','))
+      }
+      const blob = new Blob([rows.join('\n')], { type: 'text/csv' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url; a.download = 'booking.csv'; a.click()
+      URL.revokeObjectURL(url)
+    } catch {}
+  }
+
   const activeBookings = items.filter((b) => b.status === 'active')
   const historyBookings = items.filter((b) => b.status !== 'active')
 
   return (
-    <AdminLayout initialUser={user}>
+    <AdminLayout>
       <div className="space-y-8">
         <div className="bg-[#f4ecd6] rounded-[24px] p-6">
           <p className="font-mono text-sm uppercase tracking-[0.05em] text-black/40">Riwayat</p>
           <h1 className="text-[32px] font-bold tracking-[-0.02em] leading-[1.1] text-black mt-1">Booking &amp; Riwayat</h1>
+          <button onClick={exportCSV}
+            className="mt-4 px-5 py-[10px] bg-white text-black rounded-[50px] text-[14px] font-light border border-[#e6e6e6] hover:bg-[#f7f7f5] transition">Export CSV</button>
         </div>
 
-        {loading ? <LoadingSpinner /> : (
+        {loading ? <ListSkeleton count={3} /> : (
           <>
             {activeBookings.length > 0 && (
               <div>

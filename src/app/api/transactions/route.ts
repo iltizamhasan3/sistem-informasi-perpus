@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma'
 import { withSupabaseRoute } from '@/lib/supabase-server'
+import type { Prisma } from '@/generated/prisma'
 
 export const GET = withSupabaseRoute({ auth: 'user' }, async (req, ctx) => {
   const { searchParams } = new URL(req.url)
@@ -8,7 +9,7 @@ export const GET = withSupabaseRoute({ auth: 'user' }, async (req, ctx) => {
   const page = searchParams.get('page')
   const mine = searchParams.get('mine')
 
-  const where: Record<string, unknown> = {}
+  const where: Prisma.TransactionWhereInput = {}
   if (mine === 'true') where.userId = ctx.user!.id
   else if (ctx.user?.role === 'member') where.userId = ctx.user.id
   else if (userId) where.userId = Number(userId)

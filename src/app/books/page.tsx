@@ -2,10 +2,13 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Pagination } from '@/components/pagination'
 import { LoadingSpinner } from '@/components/loading-spinner'
 import { ConfirmModal } from '@/components/confirm-modal'
 import { Toast } from '@/components/toast'
+import { useUser } from '@/lib/auth-context'
+import { TableSkeleton } from '@/components/skeleton'
 
 interface Book {
   id: number
@@ -19,6 +22,7 @@ interface Book {
 }
 
 export default function BooksPage() {
+  const { user } = useUser()
   const [books, setBooks] = useState<Book[]>([])
   const [search, setSearch] = useState('')
   const [page, setPage] = useState(1)
@@ -28,12 +32,10 @@ export default function BooksPage() {
   const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
   const [deleteId, setDeleteId] = useState<number | null>(null)
   const [deleting, setDeleting] = useState(false)
-  const [isAdmin, setIsAdmin] = useState(false)
+
+  const isAdmin = user?.role === 'admin'
 
   useEffect(() => {
-    fetch('/api/auth/me').then(r => r.json()).then(data => {
-      if (data.user?.role === 'admin') setIsAdmin(true)
-    }).catch(() => {})
     fetchBooks().finally(() => setPageLoading(false))
   }, [])
 
@@ -142,12 +144,12 @@ export default function BooksPage() {
           </thead>
           <tbody>
             {pageLoading ? (
-              <tr><td colSpan={isAdmin ? 7 : 6}><LoadingSpinner /></td></tr>
+              <tr><td colSpan={isAdmin ? 7 : 6}><TableSkeleton rows={5} cols={isAdmin ? 6 : 5} /></td></tr>
             ) : books.map((book) => (
               <tr key={book.id} className="border-b border-[#f1f1f1] hover:bg-[#c5b0f4]/8 transition">
                 <td className="px-4 py-3">
                   {book.coverImage ? (
-                    <img src={book.coverImage} alt="" className="w-10 h-14 object-cover border border-[#e6e6e6] rounded-[8px]" />
+                    <Image src={book.coverImage} alt="" width={40} height={56} className="object-cover border border-[#e6e6e6] rounded-[8px]" />
                   ) : (
                     <div className="w-10 h-14 bg-[#f7f7f5] rounded-[8px] flex items-center justify-center text-[13px] font-light text-black/20">-</div>
                   )}

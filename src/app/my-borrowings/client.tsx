@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { AdminLayout } from '@/components/admin-layout'
 import { LoadingSpinner } from '@/components/loading-spinner'
 import { Toast } from '@/components/toast'
+import { ListSkeleton } from '@/components/skeleton'
 
 interface Transaction {
   id: number
@@ -30,7 +31,7 @@ export function MyBorrowingsClient({ user }: { user: { name: string; role: strin
   const totalFine = active.reduce((sum, t) => sum + (t.status === 'overdue' ? t.fine : 0), 0)
 
   return (
-    <AdminLayout initialUser={user}>
+    <AdminLayout>
       {toast && <Toast type={toast.type} message={toast.message} onClose={() => setToast(null)} />}
       <div className="space-y-4">
         <div className="bg-[#f3c9b6] rounded-[24px] p-6">
@@ -44,7 +45,7 @@ export function MyBorrowingsClient({ user }: { user: { name: string; role: strin
           </div>
         )}
 
-        {loading ? <LoadingSpinner /> : (
+        {loading ? <ListSkeleton count={3} /> : (
           <div className="space-y-3">
             {active.length === 0 ? (
               <p className="text-[15px] font-light text-black/40 text-center py-8">Tidak ada peminjaman aktif</p>

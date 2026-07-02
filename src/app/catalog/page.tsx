@@ -2,10 +2,13 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { AdminLayout } from '@/components/admin-layout'
 import { LoadingSpinner } from '@/components/loading-spinner'
 import { Pagination } from '@/components/pagination'
 import { Toast } from '@/components/toast'
+import { useUser } from '@/lib/auth-context'
+import { CardSkeleton } from '@/components/skeleton'
 
 interface Book {
   id: number
@@ -22,6 +25,7 @@ interface Category {
 }
 
 export default function CatalogPage() {
+  const { user } = useUser()
   const [books, setBooks] = useState<Book[]>([])
   const [categories, setCategories] = useState<Category[]>([])
   const [search, setSearch] = useState('')
@@ -29,18 +33,15 @@ export default function CatalogPage() {
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(0)
   const [total, setTotal] = useState(0)
-  const [user, setUser] = useState<{ id: number; name: string; role: string } | null>(null)
   const [loading, setLoading] = useState(true)
   const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
 
   useEffect(() => {
-    Promise.all([
-      fetch('/api/categories', { cache: 'no-store' }).then((r) => r.json()),
-      fetch('/api/auth/me').then((r) => r.json()),
-    ]).then(([cats, auth]) => {
-      setCategories(cats.categories)
-      setUser(auth.user || null)
-    }).catch(() => {}).finally(() => { fetchBooks(); setLoading(false) })
+    fetch('/api/categories', { cache: 'no-store' })
+      .then((r) => r.json())
+      .then((cats) => setCategories(cats.categories))
+      .catch(() => {})
+      .finally(() => { fetchBooks(); setLoading(false) })
   }, [])
 
   useEffect(() => {
@@ -100,13 +101,13 @@ export default function CatalogPage() {
         </div>
       </div>
 
-      {loading ? <LoadingSpinner /> : (
+      {loading ? <CardSkeleton count={4} /> : (
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         {books.map((book) => (
           <Link key={book.id} href={`/catalog/${book.id}`} className="bg-white rounded-[24px] border border-[#e6e6e6] overflow-hidden transition hover:bg-[#f7f7f5]">
-            <div className="aspect-[3/4] bg-[#f7f7f5] flex items-center justify-center">
+            <div className="aspect-[3/4] bg-[#f7f7f5] flex items-center justify-center relative">
               {book.coverImage ? (
-                <img src={book.coverImage} alt={book.title} className="w-full h-full object-cover" />
+                <Image src={book.coverImage} alt={book.title} fill className="object-cover" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw" />
               ) : (
                 <span className="text-[32px] text-black/20 font-light">?</span>
               )}
@@ -137,7 +138,7 @@ export default function CatalogPage() {
   )
 
   if (user) {
-    return <AdminLayout initialUser={user}>{toast && <Toast type={toast.type} message={toast.message} onClose={() => setToast(null)} />}{content}</AdminLayout>
+    return <AdminLayout>{toast && <Toast type={toast.type} message={toast.message} onClose={() => setToast(null)} />}{content}</AdminLayout>
   }
 
   return (

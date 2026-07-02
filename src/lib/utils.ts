@@ -13,9 +13,14 @@ export function formatRupiah(amount: number) {
   }).format(amount)
 }
 
+const fineRate = Number(process.env.FINE_RATE) || 2000
+
 export function calculateFine(dueDate: Date, returnDate?: Date | null) {
   const end = returnDate || new Date()
   const diffTime = end.getTime() - new Date(dueDate).getTime()
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-  return diffDays > 0 ? diffDays * 2000 : 0
+  return diffDays > 0 ? diffDays * fineRate : 0
 }
+
+export const BORROW_DURATION_DAYS = 7
+

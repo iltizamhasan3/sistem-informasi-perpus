@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma'
 import { withSupabaseRoute } from '@/lib/supabase-server'
+import { BORROW_DURATION_DAYS } from '@/lib/utils'
 import { notifyUser, notifyAdmins } from '@/lib/notifications'
 
 export const POST = withSupabaseRoute({ auth: 'user' }, async (req, ctx) => {
@@ -22,7 +23,7 @@ export const POST = withSupabaseRoute({ auth: 'user' }, async (req, ctx) => {
       data: {
         userId: targetUserId,
         bookId: Number(bookId),
-        dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+        dueDate: new Date(Date.now() + BORROW_DURATION_DAYS * 24 * 60 * 60 * 1000),
       },
       include: {
         user: { select: { id: true, name: true } },

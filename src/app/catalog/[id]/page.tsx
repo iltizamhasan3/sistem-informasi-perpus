@@ -3,8 +3,11 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import { AdminLayout } from '@/components/admin-layout'
 import { LoadingSpinner } from '@/components/loading-spinner'
+import { useUser } from '@/lib/auth-context'
+import { Skeleton } from '@/components/skeleton'
 
 interface BookDetail {
   id: number
@@ -21,8 +24,8 @@ interface BookDetail {
 
 export default function BookDetailPage() {
   const { id } = useParams()
+  const { user } = useUser()
   const [book, setBook] = useState<BookDetail | null>(null)
-  const [user, setUser] = useState<{ id: number; name: string; role: string } | null>(null)
   const [loading, setLoading] = useState(true)
   const [booking, setBooking] = useState(false)
   const [bookingCode, setBookingCode] = useState<string | null>(null)
@@ -34,11 +37,9 @@ export default function BookDetailPage() {
   useEffect(() => {
     Promise.all([
       fetch(`/api/books/${id}`).then((r) => r.json()),
-      fetch('/api/auth/me').then((r) => r.json()),
       fetch('/api/ebooks/my').then((r) => r.json()).catch(() => ({ active: [] })),
-    ]).then(([bookData, auth, ebData]) => {
+    ]).then(([bookData, ebData]) => {
       if (bookData.book) setBook(bookData.book)
-      if (auth.user) setUser(auth.user)
       const found = (ebData.active ?? []).find((r: { bookId: number }) => r.bookId === Number(id))
       if (found) setActiveRental({ id: found.id })
     }).catch(() => {}).finally(() => setLoading(false))
@@ -108,14 +109,26 @@ export default function BookDetailPage() {
         )}
       </div>
 
-      {loading ? <LoadingSpinner /> : !book ? (
+      {loading ? (
+        <div className="bg-white rounded-[24px] border border-[#e6e6e6] overflow-hidden p-6 space-y-4">
+          <div className="md:flex gap-6">
+            <Skeleton className="w-full md:w-64 aspect-[3/4]" />
+            <div className="flex-1 space-y-3 mt-4 md:mt-0">
+              <Skeleton className="h-8 w-3/4" />
+              <Skeleton className="h-5 w-1/2" />
+              <Skeleton className="h-4 w-1/3" />
+              <Skeleton className="h-20 w-full" />
+            </div>
+          </div>
+        </div>
+      ) : !book ? (
         <p className="text-[15px] font-light text-black/40 text-center py-8">Buku tidak ditemukan</p>
       ) : (
         <div className="bg-white rounded-[24px] border border-[#e6e6e6] overflow-hidden">
           <div className="md:flex">
             <div className="md:w-64 shrink-0 bg-[#f7f7f5]">
               {book.coverImage ? (
-                <img src={book.coverImage} alt={book.title} className="w-full aspect-[3/4] object-cover" />
+                <Image src={book.coverImage} alt={book.title} width={256} height={340} className="w-full aspect-[3/4] object-cover" />
               ) : (
                 <div className="w-full aspect-[3/4] flex items-center justify-center">
                   <span className="text-[32px] text-black/20 font-light">?</span>
@@ -214,7 +227,7 @@ export default function BookDetailPage() {
   )
 
   if (user) {
-    return <AdminLayout initialUser={user}>{content}</AdminLayout>
+    return <AdminLayout>{content}</AdminLayout>
   }
 
   return (

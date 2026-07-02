@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma'
 import { withSupabaseRoute } from '@/lib/supabase-server'
+import type { Prisma } from '@/generated/prisma'
 
 export const GET = withSupabaseRoute({ auth: 'user' }, async (req) => {
   const { searchParams } = new URL(req.url)
@@ -7,7 +8,7 @@ export const GET = withSupabaseRoute({ auth: 'user' }, async (req) => {
   const categoryId = searchParams.get('categoryId')
   const page = searchParams.get('page')
 
-  const where: Record<string, unknown> = {}
+  const where: Prisma.BookWhereInput = {}
   if (search) {
     where.OR = [
       { title: { contains: search, mode: 'insensitive' } },

@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma'
 import { withSupabaseRoute } from '@/lib/supabase-server'
+import { BORROW_DURATION_DAYS } from '@/lib/utils'
 import { expireExpiredBookings } from '@/lib/booking'
 import { notifyUser, notifyAdmins } from '@/lib/notifications'
 
@@ -29,7 +30,7 @@ export const POST = withSupabaseRoute({ auth: 'user' }, async (req, ctx) => {
   }
 
   const now = new Date()
-  const dueDate = new Date(now.getTime() + 5 * 24 * 60 * 60 * 1000)
+  const dueDate = new Date(now.getTime() + BORROW_DURATION_DAYS * 24 * 60 * 60 * 1000)
 
   const [transaction] = await prisma.$transaction([
     prisma.transaction.create({

@@ -1,8 +1,13 @@
 import { prisma } from '@/lib/prisma'
 import { cookies } from 'next/headers'
+import { checkRateLimit } from '@/lib/rate-limit'
 
 export async function POST(req: Request) {
   try {
+    const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
+    const { allowed } = checkRateLimit(ip)
+    if (!allowed) return Response.json({ error: 'Terlalu banyak percobaan. Coba lagi nanti.' }, { status: 429 })
+
     const { email, password } = await req.json()
     if (!email || !password) return Response.json({ error: 'Email dan password wajib diisi' }, { status: 400 })
 

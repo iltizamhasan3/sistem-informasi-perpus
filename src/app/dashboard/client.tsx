@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { AdminLayout } from '@/components/admin-layout'
 import { LoadingSpinner } from '@/components/loading-spinner'
 import { Toast } from '@/components/toast'
+import { CardSkeleton, Skeleton } from '@/components/skeleton'
 
 interface DashboardData {
   stats: { totalBooks: number; totalMembers: number; activeBorrows: number; todayTransactions: number }
@@ -39,12 +40,22 @@ export function DashboardClient({ user }: { user: { name: string; role: string }
   }
 
   return (
-    <AdminLayout initialUser={user}>
+    <AdminLayout>
       {dashboardError && (
         <div className="bg-[#f3c9b6]/30 text-black p-4 rounded-[12px] text-[15px] font-light border border-[#f3c9b6] mb-6">{dashboardError}</div>
       )}
 
-      {dashboardLoading ? <LoadingSpinner /> :
+      {dashboardLoading ? (
+        <div className="space-y-8">
+          <Skeleton className="h-32 w-full rounded-[24px]" />
+          <CardSkeleton count={4} />
+          <div className="grid md:grid-cols-2 gap-5">
+            <Skeleton className="h-48 rounded-[24px]" />
+            <Skeleton className="h-48 rounded-[24px]" />
+          </div>
+          <Skeleton className="h-64 rounded-[24px]" />
+        </div>
+      ) :
       <div className="space-y-8">
         <div className="bg-[#f4ecd6] rounded-[24px] p-12">
           <p className="font-mono text-sm uppercase tracking-[0.05em] text-black/40 mb-3">Dashboard</p>

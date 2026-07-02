@@ -15,11 +15,27 @@ function extractTokenFromCookie(req: Request): string | null {
   return match ? match[1] : null
 }
 
+function isValidOrigin(req: Request): boolean {
+  if (process.env.NODE_ENV === 'development') return true
+  const method = req.method
+  if (method === 'GET' || method === 'HEAD') return true
+  const origin = req.headers.get('origin')
+  const referer = req.headers.get('referer')
+  if (!origin && !referer) return false
+  const ALLOWED = process.env.ALLOWED_ORIGIN || ''
+  if (!ALLOWED) return true
+  const check = (url: string) => url.startsWith(ALLOWED)
+  return !!(origin && check(origin)) || !!(referer && check(referer))
+}
+
 export function withSupabaseRoute<T extends Record<string, string> = {}>(
   config: Config,
   handler: (req: Request, ctx: ExtendedCtx<T>) => Response | Promise<Response>,
 ) {
   return async (req: Request, routeCtx: NextCtx<T>) => {
+    if (!isValidOrigin(req)) {
+      return Response.json({ error: 'Forbidden' }, { status: 403 })
+    }
     let proxyReq: Request = req
 
     if (!req.headers.get('authorization')) {

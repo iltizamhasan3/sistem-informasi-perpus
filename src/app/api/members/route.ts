@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma'
 import { withSupabaseRoute } from '@/lib/supabase-server'
 import { notifyUser } from '@/lib/notifications'
+import type { Prisma } from '@/generated/prisma'
 
 export const GET = withSupabaseRoute({ auth: 'user' }, async (req, ctx) => {
   if (!ctx.user || ctx.user.role !== 'admin') return Response.json({ error: 'Unauthorized' }, { status: 403 })
@@ -9,7 +10,7 @@ export const GET = withSupabaseRoute({ auth: 'user' }, async (req, ctx) => {
   const search = searchParams.get('search') || ''
   const page = searchParams.get('page')
 
-  const where: Record<string, unknown> = { role: 'member' as const }
+  const where: Prisma.UserWhereInput = { role: 'member' }
   if (search) {
     where.OR = [
       { name: { contains: search, mode: 'insensitive' } },

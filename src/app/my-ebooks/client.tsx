@@ -2,9 +2,11 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { AdminLayout } from '@/components/admin-layout'
 import { LoadingSpinner } from '@/components/loading-spinner'
 import { Toast } from '@/components/toast'
+import { ListSkeleton } from '@/components/skeleton'
 
 interface EbookRental {
   id: number
@@ -27,7 +29,7 @@ export function MyEbooksClient({ user }: { user: { name: string; role: string } 
   }, [])
 
   return (
-    <AdminLayout initialUser={user}>
+    <AdminLayout>
       {toast && <Toast type={toast.type} message={toast.message} onClose={() => setToast(null)} />}
       <div className="space-y-4">
         <div className="bg-[#c5b0f4] rounded-[24px] p-6">
@@ -35,7 +37,7 @@ export function MyEbooksClient({ user }: { user: { name: string; role: string } 
           <h1 className="text-[32px] font-bold tracking-[-0.02em] leading-[1.1] text-black mt-1">E-book Saya</h1>
         </div>
 
-        {loading ? <LoadingSpinner /> : (
+        {loading ? <ListSkeleton count={3} /> : (
           <div className="space-y-3">
             {active.length === 0 ? (
               <p className="text-[15px] font-light text-black/40 text-center py-8">Tidak ada e-book aktif</p>
@@ -47,8 +49,8 @@ export function MyEbooksClient({ user }: { user: { name: string; role: string } 
                 <div key={r.id} className="bg-white rounded-[12px] border border-[#e6e6e6] p-5">
                   <div className="flex items-start justify-between">
                     <div className="flex items-start gap-3">
-                      <div className="w-10 h-14 bg-[#f7f7f5] rounded-[8px] overflow-hidden shrink-0 flex items-center justify-center text-[18px] text-black/20 font-light">
-                        {r.book.coverImage ? <img src={r.book.coverImage} className="w-full h-full object-cover" /> : '?'}
+                      <div className="w-10 h-14 bg-[#f7f7f5] rounded-[8px] overflow-hidden shrink-0 flex items-center justify-center text-[18px] text-black/20 font-light relative">
+                        {r.book.coverImage ? <Image src={r.book.coverImage} alt="" fill className="object-cover" /> : '?'}
                       </div>
                       <div>
                         <h3 className="text-[16px] font-bold text-black">{r.book.title}</h3>

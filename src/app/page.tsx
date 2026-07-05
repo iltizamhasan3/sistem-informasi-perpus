@@ -42,9 +42,7 @@ export default async function HomePage() {
       <main className="flex-1 flex flex-col z-10 relative">
         {/* Hero Section */}
         <section className="max-w-6xl mx-auto px-6 pt-16 pb-20 w-full flex flex-col items-center text-center">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#c5b0f4]/15 border border-[#c5b0f4]/25 text-[#3d4f97] text-[12px] font-medium tracking-wide mb-6 animate-fade-in uppercase">
-            <span>✨</span> Sistem Perpustakaan Digital Generasi Baru
-          </div>
+
           <h1 className="text-[44px] md:text-[68px] font-extrabold tracking-[-0.04em] leading-[1.05] text-black max-w-4xl font-display">
             Membuka Gerbang <span className="bg-gradient-to-r from-[#3D4F97] via-[#60619C] to-[#8BA1D4] bg-clip-text text-transparent">Pengetahuan Tanpa Batas</span>
           </h1>
@@ -56,10 +54,7 @@ export default async function HomePage() {
               className="px-8 py-[14px] btn-gradient rounded-full text-[16px] font-semibold text-center transition-all shadow-md">
               Mulai Sekarang
             </Link>
-            <Link href="/catalog"
-              className="px-8 py-[14px] bg-white/80 hover:bg-white text-black rounded-full text-[16px] font-medium text-center border border-black/10 transition-all backdrop-blur-md">
-              Lihat Katalog Buku
-            </Link>
+
           </div>
         </section>
 

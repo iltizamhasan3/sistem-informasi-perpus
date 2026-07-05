@@ -1,8 +1,8 @@
 import { prisma } from '@/lib/prisma'
 import { withSupabaseRoute } from '@/lib/supabase-server'
-import type { Prisma } from '@/generated/prisma'
+import type { Prisma } from '@/generated/prisma/client'
 
-export const GET = withSupabaseRoute({ auth: 'user' }, async (req) => {
+export const GET = withSupabaseRoute({ auth: ['user', 'none'] }, async (req) => {
   const { searchParams } = new URL(req.url)
   const search = searchParams.get('search') || ''
   const categoryId = searchParams.get('categoryId')

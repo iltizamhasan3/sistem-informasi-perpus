@@ -1,6 +1,6 @@
 import { prisma } from '@/lib/prisma'
 import { withSupabaseRoute } from '@/lib/supabase-server'
-import type { Prisma } from '@/generated/prisma'
+import type { Prisma } from '@/generated/prisma/client'
 
 export const GET = withSupabaseRoute({ auth: 'user' }, async (req, ctx) => {
   const { searchParams } = new URL(req.url)

@@ -1,7 +1,7 @@
 import { prisma } from '@/lib/prisma'
 import { withSupabaseRoute } from '@/lib/supabase-server'
 
-export const GET = withSupabaseRoute({ auth: 'user' }, async () => {
+export const GET = withSupabaseRoute({ auth: ['user', 'none'] }, async () => {
   const categories = await prisma.category.findMany({
     orderBy: { name: 'asc' },
     include: { _count: { select: { books: true } } },

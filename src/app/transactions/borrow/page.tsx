@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { LoadingSpinner } from '@/components/loading-spinner'
 import { Toast } from '@/components/toast'
 import { ConfirmModal } from '@/components/confirm-modal'
+import { SearchableSelect } from '@/components/searchable-select'
 
 interface Book { id: number; title: string; author: string; stock: number }
 interface Member { id: number; name: string; email: string }
@@ -116,91 +117,103 @@ export default function BorrowPage() {
   }
 
   return (
-    <div>
-      <div className="bg-[#dceeb1] rounded-[24px] p-8 md:p-12 mb-8">
-        <p className="font-mono text-sm uppercase tracking-[0.05em] text-black/40 mb-3">Transaksi</p>
-        <h1 className="text-[32px] font-bold tracking-[-0.02em] leading-[1.1] text-black">Peminjaman Buku</h1>
-        <p className="text-[18px] font-light leading-relaxed text-black/50 mt-3 max-w-xl">Pinjam buku baru atau konfirmasi booking anggota.</p>
+    <div className="relative w-full z-10">
+      
+      {/* Ghost Watermark Background */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 z-[-1] pointer-events-none w-full text-center mt-[-60px]">
+         <h1 className="mc-ghost-watermark select-none text-[90px] md:text-[200px]">BORROW</h1>
       </div>
 
-      {pageLoading ? <LoadingSpinner /> : (
-        <div className="space-y-10">
-          {userRole === 'admin' && (
-            <div className="bg-white rounded-[24px] border border-[#e6e6e6] p-8 mx-auto max-w-lg">
-              <p className="font-mono text-sm uppercase tracking-[0.05em] text-black/40">Booking</p>
-              <h3 className="text-[18px] font-light leading-relaxed text-black/50 mt-1 mb-5">Konfirmasi Kode Booking</h3>
-              <div className="flex gap-2 mb-4">
-                <input type="text" value={bookingCode} onChange={(e) => setBookingCode(e.target.value.toUpperCase())}
-                  placeholder="Masukkan kode booking"
-                  className="flex-1 px-[14px] py-3 bg-white border border-[#e6e6e6] rounded-[8px] text-[16px] font-light text-black placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-[#c5b0f4]/20 focus:border-black transition" />
-                <button onClick={handleSearchBooking} disabled={bookingSearching}
-                  className="px-5 py-[10px] bg-black text-white rounded-[50px] text-[14px] font-light hover:bg-gray-800 transition disabled:opacity-40 shrink-0">
-                  {bookingSearching ? 'Mencari...' : 'Cari'}
-                </button>
-              </div>
-              {bookingError && <p className="text-[15px] font-light text-black/50 mb-3">{bookingError}</p>}
+      <div className="mc-card-stadium p-6 md:p-12 mb-10 mt-10 max-w-2xl mx-auto shadow-md">
+        <div className="mb-10 text-center">
+          <p className="mc-eyebrow text-[var(--color-slate)] mb-3">Transaksi</p>
+          <h1 className="mc-heading-2 text-[var(--color-ink)]">Peminjaman Buku</h1>
+          <p className="text-[16px] font-[450] text-[var(--color-slate)] mt-4 max-w-lg mx-auto">
+            Pinjam buku baru atau konfirmasi booking anggota.
+          </p>
+        </div>
 
-              {bookingData && (
-                <div className="bg-[#f7f7f5] rounded-[12px] p-6 space-y-3">
-                  <p className="text-lg tracking-widest font-mono font-bold text-black">{bookingData.code}</p>
-                  <div className="text-[15px] font-light text-black space-y-1">
-                    <p><span className="text-black/40">Anggota:</span> {bookingData.user.name} ({bookingData.user.email})</p>
-                    <p><span className="text-black/40">Buku:</span> {bookingData.book.title}</p>
-                    <p><span className="text-black/40">Booking:</span> {new Date(bookingData.expiresAt).toLocaleDateString('id-ID', { hour: '2-digit', minute: '2-digit' })}</p>
-                  </div>
-                  <button onClick={() => setConfirmBooking(true)} disabled={confirming}
-                    className="px-5 py-[10px] bg-black text-white rounded-[50px] text-[14px] font-light hover:bg-gray-800 transition disabled:opacity-40">
-                    Konfirmasi & Buat Transaksi
+        {pageLoading ? <LoadingSpinner /> : (
+          <div className="space-y-10">
+            {userRole === 'admin' && (
+              <div className="bg-white/40 p-6 md:p-8 rounded-[32px] border border-black/5">
+                <p className="mc-eyebrow text-[var(--color-slate)] mb-5 text-center">Konfirmasi Kode Booking</p>
+                <div className="flex flex-col sm:flex-row gap-4 mb-2">
+                  <input type="text" value={bookingCode} onChange={(e) => setBookingCode(e.target.value.toUpperCase())}
+                    placeholder="Masukkan kode booking"
+                    className="flex-1 w-full px-6 py-4 bg-white border border-black/5 rounded-full text-[15px] font-[450] text-[var(--color-ink)] placeholder:text-[var(--color-slate)]/50 focus:outline-none focus:ring-2 focus:ring-[var(--color-ink)] focus:border-transparent transition-all shadow-sm" />
+                  <button onClick={handleSearchBooking} disabled={bookingSearching}
+                    className="mc-btn-primary px-8 py-4 w-full sm:w-auto flex justify-center items-center shadow-md shrink-0">
+                    {bookingSearching ? 'Mencari...' : 'Cari'}
                   </button>
                 </div>
-              )}
-            </div>
-          )}
+                {bookingError && <p className="text-[14px] font-[500] text-[var(--color-signal)] mt-4 text-center">{bookingError}</p>}
 
-          <div className="mx-auto max-w-lg">
-            <p className="font-mono text-sm uppercase tracking-[0.05em] text-black/40">Langsung</p>
-            <h3 className="text-[18px] font-light leading-relaxed text-black/50 mt-1 mb-5">Pinjam Langsung</h3>
-            <form onSubmit={handleSubmit} className="bg-white rounded-[24px] border border-[#e6e6e6] p-8 mx-auto max-w-lg space-y-5">
-              {error && (
-              <div className="bg-[#f3c9b6]/30 text-black p-4 rounded-[12px] text-[15px] font-light border border-[#f3c9b6]">{error}</div>
-              )}
+                {bookingData && (
+                  <div className="bg-white p-6 rounded-[24px] space-y-4 shadow-sm border border-black/5 mt-6">
+                    <p className="text-xl tracking-widest font-mono font-bold text-center text-[var(--color-ink)]">{bookingData.code}</p>
+                    <div className="text-[14px] font-[450] text-[var(--color-ink)] space-y-2 border-t border-black/5 pt-4">
+                      <p><span className="text-[var(--color-slate)]">Anggota:</span> {bookingData.user.name} ({bookingData.user.email})</p>
+                      <p><span className="text-[var(--color-slate)]">Buku:</span> {bookingData.book.title}</p>
+                      <p><span className="text-[var(--color-slate)]">Batas Waktu:</span> {new Date(bookingData.expiresAt).toLocaleDateString('id-ID', { hour: '2-digit', minute: '2-digit' })}</p>
+                    </div>
+                    <button onClick={() => setConfirmBooking(true)} disabled={confirming}
+                      className="mc-btn-primary w-full py-3 mt-4 flex justify-center">
+                      Konfirmasi & Buat Transaksi
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
 
-              {userRole === 'admin' && (
+            <div>
+              <p className="mc-eyebrow text-[var(--color-slate)] mb-6 text-center">Pinjam Langsung</p>
+              <form onSubmit={handleSubmit} className="space-y-6">
+                {error && (
+                  <div className="bg-[#fff5f2] border border-[var(--color-signal)]/10 text-[var(--color-signal)] px-6 py-4 rounded-[16px] text-[15px] font-[500] shadow-sm text-center">
+                    {error}
+                  </div>
+                )}
+
+                {userRole === 'admin' && (
+                  <div>
+                    <label className="text-[14px] font-[500] text-[var(--color-ink)] pl-4 mb-2 block">Pilih Anggota <span className="text-[var(--color-signal)]">*</span></label>
+                    <SearchableSelect
+                      value={memberId}
+                      onChange={setMemberId}
+                      options={members.map((m) => ({ id: m.id.toString(), label: `${m.name} (${m.email})` }))}
+                      placeholder="Pilih anggota perpustakaan"
+                      className="w-full px-6 py-4 bg-white border border-black/5 rounded-full text-[15px] font-[450] text-[var(--color-ink)] focus:outline-none focus:ring-2 focus:ring-[var(--color-ink)] focus:border-transparent transition-all shadow-sm"
+                    />
+                  </div>
+                )}
+
                 <div>
-                  <label className="text-[15px] font-light text-black mb-2 block">Anggota</label>
-                  <select value={memberId} onChange={(e) => setMemberId(e.target.value)}
-                    className="w-full px-[14px] py-3 bg-white border border-[#e6e6e6] rounded-[8px] text-[16px] font-light text-black focus:outline-none focus:ring-2 focus:ring-[#c5b0f4]/20 focus:border-black transition">
-                    <option value="">Pilih anggota</option>
-                    {members.map((m) => <option key={m.id} value={m.id}>{m.name} ({m.email})</option>)}
-                  </select>
+                  <label className="text-[14px] font-[500] text-[var(--color-ink)] pl-4 mb-2 block">Pilih Buku <span className="text-[var(--color-signal)]">*</span></label>
+                  <SearchableSelect
+                    value={bookId}
+                    onChange={setBookId}
+                    options={books.filter((b) => b.stock > 0).map((b) => ({ id: b.id.toString(), label: `${b.title} - ${b.author} (stok: ${b.stock})` }))}
+                    placeholder="Pilih buku yang tersedia"
+                    className="w-full px-6 py-4 bg-white border border-black/5 rounded-full text-[15px] font-[450] text-[var(--color-ink)] focus:outline-none focus:ring-2 focus:ring-[var(--color-ink)] focus:border-transparent transition-all shadow-sm"
+                  />
                 </div>
-              )}
 
-              <div>
-                <label className="text-[15px] font-light text-black mb-2 block">Buku</label>
-                <select value={bookId} onChange={(e) => setBookId(e.target.value)}
-                  className="w-full px-[14px] py-3 bg-white border border-[#e6e6e6] rounded-[8px] text-[16px] font-light text-black focus:outline-none focus:ring-2 focus:ring-[#c5b0f4]/20 focus:border-black transition">
-                  <option value="">Pilih buku</option>
-                  {books.filter((b) => b.stock > 0).map((b) => (
-                    <option key={b.id} value={b.id}>{b.title} - {b.author} (stok: {b.stock})</option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="flex gap-3 pt-2">
-                <button type="submit" disabled={loading || !bookId || (userRole === 'admin' && !memberId)}
-                  className="px-5 py-[10px] bg-black text-white rounded-[50px] text-[14px] font-light hover:bg-gray-800 transition disabled:opacity-40">
-                  {loading ? 'Memproses...' : 'Pinjam Buku'}
-                </button>
-                <button type="button" onClick={() => router.push('/transactions')}
-                  className="px-5 py-[10px] bg-white text-black rounded-[50px] text-[14px] font-light border border-[#e6e6e6] hover:bg-[#f7f7f5] transition">
-                  Batal
-                </button>
-              </div>
-            </form>
+                <div className="flex flex-col sm:flex-row items-center gap-4 pt-8 mt-8 border-t border-[var(--color-ink)]/5">
+                  <button type="submit" disabled={loading || !bookId || (userRole === 'admin' && !memberId)}
+                    className="mc-btn-primary w-full sm:w-auto px-10 py-4 shadow-md disabled:opacity-50 flex justify-center items-center">
+                    {loading ? 'Memproses...' : 'Pinjam Buku'}
+                  </button>
+                  <button type="button" onClick={() => router.push('/transactions')}
+                    className="mc-btn-secondary w-full sm:w-auto px-10 py-4">
+                    Batal
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       <ConfirmModal
         open={confirmBooking && bookingData !== null}

@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { Pagination } from '@/components/pagination'
 import { ConfirmModal } from '@/components/confirm-modal'
 import { Toast } from '@/components/toast'
-import { TableSkeleton } from '@/components/skeleton'
+import { LoadingSpinner } from '@/components/loading-spinner'
 
 interface Member {
   id: number
@@ -117,76 +117,111 @@ export default function MembersPage() {
   }
 
   return (
-    <div>
-      <div className="bg-[#efd4d4] rounded-[24px] p-8 md:p-12 mb-8">
-        <p className="font-mono text-sm uppercase tracking-[0.05em] text-black/40 mb-3">Anggota</p>
-        <h1 className="text-[32px] font-bold tracking-[-0.02em] leading-[1.1] text-black">Anggota</h1>
-        <p className="text-[18px] font-light leading-relaxed text-black/50 mt-3 max-w-xl">Kelola data anggota perpustakaan</p>
+    <div className="relative w-full z-10">
+      
+      {/* Ghost Watermark */}
+      <div className="absolute -top-16 -left-10 md:-left-24 z-[-1] pointer-events-none overflow-hidden w-[150%] whitespace-nowrap">
+         <h1 className="mc-ghost-watermark select-none text-[120px] md:text-[240px]">USERS</h1>
       </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-        <form onSubmit={handleSearch} className="flex items-center gap-3">
+      <div className="mc-card-stadium p-6 md:p-12 mb-16 relative overflow-hidden flex items-end min-h-[250px] md:min-h-[300px]">
+        <div className="absolute -top-10 -right-10 opacity-10 md:opacity-5 pointer-events-none">
+          <h1 className="text-[100px] md:text-[200px] font-bold tracking-tighter leading-none" style={{ fontFamily: 'var(--font-display)' }}>USER</h1>
+        </div>
+        <div className="relative z-10 w-full flex flex-col md:flex-row justify-between md:items-end gap-6">
+           <div className="w-full md:w-auto min-w-0">
+              <p className="mc-eyebrow text-[var(--color-slate)] mb-4">Direktori Anggota</p>
+              <h1 className="mc-heading-1 text-[var(--color-ink)] break-words break-all sm:break-normal">Anggota<br/>Perpustakaan</h1>
+           </div>
+           <p className="text-[18px] font-[450] text-[var(--color-slate)] max-w-sm text-right pb-2">
+             Kelola keanggotaan, pantau sirkulasi peminjaman, dan lihat riwayat aktivitas pembaca.
+           </p>
+        </div>
+      </div>
+
+      <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-12">
+        <form onSubmit={handleSearch} className="relative flex items-center w-full md:w-[400px]">
           <input type="text" value={search} onChange={(e) => setSearch(e.target.value)}
             placeholder="Cari nama atau email..."
-            className="w-full max-w-[240px] px-[14px] py-[10px] bg-white border border-[#e6e6e6] rounded-[50px] text-[15px] font-light text-black placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-[#c5b0f4]/20 focus:border-black transition" />
-          <button type="submit"
-            className="px-5 py-[10px] bg-black text-white rounded-[50px] text-[14px] font-light hover:bg-gray-800 transition">Cari</button>
+            className="w-full pl-6 pr-14 py-4 bg-white border-none rounded-full text-[16px] font-[450] text-[var(--color-ink)] placeholder:text-[var(--color-slate)]/50 focus:outline-none focus:ring-2 focus:ring-[var(--color-ink)] transition-shadow shadow-[0_8px_24px_rgba(0,0,0,0.04)]" />
+          <button type="submit" className="absolute right-2 w-12 h-12 bg-[var(--color-ink)] rounded-full flex items-center justify-center hover:scale-[0.96] transition-transform">
+            <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+          </button>
         </form>
-        <div className="flex gap-2">
+        
+        <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
           <button onClick={exportCSV} disabled={exporting}
-            className="px-5 py-[10px] bg-white text-black rounded-[50px] text-[14px] font-light border border-[#e6e6e6] hover:bg-[#f7f7f5] transition disabled:opacity-40">
+            className="mc-btn-secondary px-6 py-4 disabled:opacity-50 w-full sm:w-auto text-center">
             {exporting ? 'Mengekspor...' : 'Export CSV'}
           </button>
-          <Link href="/members/create"
-            className="px-5 py-[10px] bg-black text-white rounded-[50px] text-[14px] font-light hover:bg-gray-800 transition">+ Tambah Anggota</Link>
+          <Link href="/members/create" className="mc-btn-primary px-8 py-4 whitespace-nowrap flex justify-center w-full sm:w-auto">
+            Tambah Anggota
+          </Link>
         </div>
       </div>
 
-      <div className="bg-white rounded-[24px] border border-[#e6e6e6] overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[600px]">
-          <thead>
-            <tr className="bg-[#efd4d4]/15">
-              <th className="text-left px-4 py-3 text-[13px] font-light text-black/50 uppercase tracking-wide">Nama</th>
-              <th className="text-left px-4 py-3 text-[13px] font-light text-black/50 uppercase tracking-wide">Email</th>
-              <th className="text-left px-4 py-3 text-[13px] font-light text-black/50 uppercase tracking-wide">Telepon</th>
-              <th className="text-center px-4 py-3 text-[13px] font-light text-black/50 uppercase tracking-wide">Status</th>
-              <th className="text-center px-4 py-3 text-[13px] font-light text-black/50 uppercase tracking-wide">Transaksi</th>
-              <th className="text-right px-4 py-3 text-[13px] font-light text-black/50 uppercase tracking-wide">Aksi</th>
-            </tr>
-          </thead>
-          <tbody>
-            {pageLoading ? (
-              <tr><td colSpan={6}><TableSkeleton rows={5} cols={6} /></td></tr>
-            ) : members.map((m) => (
-              <tr key={m.id} className="border-b border-[#f1f1f1] hover:bg-[#c5b0f4]/8 transition">
-                <td className="px-4 py-3 text-[15px] font-light text-black">{m.name}</td>
-                <td className="px-4 py-3 text-[15px] font-light text-black/50">{m.email}</td>
-                <td className="px-4 py-3 text-[15px] font-light text-black/50">{m.phone || '-'}</td>
-                <td className="px-4 py-3 text-center">
-                  <button onClick={() => toggleActive(m.id, m.isActive)}
-                    className={`inline-flex px-3 py-1 rounded-[50px] text-[13px] font-light ${
-                      m.isActive ? 'bg-[#c8e6cd] text-black' : 'bg-[#f3c9b6] text-black'
-                    }`}>
-                    {m.isActive ? 'Aktif' : 'Nonaktif'}
-                  </button>
-                </td>
-                <td className="px-4 py-3 text-center text-[15px] font-light text-black/50">{m._count.transactions}</td>
-                <td className="px-4 py-3 text-right space-x-3">
-                  <Link href={`/members/${m.id}/edit`} className="text-[14px] font-light text-[#60619C]/60 hover:text-[#60619C] transition">Edit</Link>
-                  <button onClick={() => setDeleteId(m.id)} className="text-[14px] font-light text-[#60619C]/60 hover:text-[#60619C] transition">Hapus</button>
-                </td>
-              </tr>
-            ))}
-            {!pageLoading && members.length === 0 && (
-              <tr><td colSpan={6} className="text-[15px] font-light text-black/40 text-center py-8">Belum ada anggota</td></tr>
-            )}
-          </tbody>
-          </table>
-        </div>
+      {/* Pill Rows List */}
+      <div className="space-y-4 mb-16">
+         {pageLoading ? (
+            <div className="flex justify-center py-24"><LoadingSpinner /></div>
+         ) : members.length === 0 ? (
+            <div className="px-8 py-24 text-center bg-white/60 backdrop-blur-sm rounded-[40px] text-[var(--color-slate)] text-[16px] font-[450]">Belum ada data anggota</div>
+         ) : (
+            members.map((m) => (
+               <div key={m.id} className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 px-6 md:px-8 py-5 md:py-6 bg-[var(--color-lifted-cream)] rounded-[32px] shadow-sm hover:shadow-[0_12px_24px_rgba(0,0,0,0.06)] transition-shadow group">
+                  
+                  {/* Name & Avatar */}
+                  <div className="flex items-center gap-6 lg:w-[30%]">
+                     <div className="w-14 h-14 shrink-0 rounded-full bg-[var(--color-ink)] text-white flex items-center justify-center font-bold text-xl shadow-md">
+                        {m.name.charAt(0).toUpperCase()}
+                     </div>
+                     <div className="flex flex-col">
+                        <span className="text-[18px] font-[500] text-[var(--color-ink)] mb-1">{m.name}</span>
+                        <span className="text-[14px] font-[450] text-[var(--color-slate)]">{m.email}</span>
+                     </div>
+                  </div>
+
+                  {/* Phone & Status */}
+                  <div className="flex items-center justify-between lg:w-[40%] gap-6">
+                     <div className="flex flex-col items-center text-center">
+                        <span className="mc-eyebrow text-[var(--color-slate)] mb-1">Telepon</span>
+                        <span className="text-[16px] font-[450] text-[var(--color-ink)]">{m.phone || '-'}</span>
+                     </div>
+                     <div className="flex flex-col items-center text-center">
+                        <span className="mc-eyebrow text-[var(--color-slate)] mb-2">Status</span>
+                        <button onClick={() => toggleActive(m.id, m.isActive)}
+                           className={`inline-flex px-4 py-1.5 rounded-full text-[13px] font-[500] border transition-colors ${
+                              m.isActive ? 'border-[var(--color-ink)]/20 text-[var(--color-ink)] hover:bg-[var(--color-ink)] hover:text-white' : 'border-[var(--color-signal)] text-[var(--color-signal)] hover:bg-[var(--color-signal)] hover:text-white'
+                           }`}>
+                           {m.isActive ? 'Aktif' : 'Nonaktif'}
+                        </button>
+                     </div>
+                     <div className="flex flex-col items-center text-center">
+                        <span className="mc-eyebrow text-[var(--color-slate)] mb-1">Transaksi</span>
+                        <span className="text-[16px] font-[500] text-[var(--color-ink)]">{m._count.transactions}</span>
+                     </div>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex items-center justify-end gap-3 lg:w-[20%]">
+                     <Link href={`/members/${m.id}/edit`} className="w-12 h-12 rounded-full bg-white flex items-center justify-center text-[var(--color-ink)] shadow-sm hover:bg-[var(--color-ink)] hover:text-white transition-all">
+                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                     </Link>
+                     <button onClick={() => setDeleteId(m.id)} className="w-12 h-12 rounded-full bg-white flex items-center justify-center text-[var(--color-signal)] shadow-sm hover:bg-[var(--color-signal)] hover:text-white transition-all">
+                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                     </button>
+                  </div>
+
+               </div>
+            ))
+         )}
       </div>
 
-      <Pagination page={page} totalPages={totalPages} total={total} onPageChange={onPageChange} />
+      <div className="flex justify-center mb-16">
+        <div className="bg-white/60 backdrop-blur-md rounded-full px-4 py-2 border border-[#e6e6e6]">
+           <Pagination page={page} totalPages={totalPages} total={total} onPageChange={onPageChange} />
+        </div>
+      </div>
 
       <ConfirmModal
         open={deleteId !== null}

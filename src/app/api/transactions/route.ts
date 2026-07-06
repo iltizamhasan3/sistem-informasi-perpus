@@ -23,7 +23,7 @@ export const GET = withSupabaseRoute({ auth: 'user' }, async (req, ctx) => {
         where,
         include: {
           user: { select: { id: true, name: true, email: true } },
-          book: { select: { id: true, title: true, author: true } },
+          book: { select: { id: true, title: true, author: true, coverImage: true } },
         },
         orderBy: { createdAt: 'desc' },
         skip,
@@ -38,7 +38,7 @@ export const GET = withSupabaseRoute({ auth: 'user' }, async (req, ctx) => {
     where,
     include: {
       user: { select: { id: true, name: true, email: true } },
-      book: { select: { id: true, title: true, author: true } },
+      book: { select: { id: true, title: true, author: true, coverImage: true } },
     },
     orderBy: { createdAt: 'desc' },
   })

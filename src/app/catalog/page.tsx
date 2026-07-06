@@ -7,7 +7,7 @@ import { AdminLayout } from '@/components/admin-layout'
 import { Pagination } from '@/components/pagination'
 import { Toast } from '@/components/toast'
 import { useUser } from '@/lib/auth-context'
-import { CardSkeleton } from '@/components/skeleton'
+import { LoadingSpinner } from '@/components/loading-spinner'
 
 interface Book {
   id: number
@@ -81,105 +81,102 @@ export default function CatalogPage() {
   }
 
   const content = (
-    <main className="max-w-6xl mx-auto px-4 py-8">
-      {/* Sleek Search Header */}
-      <div className="bg-gradient-to-r from-[#c5b0f4]/15 via-[#9fbee7]/15 to-[#FAF9F5] border border-black/5 rounded-[32px] p-8 mb-8 relative overflow-hidden shadow-sm">
-        <div className="absolute right-[-10%] top-[-20%] w-[250px] h-[250px] bg-[#c5b0f4]/20 rounded-full blur-[40px] pointer-events-none" />
-        <div className="relative z-10 max-w-3xl">
-          <p className="font-mono text-[12px] uppercase tracking-wider text-black/50 mb-2">Katalog Perpustakaan</p>
-          <h1 className="text-[36px] font-extrabold tracking-tight leading-tight text-black mb-6 font-display">
-            Jelajahi Dunia Lewat Buku
-          </h1>
+    <div className="relative w-full z-10 px-4 max-w-7xl mx-auto">
+      {/* Ghost Watermark */}
+      <div className="absolute -top-16 -left-10 md:-left-24 z-[-1] pointer-events-none overflow-hidden w-[150%] whitespace-nowrap">
+         <h1 className="mc-ghost-watermark select-none text-[120px] md:text-[240px]">CATALOG</h1>
+      </div>
 
-          <div className="flex flex-col md:flex-row gap-3 w-full">
-            <form onSubmit={handleSearch} className="flex-1 flex gap-2 w-full">
-              <div className="relative flex-1">
-                <span className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-black/30">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                    <circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" />
-                  </svg>
-                </span>
-                <input type="text" value={search} onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Cari judul, pengarang, penerbit..."
-                  className="w-full pl-11 pr-4 py-3.5 bg-white border border-black/5 rounded-2xl text-[15px] text-black placeholder:text-black/30 focus:outline-none focus:ring-2 focus:ring-[#c5b0f4]/20 focus:border-[#60619C] shadow-sm transition-all" />
-              </div>
-              <button type="submit"
-                className="px-6 py-3.5 btn-gradient rounded-2xl text-[14px] font-semibold transition-all shadow-md shrink-0">
-                Cari
-              </button>
-            </form>
-            <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)}
-              className="w-full md:w-auto px-4 py-3.5 bg-white border border-black/5 rounded-2xl text-[15px] text-black/85 focus:outline-none focus:ring-2 focus:ring-[#c5b0f4]/20 focus:border-[#60619C] shadow-sm transition-all">
-              <option value="">Semua Kategori</option>
-              {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-            </select>
-          </div>
+      <div className="mc-card-stadium p-6 md:p-12 mb-16 mt-8 relative overflow-hidden flex items-end min-h-[250px] md:min-h-[300px]">
+        <div className="absolute -top-10 -right-10 opacity-10 md:opacity-5 pointer-events-none">
+          <h1 className="text-[100px] md:text-[200px] font-bold tracking-tighter leading-none" style={{ fontFamily: 'var(--font-display)' }}>CATALOG</h1>
+        </div>
+        <div className="relative z-10 w-full flex flex-col md:flex-row justify-between md:items-end gap-6">
+           <div>
+              <p className="mc-eyebrow text-[var(--color-slate)] mb-4">Jelajahi Dunia</p>
+              <h1 className="mc-heading-1 text-[var(--color-ink)]">Katalog<br/>Perpustakaan</h1>
+           </div>
+           
+           <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
+             <form onSubmit={handleSearch} className="relative flex items-center w-full md:w-[320px]">
+               <input type="text" value={search} onChange={e => setSearch(e.target.value)}
+                 placeholder="Cari buku..."
+                 className="w-full pl-6 pr-14 py-4 bg-white border border-[var(--color-ink)]/10 rounded-full text-[16px] font-[450] text-[var(--color-ink)] placeholder:text-[var(--color-slate)]/50 focus:outline-none focus:border-[var(--color-ink)]/40 transition-shadow shadow-sm" />
+               <button type="submit" className="absolute right-2 w-12 h-12 bg-[var(--color-ink)] rounded-full flex items-center justify-center hover:scale-[0.96] transition-transform">
+                 <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+               </button>
+             </form>
+             
+             <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)}
+               className="w-full md:w-auto px-6 py-4 bg-white border border-[var(--color-ink)]/10 rounded-full text-[16px] font-[450] text-[var(--color-ink)] focus:outline-none focus:border-[var(--color-ink)]/40 transition-shadow shadow-sm appearance-none cursor-pointer"
+               style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%23141413\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'1.5\' d=\'M19 9l-7 7-7-7\'/%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1.2rem center', backgroundSize: '1.2em', paddingRight: '3rem' }}>
+               <option value="">Semua Kategori</option>
+               {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+             </select>
+           </div>
         </div>
       </div>
 
-      {/* Book Grid */}
-      {loading ? <CardSkeleton count={8} /> : (
-        <div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {books.map((book) => (
-              <Link key={book.id} href={`/catalog/${book.id}`} 
-                className="glass-card hover-scale-card rounded-[24px] overflow-hidden flex flex-col h-full">
-                <div className="aspect-[3/4] bg-black/5 flex items-center justify-center relative overflow-hidden group">
-                  {book.coverImage ? (
-                    <Image src={book.coverImage} alt={book.title} fill className="object-cover transition duration-500 group-hover:scale-105" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw" />
-                  ) : (
-                    <div className="flex flex-col items-center gap-2 text-black/20">
-                      <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
-                        <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                      </svg>
-                      <span className="text-[12px] font-medium tracking-wide">Sampul Kosong</span>
+      {/* Grid Buku */}
+      {loading ? (
+         <div className="flex justify-center py-48"><LoadingSpinner /></div>
+      ) : books.length === 0 ? (
+         <div className="py-32 text-center bg-white/40 rounded-[40px] border border-white/60 backdrop-blur-sm shadow-sm mb-16">
+            <h3 className="mc-heading-3 text-[var(--color-slate)]">Buku tidak ditemukan.</h3>
+            <p className="text-[16px] text-[var(--color-slate)]/70 mt-2">Coba gunakan kata kunci lain.</p>
+         </div>
+      ) : (
+         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-8 gap-y-16 mb-24 mt-16 relative">
+            {books.map((book, idx) => (
+              <Link href={`/catalog/${book.id}`} key={book.id} className="flex flex-col items-center group relative cursor-pointer">
+                 
+                 <div className="relative mb-8 z-10">
+                    {/* Rectangular Card Portrait */}
+                    <div className="w-[180px] md:w-[220px] aspect-[3/4] rounded-[24px] overflow-hidden bg-white shadow-[0_16px_32px_rgba(0,0,0,0.06)] group-hover:shadow-[0_24px_48px_rgba(0,0,0,0.12)] transition-shadow duration-500 relative flex items-center justify-center">
+                       {book.coverImage ? (
+                          <Image src={book.coverImage} alt={book.title} fill className="object-cover object-center transition-transform duration-700 group-hover:scale-105" sizes="(max-width: 768px) 180px, 220px" />
+                       ) : (
+                          <span className="text-[var(--color-slate)]/20 font-bold text-6xl" style={{ fontFamily: 'var(--font-display)' }}>?</span>
+                       )}
+                       <div className="absolute inset-0 rounded-[24px] border border-black/5 pointer-events-none"></div>
                     </div>
-                  )}
-                </div>
-                <div className="p-5 flex-1 flex flex-col justify-between">
-                  <div>
-                    <span className="inline-flex px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-[#60619C]/10 text-[#3d4f97] mb-3">
-                      {book.category.name}
-                    </span>
-                    <h3 className="text-[15px] font-bold text-black leading-snug line-clamp-2 font-display hover:text-[#3D4F97] transition-all">
-                      {book.title}
-                    </h3>
-                    <p className="text-[13px] font-light text-black/50 mt-1">{book.author}</p>
-                  </div>
-                  <div className="mt-4 pt-3 border-t border-black/5 flex items-center justify-between">
-                    {book.stock > 0 ? (
-                      <span className="inline-flex px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-500/10 text-emerald-700">
-                        Tersedia ({book.stock})
+                 </div>
+
+                 {/* Info Buku */}
+                 <div className="flex flex-col items-center text-center max-w-[240px]">
+                   <div className="flex items-center gap-2 mb-3">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-signal-light)]"></span>
+                      <span className="mc-eyebrow text-[var(--color-slate)]">{book.category.name}</span>
+                   </div>
+
+                   <h3 className="text-[18px] font-bold tracking-tight text-[var(--color-ink)] line-clamp-2 mb-2 leading-snug group-hover:text-[var(--color-signal)] transition-colors">{book.title}</h3>
+                   <p className="text-[15px] font-[450] text-[var(--color-slate)] mb-4">{book.author}</p>
+
+                   {/* Status Label */}
+                   {book.stock > 0 ? (
+                      <span className="px-4 py-1.5 rounded-full text-[13px] font-[500] border border-[var(--color-ink)]/15 text-[var(--color-ink)] bg-white/50">
+                         Tersedia ({book.stock})
                       </span>
-                    ) : (
-                      <span className="inline-flex px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-rose-500/10 text-rose-700">
-                        Stok Habis
+                   ) : (
+                      <span className="px-4 py-1.5 rounded-full text-[13px] font-[500] border border-[var(--color-signal)] text-[var(--color-signal)] bg-white/50">
+                         Stok Habis
                       </span>
-                    )}
-                  </div>
-                </div>
+                   )}
+                 </div>
               </Link>
             ))}
-          </div>
-
-          {!loading && books.length === 0 && (
-            <div className="text-center py-16 glass-card rounded-[24px] p-8 max-w-md mx-auto">
-              <svg className="w-12 h-12 text-black/20 mx-auto mb-4" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
-                <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-              </svg>
-              <h3 className="text-[16px] font-bold text-black mb-1">Buku Tidak Ditemukan</h3>
-              <p className="text-[14px] font-light text-black/50">Coba gunakan kata kunci pencarian yang lain.</p>
-            </div>
-          )}
-
-          {!loading && books.length > 0 && (
-            <div className="mt-10 flex justify-center">
-              <Pagination page={page} totalPages={totalPages} total={total} onPageChange={onPageChange} />
-            </div>
-          )}
-        </div>
+         </div>
       )}
-    </main>
+
+      {/* Pagination Container */}
+      {!loading && books.length > 0 && (
+         <div className="flex justify-center mb-24">
+           <div className="bg-white/60 backdrop-blur-md rounded-full px-4 py-2 border border-[#e6e6e6]">
+              <Pagination page={page} totalPages={totalPages} total={total} onPageChange={onPageChange} />
+           </div>
+         </div>
+      )}
+    </div>
   )
 
   if (user) {
@@ -187,24 +184,23 @@ export default function CatalogPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FAF9F5] relative overflow-hidden font-sans">
-      <div className="absolute top-[-10%] right-[-10%] w-[300px] h-[300px] bg-[#c5b0f4]/10 rounded-full blur-[60px] pointer-events-none" />
+    <div className="min-h-screen bg-[var(--color-canvas-cream)] relative overflow-hidden font-sans">
       {toast && <Toast type={toast.type} message={toast.message} onClose={() => setToast(null)} />}
       
       {/* Navbar for Guest */}
-      <nav className="sticky top-0 z-50 glass-header">
-        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+      <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-black/5">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center">
-              <svg className="w-3.5 h-3.5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M12 6v13" /><path d="M12 6a4 4 0 0 0-4-4H2v16h6a4 4 0 0 1 4 4" /><path d="M12 6a4 4 0 0 1 4-4h6v16h-6a4 4 0 0 0-4 4" />
-              </svg>
+            <div className="w-9 h-9 rounded-full bg-[var(--color-signal)] flex items-center justify-center">
+               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5 text-white">
+                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+               </svg>
             </div>
-            <span className="text-[16px] font-bold text-black font-display">SiPustaka</span>
+            <span className="font-[500] text-xl tracking-tight text-[var(--color-ink)]">SiPustaka</span>
           </Link>
-          <div className="flex items-center gap-2">
-            <Link href="/login" className="px-5 py-[8px] text-[14px] font-medium text-black/80 hover:bg-black/5 rounded-full transition-all">Masuk</Link>
-            <Link href="/register" className="px-5 py-[9px] btn-gradient text-[14px] font-medium rounded-full transition-all shadow-sm">Daftar</Link>
+          <div className="flex items-center gap-4">
+            <Link href="/login" className="text-[15px] font-[500] text-[var(--color-ink)] hover:text-[var(--color-signal)] transition-colors">Masuk</Link>
+            <Link href="/register" className="mc-btn-primary px-6 py-2">Daftar</Link>
           </div>
         </div>
       </nav>

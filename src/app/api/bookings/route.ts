@@ -40,7 +40,7 @@ export const POST = withSupabaseRoute({ auth: 'user' }, async (req, ctx) => {
     const [booking] = await Promise.all([
       tx.booking.create({
         data: { code, userId, bookId: Number(bookId), expiresAt },
-        include: { book: { select: { id: true, title: true } } },
+        include: { book: { select: { id: true, title: true, coverImage: true } } },
       }),
     ])
 
@@ -69,7 +69,7 @@ export const GET = withSupabaseRoute({ auth: 'user' }, async (req, ctx) => {
     where,
     include: {
       user: { select: { id: true, name: true, email: true } },
-      book: { select: { id: true, title: true, author: true } },
+      book: { select: { id: true, title: true, author: true, coverImage: true } },
     },
     orderBy: { createdAt: 'desc' },
   })

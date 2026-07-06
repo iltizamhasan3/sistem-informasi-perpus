@@ -75,55 +75,77 @@ export default function CategoriesPage() {
   }
 
   return (
-    <div>
-      <div className="bg-[#c8e6cd] rounded-[24px] p-8 md:p-12 mb-8">
-        <p className="font-mono text-sm uppercase tracking-[0.05em] text-black/40 mb-3">Kategori</p>
-        <h1 className="text-[32px] font-bold tracking-[-0.02em] leading-[1.1] text-black">Kategori Buku</h1>
-        <p className="text-[18px] font-light leading-relaxed text-black/50 mt-3 max-w-xl">Kelola kategori buku perpustakaan</p>
+    <div className="relative w-full z-10">
+      
+      {/* Ghost Watermark */}
+      <div className="absolute -top-16 -left-10 md:-left-24 z-[-1] pointer-events-none overflow-hidden w-[150%] whitespace-nowrap">
+         <h1 className="mc-ghost-watermark select-none text-[120px] md:text-[240px]">CATEGORIES</h1>
+      </div>
+
+      <div className="mc-card-stadium p-6 md:p-12 mb-16 relative overflow-hidden flex items-end min-h-[250px] md:min-h-[300px]">
+        <div className="absolute -top-10 -right-10 opacity-10 md:opacity-5 pointer-events-none">
+          <h1 className="text-[100px] md:text-[200px] font-bold tracking-tighter leading-none" style={{ fontFamily: 'var(--font-display)' }}>CATEGORIES</h1>
+        </div>
+        <div className="relative z-10 w-full flex flex-col md:flex-row justify-between md:items-end gap-6">
+           <div className="w-full md:w-auto min-w-0">
+              <p className="mc-eyebrow text-[var(--color-slate)] mb-4">Klasifikasi Literatur</p>
+              <h1 className="mc-heading-1 text-[var(--color-ink)] break-words break-all sm:break-normal">Kategori<br/>Buku</h1>
+           </div>
+           <p className="text-[18px] font-[450] text-[var(--color-slate)] max-w-sm text-right pb-2">
+             Kelola dan kelompokkan literatur perpustakaan untuk mempermudah sirkulasi.
+           </p>
+        </div>
       </div>
 
       {error && (
-        <div className="px-4 py-3 text-[15px] font-light text-black bg-[#f3c9b6] rounded-[8px] mb-6">{error}</div>
+        <div className="px-6 py-4 text-[15px] font-[500] text-[var(--color-signal)] bg-white rounded-[24px] mb-8 shadow-sm border border-[var(--color-signal)]/20">{error}</div>
       )}
 
-      <form onSubmit={handleCreate} className="flex items-center gap-3 mb-6">
-        <input type="text" value={name} onChange={(e) => setName(e.target.value)}
-          placeholder="Nama kategori baru"
-          className="w-full max-w-[240px] px-[14px] py-[10px] bg-white border border-[#e6e6e6] rounded-[50px] text-[15px] font-light text-black placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-[#c5b0f4]/20 focus:border-black transition" />
-        <button type="submit" disabled={loading || !name.trim()}
-          className="px-5 py-[10px] bg-black text-white rounded-[50px] text-[14px] font-light hover:bg-gray-800 transition disabled:opacity-40">
-          {loading ? 'Menyimpan...' : 'Tambah'}
-        </button>
-      </form>
+      {/* Tambah Kategori */}
+      <div className="flex flex-col md:flex-row items-center justify-between gap-8 mb-12">
+        <h3 className="mc-heading-3 text-[var(--color-ink)]">Daftar Kategori</h3>
+        
+        <form onSubmit={handleCreate} className="relative flex items-center w-full md:w-[400px]">
+          <input type="text" value={name} onChange={(e) => setName(e.target.value)}
+            placeholder="Tambah kategori baru..."
+            className="w-full pl-6 pr-32 py-4 bg-white border-none rounded-full text-[16px] font-[450] text-[var(--color-ink)] placeholder:text-[var(--color-slate)]/50 focus:outline-none focus:ring-2 focus:ring-[var(--color-ink)] transition-shadow shadow-[0_8px_24px_rgba(0,0,0,0.04)]" />
+          <button type="submit" disabled={loading || !name.trim()}
+            className="absolute right-2 mc-btn-primary px-6 py-2.5 rounded-full disabled:opacity-50">
+            {loading ? '...' : '+ Tambah'}
+          </button>
+        </form>
+      </div>
 
-      <div className="bg-white rounded-[24px] border border-[#e6e6e6] overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[400px]">
-          <thead>
-            <tr className="bg-[#c8e6cd]/15">
-              <th className="text-left px-4 py-3 text-[13px] font-light text-black/50 uppercase tracking-wide">Nama</th>
-              <th className="text-left px-4 py-3 text-[13px] font-light text-black/50 uppercase tracking-wide">Jumlah Buku</th>
-              <th className="text-right px-4 py-3 text-[13px] font-light text-black/50 uppercase tracking-wide">Aksi</th>
-            </tr>
-          </thead>
-          <tbody>
-            {pageLoading ? (
-              <tr><td colSpan={3}><LoadingSpinner /></td></tr>
-            ) : categories.map((cat) => (
-              <tr key={cat.id} className="border-b border-[#f1f1f1] hover:bg-[#c5b0f4]/8 transition">
-                <td className="px-4 py-3 text-[15px] font-light text-black">{cat.name}</td>
-                <td className="px-4 py-3 text-[15px] font-light text-black/50">{cat._count.books} buku</td>
-                <td className="px-4 py-3 text-right">
-                  <button onClick={() => setDeleteId(cat.id)} className="text-[14px] font-light text-[#60619C]/60 hover:text-[#60619C] transition">Hapus</button>
-                </td>
-              </tr>
-            ))}
-            {!pageLoading && categories.length === 0 && (
-              <tr><td colSpan={3} className="text-[15px] font-light text-black/40 text-center py-8">Belum ada kategori</td></tr>
-            )}
-          </tbody>
-          </table>
-        </div>
+      {/* Pill Rows List */}
+      <div className="space-y-4">
+         {pageLoading ? (
+            <div className="flex justify-center py-24"><LoadingSpinner /></div>
+         ) : categories.length === 0 ? (
+            <div className="px-8 py-24 text-center bg-white/60 backdrop-blur-sm rounded-[40px] text-[var(--color-slate)] text-[16px] font-[450]">Belum ada kategori</div>
+         ) : (
+            categories.map((cat) => (
+               <div key={cat.id} className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 px-6 md:px-8 py-5 md:py-6 bg-[var(--color-lifted-cream)] rounded-[24px] shadow-sm hover:shadow-md transition-shadow group">
+                  
+                  <div className="flex items-center gap-6">
+                     <div className="w-12 h-12 rounded-full bg-[var(--color-ink)]/5 text-[var(--color-ink)] flex items-center justify-center">
+                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
+                     </div>
+                     <span className="text-[18px] font-[500] text-[var(--color-ink)]">{cat.name}</span>
+                  </div>
+
+                  <div className="flex items-center justify-between sm:justify-end gap-12 sm:w-1/2">
+                     <div className="flex flex-col text-right">
+                        <span className="mc-eyebrow text-[var(--color-slate)] mb-1">Jumlah Buku</span>
+                        <span className="text-[16px] font-[500] text-[var(--color-ink)]">{cat._count.books} pcs</span>
+                     </div>
+                     
+                     <button onClick={() => setDeleteId(cat.id)} className="w-12 h-12 rounded-full bg-white flex items-center justify-center text-[var(--color-signal)] opacity-100 sm:opacity-0 group-hover:opacity-100 shadow-sm hover:bg-[var(--color-signal)] hover:text-white transition-all">
+                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                     </button>
+                  </div>
+               </div>
+            ))
+         )}
       </div>
 
       <ConfirmModal

@@ -2,137 +2,128 @@
 @custom-variant max-md (@media (width < 48rem));
 
 @theme inline {
-  --color-page: #DEDEDE;
-  --color-canvas: #7A8ABA;
-  --color-canvas-soft: #9FBEE7;
-  --color-periwinkle: #8BA1D4;
-  --color-lavender: #ACACE7;
-  --color-ice: #C0D5E6;
-  --color-chrome-indigo: #3D4F97;
-  --color-muted-indigo: #60619C;
-  --color-platinum: #DEDEDE;
-  --color-surface: #FFFFFF;
-  --color-carbon: #21242E;
-  --color-amber: #ECAB37;
-  --color-nav-gold: #E48600;
-  --color-signal: #F68D1F;
-  --color-nintendo-red: #E60012;
-  --color-primary: #E60012;
-  --color-ink: #21242E;
-  --color-ink-soft: #3D4F97;
-  --color-on-primary: #FFFFFF;
-  --color-hairline: #5A5F8C;
-  --color-danger: #E60012;
-  --font-sans: var(--font-inter), Arial, Helvetica, sans-serif;
-  --font-display: var(--font-outfit), sans-serif;
-  --font-mono: "Courier New", monospace;
-}
+  --color-canvas-cream: #F3F0EE;
+  --color-lifted-cream: #FCFBFA;
+  --color-ink: #141413;
+  --color-charcoal: #262627;
+  --color-slate: #696969;
+  --color-signal: #CF4500;
+  --color-signal-light: #F37338;
+  --color-link: #3860BE;
 
-@keyframes fade-in {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: translateY(0); }
+  --font-sans: var(--font-inter), Arial, sans-serif;
+  --font-display: var(--font-outfit), sans-serif;
 }
 
 @layer base {
+  body {
+    background-color: var(--color-canvas-cream);
+    color: var(--color-ink);
+    font-weight: 450;
+  }
   :focus-visible {
-    outline: 2px solid #c5b0f4;
+    outline: 2px solid var(--color-signal);
     outline-offset: 2px;
   }
 }
 
-@utility animate-fade-in {
-  animation: fade-in 0.25s ease-out;
-}
-
 @layer utilities {
-  .chrome-panel {
-    background-color: var(--color-canvas);
-    box-shadow: inset 0 1px 0 0 rgba(255,255,255,0.3), 0 1px 0 0 var(--color-chrome-indigo);
-  }
-  .chrome-panel-raised {
-    background-color: var(--color-periwinkle);
-    box-shadow: inset 0 1px 0 0 rgba(255,255,255,0.35), 0 1px 0 0 var(--color-chrome-indigo);
-  }
-  .chrome-panel-inset {
-    background-color: var(--color-platinum);
-    box-shadow: inset 0 1px 2px 0 rgba(0,0,0,0.1);
-  }
-  .chrome-carbon {
-    background-color: var(--color-carbon);
-    background-image: radial-gradient(circle, rgba(255,255,255,0.04) 1px, transparent 1px);
-    background-size: 4px 4px;
-  }
-  .chrome-carbon-solid {
-    background-color: var(--color-carbon);
-  }
-  .chrome-bevel-top {
-    box-shadow: inset 0 1px 0 0 rgba(255,255,255,0.25);
-  }
-  .chrome-bevel-bottom {
-    box-shadow: 0 1px 0 0 var(--color-chrome-indigo);
-  }
-  .display-text {
-    font-family: Arial Black, Arial, sans-serif;
-    font-size: 44px;
-    font-weight: 900;
-    line-height: 1;
-    color: var(--color-surface);
-    text-shadow:
-      2px 2px 0 var(--color-carbon),
-      -1px -1px 0 var(--color-carbon),
-      1px -1px 0 var(--color-carbon),
-      -1px 1px 0 var(--color-carbon),
-      1px 1px 0 var(--color-carbon);
-    -webkit-text-stroke: 2px var(--color-carbon);
-  }
-  .ui-label {
-    font-family: Arial, sans-serif;
-    font-size: 11px;
-    font-weight: 700;
+  .mc-heading-1 {
+    font-size: clamp(40px, 8vw, 64px);
+    font-weight: 500;
     line-height: 1.1;
-    letter-spacing: 0.5px;
+    letter-spacing: -0.02em;
+  }
+  .mc-heading-2 {
+    font-size: 36px;
+    font-weight: 500;
+    line-height: 44px;
+    letter-spacing: -0.72px;
+  }
+  .mc-heading-3 {
+    font-size: 24px;
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: -0.48px;
+  }
+  .mc-eyebrow {
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 14px;
+    letter-spacing: 0.56px;
     text-transform: uppercase;
   }
-  .nav-link-text {
-    font-family: Arial, sans-serif;
-    font-size: 13px;
-    font-weight: 700;
-    line-height: 1;
-    letter-spacing: 0.5px;
+  .mc-ghost-watermark {
+    font-size: 120px;
+    font-weight: 500;
+    letter-spacing: -2.4px;
+    color: #E8E2DA;
   }
-  .halftone-dots {
-    background-image: radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 1px);
-    background-size: 4px 4px;
+  
+  .mc-btn-primary {
+    background-color: var(--color-ink);
+    color: var(--color-canvas-cream);
+    border-radius: 20px;
+    padding: 6px 24px;
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: -0.32px;
+    border: 1.5px solid var(--color-ink);
+    transition: all 0.2s ease;
   }
-  .glass-card {
-    background: rgba(255, 255, 255, 0.7);
+  .mc-btn-primary:hover {
+    background-color: var(--color-charcoal);
+    border-color: var(--color-charcoal);
+  }
+  .mc-btn-primary:active {
+    transform: scale(0.97);
+  }
+  
+  .mc-btn-secondary {
+    background-color: #FFFFFF;
+    color: var(--color-ink);
+    border-radius: 20px;
+    padding: 6px 24px;
+    font-size: 16px;
+    font-weight: 450;
+    border: 1.5px solid var(--color-ink);
+    transition: all 0.2s ease;
+  }
+  .mc-btn-secondary:hover {
+    background-color: var(--color-ink);
+    color: var(--color-canvas-cream);
+  }
+  .mc-btn-secondary:active {
+    transform: scale(0.97);
+  }
+  
+  .mc-satellite-cta {
+    background-color: #FFFFFF;
+    border-radius: 50%;
+    width: 56px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-ink);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    transition: transform 0.2s ease;
+  }
+  .mc-satellite-cta:hover {
+    transform: scale(1.05);
+  }
+  
+  .mc-nav-pill {
+    background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.04);
+    border-radius: 999px;
+    padding: 16px 40px;
+    box-shadow: 0 4px 24px 0 rgba(0, 0, 0, 0.04);
   }
-  .glass-header {
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    border-bottom: 1px solid rgba(230, 230, 230, 0.5);
-  }
-  .hover-scale-card {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-  .hover-scale-card:hover {
-    transform: translateY(-6px) scale(1.015);
-    box-shadow: 0 20px 40px -15px rgba(0,0,0,0.08);
-    border-color: rgba(96, 97, 156, 0.2);
-  }
-  .btn-gradient {
-    background: linear-gradient(135deg, #3d4f97 0%, #60619c 100%);
-    color: white;
-    transition: all 0.25s ease;
-  }
-  .btn-gradient:hover {
-    background: linear-gradient(135deg, #2c3a72 0%, #4f5082 100%);
-    box-shadow: 0 4px 14px rgba(96, 97, 156, 0.3);
-    transform: translateY(-1px);
+  
+  .mc-card-stadium {
+    border-radius: 40px;
+    box-shadow: 0 24px 48px 0 rgba(0, 0, 0, 0.08);
+    background-color: var(--color-lifted-cream);
   }
 }

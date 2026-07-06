@@ -22,17 +22,17 @@ export function ConfirmModal({ open, title, message, confirmLabel = 'Ya', cancel
   if (!open) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30" onClick={onCancel}>
-      <div className="bg-white rounded-[24px] shadow-sm p-8 max-w-sm w-full mx-4" onClick={(e) => e.stopPropagation()}>
-        <h3 className="text-[18px] font-bold text-black mb-2">{title}</h3>
-        <p className="text-[15px] font-light text-black/60 mb-6 leading-relaxed">{message}</p>
-        <div className="flex justify-end gap-3">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm" onClick={onCancel}>
+      <div className="bg-[var(--color-lifted-cream)] rounded-[40px] shadow-[0_24px_48px_0_rgba(0,0,0,0.08)] p-10 max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
+        <h3 className="mc-heading-3 text-[var(--color-ink)] mb-3">{title}</h3>
+        <p className="text-[16px] font-[450] text-[var(--color-slate)] mb-10 leading-relaxed">{message}</p>
+        <div className="flex justify-end gap-4">
           <button onClick={onCancel} disabled={loading}
-            className="px-5 py-[10px] bg-white text-black rounded-[50px] text-[15px] font-light border border-[#e6e6e6] transition hover:bg-[#c5b0f4]/10 disabled:opacity-40">
+            className="mc-btn-secondary disabled:opacity-40">
             {cancelLabel}
           </button>
           <button onClick={onConfirm} disabled={loading}
-            className="px-5 py-[10px] bg-black text-white rounded-[50px] text-[15px] font-light transition hover:bg-gray-800 disabled:opacity-40">
+            className="bg-[var(--color-signal)] text-white rounded-[24px] px-[30px] py-[8px] text-[15px] font-[500] tracking-tight transition hover:bg-[#b53c00] disabled:opacity-40 border-none">
             {loading ? 'Memproses...' : confirmLabel}
           </button>
         </div>

@@ -95,133 +95,148 @@ export default function BookDetailPage() {
   }
 
   const content = (
-    <main className="max-w-4xl mx-auto px-4 py-6">
-      <div className="bg-[#efd4d4] rounded-[24px] p-6 mb-6">
-        <Link href="/catalog" className="inline-flex items-center gap-1 text-[14px] font-light text-black/60 hover:text-black transition mb-2">
-          &larr; Kembali ke Katalog
-        </Link>
-        <p className="font-mono text-sm uppercase tracking-[0.05em] text-black/40">Detail Buku</p>
-        {book && (
-          <span className="inline-flex px-3 py-1 rounded-[50px] text-[13px] font-light bg-white/60 text-black mt-2">
-            {book.category.name}
-          </span>
-        )}
+    <main className="max-w-4xl mx-auto px-4 py-12 relative z-10">
+      
+      {/* Ghost Watermark Background */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 z-[-1] pointer-events-none w-full text-center mt-[-60px]">
+         <h1 className="mc-ghost-watermark select-none text-[120px] md:text-[240px]">BOOK</h1>
       </div>
 
-      {loading ? (
-        <div className="bg-white rounded-[24px] border border-[#e6e6e6] overflow-hidden p-6 space-y-4">
-          <div className="md:flex gap-6">
-            <Skeleton className="w-full md:w-64 aspect-[3/4]" />
-            <div className="flex-1 space-y-3 mt-4 md:mt-0">
-              <Skeleton className="h-8 w-3/4" />
-              <Skeleton className="h-5 w-1/2" />
-              <Skeleton className="h-4 w-1/3" />
-              <Skeleton className="h-20 w-full" />
-            </div>
+      <div className="mc-card-stadium p-6 md:p-12 mb-6">
+        <div className="mb-8 border-b border-[var(--color-ink)]/5 pb-6">
+          <Link href="/catalog" className="inline-flex items-center gap-2 text-[14px] font-[500] text-[var(--color-slate)] hover:text-[var(--color-ink)] transition mb-4">
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+            Kembali ke Katalog
+          </Link>
+          <div className="flex items-center gap-3">
+             <p className="mc-eyebrow text-[var(--color-slate)]">Detail Buku</p>
+             {book && (
+               <span className="inline-flex px-3 py-1 rounded-full text-[12px] font-[500] bg-[var(--color-ink)]/5 text-[var(--color-ink)]">
+                 {book.category.name}
+               </span>
+             )}
           </div>
         </div>
-      ) : !book ? (
-        <p className="text-[15px] font-light text-black/40 text-center py-8">Buku tidak ditemukan</p>
-      ) : (
-        <div className="bg-white rounded-[24px] border border-[#e6e6e6] overflow-hidden">
-          <div className="md:flex">
-            <div className="md:w-64 shrink-0 bg-[#f7f7f5]">
-              {book.coverImage ? (
-                <Image src={book.coverImage} alt={book.title} width={256} height={340} className="w-full aspect-[3/4] object-cover" />
-              ) : (
-                <div className="w-full aspect-[3/4] flex items-center justify-center">
-                  <span className="text-[32px] text-black/20 font-light">?</span>
-                </div>
-              )}
-            </div>
-            <div className="p-6 md:p-8 flex-1 min-w-0">
-              <h1 className="text-[32px] font-bold tracking-[-0.02em] leading-[1.1] text-black">{book.title}</h1>
-              <p className="text-[18px] font-light text-black/50 mt-1">{book.author}</p>
 
-              <div className="mt-4 space-y-1 text-[15px] font-light text-black/60">
-                {book.publisher && <p>Penerbit: {book.publisher}</p>}
-                {book.year && <p>Tahun: {book.year}</p>}
+        {loading ? (
+          <div className="space-y-4">
+            <div className="md:flex gap-8">
+              <Skeleton className="w-full md:w-64 aspect-[3/4] rounded-[24px]" />
+              <div className="flex-1 space-y-4 mt-6 md:mt-0">
+                <Skeleton className="h-10 w-3/4 rounded-full" />
+                <Skeleton className="h-6 w-1/2 rounded-full" />
+                <Skeleton className="h-4 w-1/3 rounded-full" />
+                <Skeleton className="h-24 w-full rounded-[16px]" />
+              </div>
+            </div>
+          </div>
+        ) : !book ? (
+          <p className="text-[16px] font-[450] text-[var(--color-slate)] text-center py-12">Buku tidak ditemukan</p>
+        ) : (
+          <div className="md:flex gap-10">
+            <div className="md:w-[280px] shrink-0">
+              <div className="rounded-[24px] overflow-hidden bg-black/5 shadow-sm border border-black/5">
+                {book.coverImage ? (
+                  <Image src={book.coverImage} alt={book.title} width={280} height={380} className="w-full aspect-[3/4] object-cover" />
+                ) : (
+                  <div className="w-full aspect-[3/4] flex items-center justify-center">
+                    <span className="text-[40px] text-[var(--color-slate)]/30 font-bold">?</span>
+                  </div>
+                )}
+              </div>
+            </div>
+            
+            <div className="flex-1 mt-8 md:mt-0">
+              <h1 className="text-[36px] font-bold tracking-tight leading-[1.1] text-[var(--color-ink)]">{book.title}</h1>
+              <p className="text-[20px] font-[450] text-[var(--color-slate)] mt-2">{book.author}</p>
+
+              <div className="mt-6 space-y-2 text-[15px] font-[450] text-[var(--color-slate)] bg-[var(--color-canvas-cream)]/50 p-4 rounded-[16px] border border-[var(--color-ink)]/5">
+                {book.publisher && <p><strong className="text-[var(--color-ink)] font-[500]">Penerbit:</strong> {book.publisher}</p>}
+                {book.year && <p><strong className="text-[var(--color-ink)] font-[500]">Tahun:</strong> {book.year}</p>}
               </div>
 
               {book.description && (
-                <div className="mt-6 pt-6 border-t border-[#e6e6e6]">
-                  <p className="text-[15px] font-light text-black mb-2">Sinopsis</p>
-                  <p className="text-[15px] font-light text-black/60 leading-relaxed whitespace-pre-line">{book.description}</p>
+                <div className="mt-8">
+                  <h3 className="text-[16px] font-[500] text-[var(--color-ink)] mb-3">Sinopsis</h3>
+                  <p className="text-[15px] font-[450] text-[var(--color-slate)] leading-relaxed whitespace-pre-line">{book.description}</p>
                 </div>
               )}
 
               {message && (
-                <div className={`mt-6 rounded-[12px] p-4 text-[15px] font-light text-black ${
-                  message.type === 'success' ? 'bg-[#c8e6cd]' : 'bg-[#f3c9b6]'
+                <div className={`mt-8 rounded-[16px] p-5 text-[15px] font-[500] ${
+                  message.type === 'success' ? 'bg-[#c8e6cd] text-[#1e4b26]' : 'bg-[#fff5f2] text-[var(--color-signal)] border border-[var(--color-signal)]/10'
                 }`}>
                   {message.text}
                   {bookingCode && (
-                    <div className="mt-2">
-                      <span className="inline-block px-3 py-1.5 bg-white rounded-[8px] text-[16px] font-mono font-bold tracking-widest">
+                    <div className="mt-4 bg-white/60 p-4 rounded-[12px]">
+                      <span className="inline-block px-4 py-2 bg-white rounded-full text-[18px] font-mono font-bold tracking-widest text-[var(--color-ink)] shadow-sm">
                         {bookingCode}
                       </span>
-                      <p className="mt-1 text-[13px] text-black/60">
-                        Tunjukkan kode ini ke admin di perpustakaan untuk mengambil buku. Booking berlaku 24 jam.
+                      <p className="mt-3 text-[14px] text-black/70 font-[450] leading-relaxed">
+                        Tunjukkan kode ini ke admin perpustakaan untuk mengambil buku fisik Anda. Batas pengambilan 24 jam.
                       </p>
-                      <Link href="/my-bookings" className="mt-2 inline-block text-[13px] text-black/50 hover:text-black underline transition">
-                        Lihat di Riwayat
+                      <Link href="/my-bookings" className="mt-3 inline-block text-[14px] font-[500] text-[var(--color-ink)] hover:underline transition">
+                        Lihat di Riwayat &rarr;
                       </Link>
                     </div>
                   )}
                 </div>
               )}
 
-              <div className="flex items-center gap-4 mt-6 pt-6 border-t border-[#e6e6e6]">
-                <span className="text-[15px] font-light text-black">Sisa stok: {book.stock}</span>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-4 mt-8 pt-8 border-t border-[var(--color-ink)]/5">
+                <div className="flex-1">
+                  <span className="text-[15px] font-[500] text-[var(--color-ink)]">Sisa stok fisik: <span className="text-[var(--color-slate)]">{book.stock}</span></span>
+                  {book.stock <= 0 && (
+                    <span className="ml-3 inline-flex px-3 py-1 rounded-full text-[12px] font-[500] bg-[var(--color-signal)]/10 text-[var(--color-signal)]">
+                      Kosong
+                    </span>
+                  )}
+                </div>
+                
                 {book.stock > 0 && user?.role === 'member' && (
                   <button onClick={handleBooking} disabled={booking}
-                    className="px-5 py-[10px] bg-black text-white rounded-[50px] text-[14px] font-light hover:bg-gray-800 transition disabled:opacity-40">
-                    {booking ? 'Memproses...' : 'Booking Buku'}
+                    className="mc-btn-primary px-8">
+                    {booking ? 'Memproses...' : 'Booking Fisik'}
                   </button>
                 )}
                 {book.stock > 0 && !user && (
-                  <Link href="/login" className="text-[14px] font-light text-black/50 hover:underline">
+                  <Link href="/login" className="mc-btn-secondary px-6">
                     Masuk untuk booking
                   </Link>
-                )}
-                {book.stock <= 0 && (
-                  <span className="inline-flex px-3 py-1 rounded-[50px] text-[13px] font-light bg-[#f3c9b6] text-black">
-                    Tidak tersedia
-                  </span>
                 )}
               </div>
 
               {book.isEbook && (
-                <div className="mt-6 pt-6 border-t border-[#e6e6e6]">
-                  <p className="text-[15px] font-light text-black mb-2">E-book</p>
+                <div className="mt-8 pt-8 border-t border-[var(--color-ink)]/5">
+                  <h3 className="text-[16px] font-[500] text-[var(--color-ink)] mb-4">E-book Digital</h3>
                   {rentMsg && (
-                    <div className={`mb-3 rounded-[12px] p-4 text-[15px] font-light text-black ${
-                      rentMsg.type === 'success' ? 'bg-[#c8e6cd]' : 'bg-[#f3c9b6]'
+                    <div className={`mb-4 rounded-[16px] p-5 text-[15px] font-[500] ${
+                      rentMsg.type === 'success' ? 'bg-[#c8e6cd] text-[#1e4b26]' : 'bg-[#fff5f2] text-[var(--color-signal)] border border-[var(--color-signal)]/10'
                     }`}>
                       {rentMsg.text}
                     </div>
                   )}
                   {activeRental ? (
                     <Link href={`/reader/${activeRental.id}`}
-                      className="inline-block px-5 py-[10px] bg-black text-white rounded-[50px] text-[14px] font-light hover:bg-gray-800 transition">
-                      Baca E-book
+                      className="mc-btn-primary px-8 inline-block">
+                      Mulai Membaca E-book
                     </Link>
                   ) : user?.role === 'member' ? (
                     <button onClick={handleRentEbook} disabled={renting}
-                      className="px-5 py-[10px] bg-black text-white rounded-[50px] text-[14px] font-light hover:bg-gray-800 transition disabled:opacity-40">
-                      {renting ? 'Memproses...' : 'Sewa E-book (2 hari)'}
+                      className="mc-btn-primary px-8">
+                      {renting ? 'Memproses...' : 'Sewa E-book (Bebas Biaya)'}
                     </button>
                   ) : !user ? (
-                    <Link href="/login" className="text-[14px] font-light text-black/50 hover:underline">
-                      Masuk untuk sewa e-book
+                    <Link href="/login" className="mc-btn-secondary px-6 inline-block">
+                      Masuk untuk baca E-book
                     </Link>
                   ) : null}
                 </div>
               )}
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </main>
   )
 
@@ -230,16 +245,20 @@ export default function BookDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f7f7f5]">
-      <nav className="bg-white border-b border-[#e6e6e6] px-4 py-2">
-        <div className="max-w-4xl mx-auto flex items-center justify-between">
-          <Link href="/" className="inline-flex items-center gap-2">
-            <span className="bg-black text-white rounded-full px-2.5 py-0.5 text-sm font-black tracking-wider">S</span>
-            <span className="text-black text-[15px] font-light">SiPustaka</span>
+    <div className="min-h-screen bg-[var(--color-canvas-cream)] relative overflow-hidden font-sans">
+      <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-black/5">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-full bg-[var(--color-signal)] flex items-center justify-center">
+               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5 text-white">
+                 <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+               </svg>
+            </div>
+            <span className="font-[500] text-xl tracking-tight text-[var(--color-ink)]">SiPustaka</span>
           </Link>
-          <div className="flex items-center gap-2">
-            <Link href="/login" className="px-5 py-[10px] text-black rounded-[50px] text-[14px] font-light hover:bg-[#f7f7f5] transition">Masuk</Link>
-            <Link href="/register" className="px-5 py-[10px] bg-black text-white rounded-[50px] text-[14px] font-light hover:bg-gray-800 transition">Daftar</Link>
+          <div className="flex items-center gap-4">
+            <Link href="/login" className="text-[15px] font-[500] text-[var(--color-ink)] hover:text-[var(--color-signal)] transition-colors">Masuk</Link>
+            <Link href="/register" className="mc-btn-primary px-6 py-2">Daftar</Link>
           </div>
         </div>
       </nav>

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { AdminLayout } from '@/components/admin-layout'
 import { ConfirmModal } from '@/components/confirm-modal'
 import { Toast } from '@/components/toast'
-import { ListSkeleton } from '@/components/skeleton'
+import { LoadingSpinner } from '@/components/loading-spinner'
 
 interface BookingItem {
   id: number
@@ -85,101 +85,155 @@ export function MyBookingsClient({ user }: { user: { name: string; role: string 
   const activeBookings = items.filter((b) => b.status === 'active')
   const historyBookings = items.filter((b) => b.status !== 'active')
 
+  const statusBadge = (status: string) => {
+    if (status === 'completed') return <span className="inline-flex px-4 py-1.5 rounded-full text-[13px] font-[500] border border-[var(--color-ink)] bg-[var(--color-ink)] text-white">Selesai</span>
+    if (status === 'expired') return <span className="inline-flex px-4 py-1.5 rounded-full text-[13px] font-[500] border border-[var(--color-signal)] text-[var(--color-signal)] bg-white">Kedaluwarsa</span>
+    return <span className="inline-flex px-4 py-1.5 rounded-full text-[13px] font-[500] border border-[var(--color-slate)]/30 text-[var(--color-slate)] bg-white/50">Dibatalkan</span>
+  }
+
   return (
     <AdminLayout>
-      <div className="space-y-8">
-        <div className="bg-[#f4ecd6] rounded-[24px] p-6">
-          <p className="font-mono text-sm uppercase tracking-[0.05em] text-black/40">Riwayat</p>
-          <h1 className="text-[32px] font-bold tracking-[-0.02em] leading-[1.1] text-black mt-1">Booking &amp; Riwayat</h1>
-          <button onClick={exportCSV}
-            className="mt-4 px-5 py-[10px] bg-white text-black rounded-[50px] text-[14px] font-light border border-[#e6e6e6] hover:bg-[#f7f7f5] transition">Export CSV</button>
+      <div className="relative w-full z-10">
+        
+        {/* Ghost Watermark */}
+        <div className="absolute -top-16 -left-10 md:-left-24 z-[-1] pointer-events-none overflow-hidden w-[150%] whitespace-nowrap">
+           <h1 className="mc-ghost-watermark select-none text-[120px] md:text-[240px]">TICKET</h1>
         </div>
 
-        {loading ? <ListSkeleton count={3} /> : (
-          <>
+        <div className="mc-card-stadium p-6 md:p-12 mb-12 relative overflow-hidden flex items-end min-h-[250px] md:min-h-[300px]">
+          <div className="absolute -top-10 -right-10 opacity-10 md:opacity-5 pointer-events-none">
+            <h1 className="text-[100px] md:text-[200px] font-bold tracking-tighter leading-none" style={{ fontFamily: 'var(--font-display)' }}>RESERVED</h1>
+          </div>
+          <div className="relative z-10 w-full flex flex-col md:flex-row justify-between md:items-end gap-6">
+             <div>
+                <p className="mc-eyebrow text-[var(--color-slate)] mb-4">Pemesanan Buku</p>
+                <h1 className="mc-heading-1 text-[var(--color-ink)]">Booking<br/>& Riwayat</h1>
+             </div>
+             
+             <div className="flex flex-col items-end">
+                <p className="text-[18px] font-[450] text-[var(--color-slate)] max-w-sm text-right mb-6">
+                  Kelola antrean peminjaman buku dan lihat riwayat pemesanan Anda.
+                </p>
+                <button onClick={exportCSV} className="mc-btn-secondary px-6 py-3">
+                   Export Data CSV
+                </button>
+             </div>
+          </div>
+        </div>
+
+        {toast && <Toast type={toast.type} message={toast.message} onClose={() => setToast(null)} />}
+
+        {loading ? (
+           <div className="flex justify-center py-24"><LoadingSpinner /></div>
+        ) : (
+          <div className="space-y-16 mb-24">
+            
+            {/* Active Bookings Section */}
             {activeBookings.length > 0 && (
               <div>
-                <h2 className="text-[18px] font-bold text-black mb-3">Booking Aktif</h2>
-                <div className="space-y-3">
+                <h2 className="mc-heading-3 text-[var(--color-ink)] mb-6 flex items-center gap-3">
+                   <span className="w-2.5 h-2.5 rounded-full bg-[var(--color-signal)] animate-pulse"></span>
+                   Booking Aktif
+                </h2>
+                <div className="space-y-4">
                   {activeBookings.map((b) => (
-                    <div key={b.id} className="bg-white rounded-[12px] border border-[#e6e6e6] p-5">
-                      <div className="flex items-start justify-between">
-                        <div>
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="inline-flex px-2 py-0.5 rounded-[50px] text-[11px] font-light bg-[#c5b0f4] text-black">
-                              Booking
+                    <div key={b.id} className="flex flex-col md:flex-row md:items-center justify-between gap-6 px-6 md:px-8 py-5 md:py-6 bg-[var(--color-lifted-cream)] rounded-[32px] shadow-sm hover:shadow-[0_12px_24px_rgba(0,0,0,0.06)] transition-shadow">
+                      
+                      <div className="flex items-start gap-4 md:w-[45%] border-b md:border-b-0 border-black/5 pb-4 md:pb-0">
+                         <div className="w-12 h-12 bg-white rounded-full shadow-sm flex items-center justify-center shrink-0 border border-black/5 text-[var(--color-ink)]">
+                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                         </div>
+                         <div>
+                            <span className="inline-flex items-center px-3 py-1 rounded-full text-[11px] font-[500] border border-[var(--color-ink)]/15 text-[var(--color-ink)] bg-white/50 mb-2 tracking-wide uppercase">
+                               Menunggu Pengambilan
                             </span>
-                            <span className="inline-flex px-2 py-0.5 rounded-[50px] text-[11px] font-light bg-[#dceeb1] text-black">
-                              Menunggu
+                            <h3 className="text-[18px] font-bold tracking-tight text-[var(--color-ink)] line-clamp-1">{b.book.title}</h3>
+                            <p className="text-[14px] font-[450] text-[var(--color-slate)] mt-1">{b.book.author}</p>
+                         </div>
+                      </div>
+
+                      <div className="flex items-center justify-between md:w-[55%] gap-4">
+                         <div className="flex flex-col items-center text-center bg-white px-5 py-3 rounded-[16px] shadow-sm border border-black/5">
+                            <span className="mc-eyebrow text-[var(--color-slate)] mb-1">Kode Booking</span>
+                            <div className="flex items-center justify-center gap-3">
+                               <span className="text-[20px] font-mono font-bold tracking-[0.2em] text-[var(--color-ink)]">{b.code}</span>
+                               <button onClick={() => copyCode(b.code)} className="text-[var(--color-slate)] hover:text-[var(--color-ink)] transition-colors p-1" title="Salin Kode">
+                                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+                               </button>
+                            </div>
+                         </div>
+                         
+                         <div className="flex flex-col items-center text-center">
+                            <span className="mc-eyebrow text-[var(--color-slate)] mb-2">Batas Pengambilan</span>
+                            <span className="text-[14px] font-[500] text-[var(--color-ink)]">
+                               {new Date(b.expiresAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}<br/>
+                               <span className="text-[12px] font-normal text-[var(--color-slate)]">{new Date(b.expiresAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}</span>
                             </span>
-                          </div>
-                          <h3 className="text-[16px] font-bold text-black">{b.book.title}</h3>
-                          <p className="text-[14px] font-light text-black/50 mt-0.5">{b.book.author}</p>
-                        </div>
+                         </div>
+                         
+                         <div className="flex justify-end">
+                            <button onClick={() => setCancelTarget(b)}
+                              className="w-12 h-12 rounded-full bg-white flex items-center justify-center text-[var(--color-signal)] shadow-sm hover:bg-[var(--color-signal)] hover:text-white transition-all border border-black/5" title="Batalkan Booking">
+                              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                            </button>
+                         </div>
                       </div>
-                      <div className="mt-3 flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <span className="text-[20px] font-mono font-bold tracking-widest text-black">{b.code}</span>
-                          <button onClick={() => copyCode(b.code)}
-                            className="px-3 py-1.5 bg-white text-black rounded-[50px] text-[12px] font-light border border-[#e6e6e6] hover:bg-[#f7f7f5] transition">
-                            Salin
-                          </button>
-                        </div>
-                        <button onClick={() => setCancelTarget(b)}
-                          className="px-4 py-1.5 bg-white text-black/50 rounded-[50px] text-[12px] font-light border border-[#e6e6e6] hover:text-black hover:bg-[#f3c9b6]/30 transition">
-                          Batalkan
-                        </button>
-                      </div>
-                      <div className="mt-2 text-[12px] font-light text-black/40">
- Berlaku hingga {new Date(b.expiresAt).toLocaleDateString('id-ID', { hour: '2-digit', minute: '2-digit' })}
-                      </div>
+
                     </div>
                   ))}
                 </div>
               </div>
             )}
 
+            {/* History Bookings Section */}
             <div>
-              <h2 className="text-[18px] font-bold text-black mb-3">Riwayat</h2>
+              <h2 className="mc-heading-3 text-[var(--color-ink)] mb-6">Riwayat Booking</h2>
+              
               {historyBookings.length === 0 ? (
-                <p className="text-[15px] font-light text-black/40 text-center py-8">Belum ada riwayat</p>
+                <div className="px-8 py-24 text-center bg-white/60 backdrop-blur-sm rounded-[40px] text-[var(--color-slate)] text-[16px] font-[450]">Belum ada riwayat pemesanan buku.</div>
               ) : (
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {historyBookings.map((b) => (
-                    <div key={b.id} className="bg-white rounded-[12px] border border-[#e6e6e6] p-5">
-                      <div className="flex items-start justify-between">
-                        <div>
-                          <div className="flex items-center gap-2 mb-1">
-                            <span className="inline-flex px-2 py-0.5 rounded-[50px] text-[11px] font-light bg-[#c5b0f4] text-black">
-                              Booking
-                            </span>
-                          </div>
-                          <h3 className="text-[16px] font-bold text-black">{b.book.title}</h3>
-                          <p className="text-[14px] font-light text-black/50 mt-0.5">{b.book.author}</p>
-                        </div>
-                        <span className={`inline-flex px-3 py-1 rounded-[50px] text-[13px] font-light shrink-0 ${
-                          b.status === 'completed' ? 'bg-[#c8e6cd] text-black' :
-                          b.status === 'expired' ? 'bg-[#f3c9b6] text-black' :
-                          'bg-[#f7f7f5] text-black/50'
-                        }`}>
-                          {b.status === 'completed' ? 'Selesai' : b.status === 'expired' ? 'Expired' : 'Dibatalkan'}
-                        </span>
+                    <div key={b.id} className="flex flex-col md:flex-row md:items-center justify-between gap-6 px-6 md:px-8 py-4 md:py-5 bg-white/40 backdrop-blur-sm rounded-[32px] border border-black/5 hover:bg-white/60 transition-colors">
+                      
+                      <div className="flex items-center gap-4 md:w-[50%]">
+                         <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 border border-black/5 ${
+                            b.status === 'completed' 
+                              ? 'bg-[var(--color-ink)]/5 text-[var(--color-ink)]' 
+                              : 'bg-[var(--color-lifted-cream)] text-[var(--color-slate)]'
+                         }`}>
+                            {b.status === 'completed' ? (
+                               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 13l4 4L19 7" /></svg>
+                            ) : (
+                               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" /></svg>
+                            )}
+                         </div>
+                         <div>
+                            <h3 className="text-[16px] font-bold text-[var(--color-ink)] line-clamp-1">{b.book.title}</h3>
+                            <p className="text-[13px] font-[450] text-[var(--color-slate)]">{b.book.author}</p>
+                         </div>
                       </div>
-                      <div className="mt-3">
-                        <span className="text-[13px] font-light text-black/40">
-                          {new Date(b.createdAt).toLocaleDateString('id-ID')}
-                        </span>
-                        {b.code && (
-                          <span className="ml-3 text-[12px] font-mono text-black/30">{b.code}</span>
-                        )}
+
+                      <div className="flex items-center justify-between md:w-[50%] gap-4">
+                         <div className="flex flex-col items-center text-center">
+                            <span className="text-[14px] font-[450] text-[var(--color-ink)]">{new Date(b.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+                            {b.code && <span className="text-[12px] font-mono text-[var(--color-slate)]">{b.code}</span>}
+                         </div>
+                         
+                         <div>
+                            {statusBadge(b.status)}
+                         </div>
                       </div>
+
                     </div>
                   ))}
                 </div>
               )}
             </div>
-          </>
+
+          </div>
         )}
+
       </div>
 
       <ConfirmModal
@@ -189,7 +243,6 @@ export function MyBookingsClient({ user }: { user: { name: string; role: string 
         onConfirm={handleCancel}
         onCancel={() => { if (!cancelling) setCancelTarget(null) }}
       />
-      {toast && <Toast type={toast.type} message={toast.message} onClose={() => setToast(null)} />}
     </AdminLayout>
   )
 }

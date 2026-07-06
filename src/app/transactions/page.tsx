@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { Pagination } from '@/components/pagination'
 import { Toast } from '@/components/toast'
 import { ConfirmModal } from '@/components/confirm-modal'
-import { TableSkeleton } from '@/components/skeleton'
+import { LoadingSpinner } from '@/components/loading-spinner'
 
 interface Transaction {
   id: number
@@ -107,98 +107,132 @@ export default function TransactionsPage() {
     return new Date(d).toLocaleDateString('id-ID')
   }
 
+  const statusBadge = (status: string) => {
+    if (status === 'borrowed') return <span className="inline-flex px-4 py-1.5 rounded-full text-[13px] font-[500] border border-[var(--color-ink)]/20 text-[var(--color-ink)]">Dipinjam</span>
+    if (status === 'returned') return <span className="inline-flex px-4 py-1.5 rounded-full text-[13px] font-[500] border border-[var(--color-ink)] bg-[var(--color-ink)] text-white">Kembali</span>
+    return <span className="inline-flex px-4 py-1.5 rounded-full text-[13px] font-[500] border border-[var(--color-signal)] text-[var(--color-signal)]">Terlambat</span>
+  }
+
   return (
-    <div>
-      <div className="bg-[#d4d1f0] rounded-[24px] p-8 md:p-12 mb-8">
-        <p className="font-mono text-sm uppercase tracking-[0.05em] text-black/40 mb-3">Transaksi</p>
-        <h1 className="text-[32px] font-bold tracking-[-0.02em] leading-[1.1] text-black">Transaksi</h1>
-        <p className="text-[18px] font-light leading-relaxed text-black/50 mt-3 max-w-xl">Kelola peminjaman dan pengembalian buku</p>
+    <div className="relative w-full z-10">
+      
+      {/* Ghost Watermark */}
+      <div className="absolute -top-16 -left-10 md:-left-24 z-[-1] pointer-events-none overflow-hidden w-[150%] whitespace-nowrap">
+         <h1 className="mc-ghost-watermark select-none text-[120px] md:text-[240px]">TRANSACTIONS</h1>
       </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-        <div className="flex items-center gap-2">
+      <div className="mc-card-stadium p-6 md:p-12 mb-16 relative overflow-hidden flex items-end min-h-[250px] md:min-h-[300px]">
+        <div className="absolute -top-10 -right-10 opacity-10 md:opacity-5 pointer-events-none">
+          <h1 className="text-[100px] md:text-[200px] font-bold tracking-tighter leading-none" style={{ fontFamily: 'var(--font-display)' }}>SYNC</h1>
+        </div>
+        <div className="relative z-10 w-full flex flex-col md:flex-row justify-between md:items-end gap-6">
+           <div className="w-full md:w-auto min-w-0">
+              <p className="mc-eyebrow text-[var(--color-slate)] mb-4">Aktivitas Peminjaman</p>
+              <h1 className="mc-heading-1 text-[var(--color-ink)] break-words break-all sm:break-normal">Sirkulasi<br/>Buku</h1>
+           </div>
+           <p className="text-[18px] font-[450] text-[var(--color-slate)] max-w-sm text-right pb-2">
+             Pantau peminjaman, batas waktu pengembalian, dan riwayat sirkulasi literatur.
+           </p>
+        </div>
+      </div>
+
+      <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-12">
+        <div className="flex flex-wrap items-center gap-3 w-full md:w-auto">
           {['', 'borrowed', 'returned', 'overdue'].map((s) => (
             <button key={s} onClick={() => handleFilter(s)}
-              className={`px-5 py-[10px] rounded-[50px] text-[14px] font-light transition ${
+              className={`px-6 py-[12px] rounded-full text-[15px] font-[500] transition-colors border ${
                 filter === s
-                  ? 'bg-[#c5b0f4] text-black border border-[#c5b0f4]'
-                  : 'bg-white text-black border border-[#e6e6e6] hover:bg-[#c5b0f4]/10'
+                  ? 'bg-[var(--color-ink)] text-white border-[var(--color-ink)]'
+                  : 'bg-white text-[var(--color-slate)] border-transparent hover:border-[var(--color-ink)]/20 shadow-sm'
               }`}>
               {s === '' ? 'Semua' : s === 'borrowed' ? 'Dipinjam' : s === 'returned' ? 'Dikembalikan' : 'Terlambat'}
             </button>
           ))}
         </div>
-        <div className="flex gap-2">
-          <button onClick={exportCSV}
-            className="px-5 py-[10px] bg-white text-black rounded-[50px] text-[14px] font-light border border-[#e6e6e6] hover:bg-[#f7f7f5] transition">Export CSV</button>
-          <Link href="/transactions/borrow"
-            className="px-5 py-[10px] bg-black text-white rounded-[50px] text-[14px] font-light hover:bg-gray-800 transition">+ Pinjam Buku</Link>
+        
+        <div className="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
+          <button onClick={exportCSV} className="mc-btn-secondary px-6 py-4 w-full sm:w-auto text-center">
+            Export CSV
+          </button>
+          <Link href="/transactions/borrow" className="mc-btn-primary px-8 py-4 whitespace-nowrap flex justify-center w-full sm:w-auto">
+            Pinjam Buku
+          </Link>
         </div>
       </div>
 
       {error && (
-        <div className="px-4 py-3 text-[15px] font-light text-black bg-[#f3c9b6] rounded-[8px] mb-6">{error}</div>
+        <div className="px-6 py-4 text-[15px] font-[500] text-[var(--color-signal)] bg-white rounded-[24px] mb-8 shadow-sm border border-[var(--color-signal)]/20">{error}</div>
       )}
 
-      <div className="bg-white rounded-[24px] border border-[#e6e6e6] overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[700px]">
-          <thead>
-            <tr className="bg-[#d4d1f0]/15">
-              <th className="text-left px-4 py-3 text-[13px] font-light text-black/50 uppercase tracking-wide">Anggota</th>
-              <th className="text-left px-4 py-3 text-[13px] font-light text-black/50 uppercase tracking-wide">Buku</th>
-              <th className="text-left px-4 py-3 text-[13px] font-light text-black/50 uppercase tracking-wide">Tgl Pinjam</th>
-              <th className="text-left px-4 py-3 text-[13px] font-light text-black/50 uppercase tracking-wide">Jatuh Tempo</th>
-              <th className="text-left px-4 py-3 text-[13px] font-light text-black/50 uppercase tracking-wide">Tgl Kembali</th>
-              <th className="text-center px-4 py-3 text-[13px] font-light text-black/50 uppercase tracking-wide">Denda</th>
-              <th className="text-center px-4 py-3 text-[13px] font-light text-black/50 uppercase tracking-wide">Status</th>
-              <th className="text-center px-4 py-3 text-[13px] font-light text-black/50 uppercase tracking-wide">Aksi</th>
-            </tr>
-          </thead>
-          <tbody>
-            {pageLoading ? (
-              <tr><td colSpan={8}><TableSkeleton rows={5} cols={8} /></td></tr>
-            ) : transactions.map((t) => (
-              <tr key={t.id} className="border-b border-[#f1f1f1] hover:bg-[#c5b0f4]/8 transition">
-                <td className="px-4 py-3">
-                  <div className="text-[15px] font-light text-black">{t.user.name}</div>
-                  <div className="text-[13px] font-light text-black/40">{t.user.email}</div>
-                </td>
-                <td className="px-4 py-3">
-                  <div className="text-[15px] font-light text-black">{t.book.title}</div>
-                  <div className="text-[13px] font-light text-black/40">{t.book.author}</div>
-                </td>
-                <td className="px-4 py-3 text-[15px] font-light text-black/50">{formatDate(t.borrowDate)}</td>
-                <td className="px-4 py-3 text-[15px] font-light text-black/50">{formatDate(t.dueDate)}</td>
-                <td className="px-4 py-3 text-[15px] font-light text-black/50">{t.returnDate ? formatDate(t.returnDate) : '-'}</td>
-                <td className="px-4 py-3 text-center text-[15px] font-light text-black">Rp {t.fine.toLocaleString()}</td>
-                <td className="px-4 py-3 text-center">
-                  <span className={`inline-flex px-3 py-1 rounded-[50px] text-[13px] font-light ${
-                    t.status === 'borrowed' ? 'bg-[#c5b0f4] text-black' :
-                    t.status === 'returned' ? 'bg-[#c8e6cd] text-black' : 'bg-[#f3c9b6] text-black'
-                  }`}>
-                    {t.status === 'borrowed' ? 'Dipinjam' : t.status === 'returned' ? 'Kembali' : 'Terlambat'}
-                  </span>
-                </td>
-                <td className="px-4 py-3 text-center">
-                  {(t.status === 'borrowed' || t.status === 'overdue') && (
-                    <button onClick={() => setReturningId(t.id)}
-                      className="px-5 py-[10px] bg-black text-white rounded-[50px] text-[14px] font-light hover:bg-gray-800 transition">
-                      Kembalikan
-                    </button>
-                  )}
-                </td>
-              </tr>
-            ))}
-            {!pageLoading && transactions.length === 0 && (
-              <tr><td colSpan={8} className="text-[15px] font-light text-black/40 text-center py-8">Belum ada transaksi</td></tr>
-            )}
-          </tbody>
-          </table>
-        </div>
+      {/* Pill Rows List */}
+      <div className="space-y-4 mb-16">
+         {pageLoading ? (
+            <div className="flex justify-center py-24"><LoadingSpinner /></div>
+         ) : transactions.length === 0 ? (
+            <div className="px-8 py-24 text-center bg-white/60 backdrop-blur-sm rounded-[40px] text-[var(--color-slate)] text-[16px] font-[450]">Belum ada data transaksi</div>
+         ) : (
+            transactions.map((t) => (
+               <div key={t.id} className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 px-6 md:px-8 py-5 md:py-6 bg-[var(--color-lifted-cream)] rounded-[32px] shadow-sm hover:shadow-[0_12px_24px_rgba(0,0,0,0.06)] transition-shadow">
+                  
+                  {/* User & Book Info */}
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-6 lg:w-[40%]">
+                     <div className="flex items-center gap-4 sm:w-1/2 border-b sm:border-b-0 sm:border-r border-black/5 pb-4 sm:pb-0 pr-4">
+                        <div className="w-12 h-12 shrink-0 rounded-full bg-[var(--color-ink)] text-white flex items-center justify-center font-bold text-lg">
+                           {t.user.name.charAt(0).toUpperCase()}
+                        </div>
+                        <div className="flex flex-col overflow-hidden">
+                           <span className="mc-eyebrow text-[var(--color-slate)] mb-1">Peminjam</span>
+                           <span className="text-[16px] font-[500] text-[var(--color-ink)] truncate">{t.user.name}</span>
+                        </div>
+                     </div>
+                     <div className="flex flex-col overflow-hidden sm:w-1/2">
+                        <span className="mc-eyebrow text-[var(--color-slate)] mb-1">Buku</span>
+                        <span className="text-[16px] font-[500] text-[var(--color-ink)] line-clamp-1">{t.book.title}</span>
+                     </div>
+                  </div>
+
+                  {/* Dates & Status */}
+                  <div className="flex flex-wrap sm:flex-nowrap items-center justify-between lg:w-[45%] gap-4">
+                     <div className="flex flex-col items-center text-center">
+                        <span className="mc-eyebrow text-[var(--color-slate)] mb-1">Tgl Pinjam</span>
+                        <span className="text-[15px] font-[450] text-[var(--color-ink)]">{formatDate(t.borrowDate)}</span>
+                     </div>
+                     <div className="flex flex-col items-center text-center">
+                        <span className="mc-eyebrow text-[var(--color-slate)] mb-1">Jatuh Tempo</span>
+                        <span className="text-[15px] font-[450] text-[var(--color-slate)]">{formatDate(t.dueDate)}</span>
+                     </div>
+                     <div className="flex flex-col items-center text-center">
+                        <span className="mc-eyebrow text-[var(--color-slate)] mb-1">Denda</span>
+                        <span className={`text-[16px] font-[500] ${t.fine > 0 ? 'text-[var(--color-signal)]' : 'text-[var(--color-ink)]'}`}>
+                           Rp {t.fine.toLocaleString()}
+                        </span>
+                     </div>
+                     <div className="flex flex-col items-center text-center">
+                        <span className="mc-eyebrow text-[var(--color-slate)] mb-2">Status</span>
+                        {statusBadge(t.status)}
+                     </div>
+                  </div>
+
+                  {/* Action */}
+                  <div className="flex items-center justify-end lg:w-[15%]">
+                     {(t.status === 'borrowed' || t.status === 'overdue') ? (
+                        <button onClick={() => setReturningId(t.id)} className="mc-btn-primary px-6 py-2 w-full text-center">
+                           Kembalikan
+                        </button>
+                     ) : (
+                        <div className="w-full text-right text-[14px] font-[450] text-[var(--color-slate)]">Selesai</div>
+                     )}
+                  </div>
+               </div>
+            ))
+         )}
       </div>
 
-      <Pagination page={page} totalPages={totalPages} total={total} onPageChange={onPageChange} />
+      <div className="flex justify-center mb-16">
+        <div className="bg-white/60 backdrop-blur-md rounded-full px-4 py-2 border border-[#e6e6e6]">
+           <Pagination page={page} totalPages={totalPages} total={total} onPageChange={onPageChange} />
+        </div>
+      </div>
 
       <ConfirmModal
         open={returningId !== null}

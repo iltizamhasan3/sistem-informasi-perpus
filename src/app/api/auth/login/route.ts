@@ -42,6 +42,15 @@ export async function POST(req: Request) {
     return Response.json({ error: error.message }, { status: 400 })
   }
 
+  if (data.session) {
+    cookieStore.set('token', data.session.access_token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      path: '/',
+      maxAge: data.session.expires_in,
+    })
+  }
+
   // Fetch user role from prisma
   const user = await prisma.user.findUnique({
     where: { email },

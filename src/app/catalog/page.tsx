@@ -97,19 +97,19 @@ export default function CatalogPage() {
               <h1 className="mc-heading-1 text-[var(--color-ink)]">Katalog<br/>Perpustakaan</h1>
            </div>
            
-           <div className="flex flex-col md:flex-row items-center gap-4 w-full md:w-auto">
-             <form onSubmit={handleSearch} className="relative flex items-center w-full md:w-[320px]">
+           <div className="flex flex-row items-center gap-3 md:gap-4 max-w-full overflow-x-auto no-scrollbar pb-2 md:pb-0">
+             <form onSubmit={handleSearch} className="relative flex items-center min-w-[220px] md:w-[320px]">
                <input type="text" value={search} onChange={e => setSearch(e.target.value)}
                  placeholder="Cari buku..."
-                 className="w-full pl-6 pr-14 py-4 bg-white border border-[var(--color-ink)]/10 rounded-full text-[16px] font-[450] text-[var(--color-ink)] placeholder:text-[var(--color-slate)]/50 focus:outline-none focus:border-[var(--color-ink)]/40 transition-shadow shadow-sm" />
-               <button type="submit" className="absolute right-2 w-12 h-12 bg-[var(--color-ink)] rounded-full flex items-center justify-center hover:scale-[0.96] transition-transform">
-                 <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                 className="w-full pl-6 pr-14 py-3.5 md:py-4 bg-white border border-[var(--color-ink)]/10 rounded-full text-[15px] md:text-[16px] font-[450] text-[var(--color-ink)] placeholder:text-[var(--color-slate)]/50 focus:outline-none focus:border-[var(--color-ink)]/40 transition-shadow shadow-sm" />
+               <button type="submit" className="absolute right-2 w-10 h-10 md:w-12 md:h-12 bg-[var(--color-ink)] rounded-full flex items-center justify-center hover:scale-[0.96] transition-transform">
+                 <svg className="w-4 h-4 md:w-5 md:h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                </button>
              </form>
              
              <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)}
-               className="w-full md:w-auto px-6 py-4 bg-white border border-[var(--color-ink)]/10 rounded-full text-[16px] font-[450] text-[var(--color-ink)] focus:outline-none focus:border-[var(--color-ink)]/40 transition-shadow shadow-sm appearance-none cursor-pointer"
-               style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%23141413\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'1.5\' d=\'M19 9l-7 7-7-7\'/%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1.2rem center', backgroundSize: '1.2em', paddingRight: '3rem' }}>
+               className="min-w-[160px] md:w-auto px-5 md:px-6 py-3.5 md:py-4 bg-white border border-[var(--color-ink)]/10 rounded-full text-[14px] md:text-[16px] font-[450] text-[var(--color-ink)] focus:outline-none focus:border-[var(--color-ink)]/40 transition-shadow shadow-sm appearance-none cursor-pointer whitespace-nowrap"
+               style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%23141413\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'1.5\' d=\'M19 9l-7 7-7-7\'/%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1.2rem center', backgroundSize: '1.2em', paddingRight: '2.8rem' }}>
                <option value="">Semua Kategori</option>
                {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
              </select>

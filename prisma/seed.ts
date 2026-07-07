@@ -33,19 +33,22 @@ async function main() {
     }
   }
 
+  const bcrypt = await import('bcryptjs')
+  const hashedUsers = await Promise.all(users.map(async (u, i) => ({
+    id: i + 1,
+    name: u.name,
+    email: u.email,
+    password: await bcrypt.hash(u.password, 10),
+    role: u.role,
+    phone: u.phone,
+    address: u.address,
+    isActive: true,
+    createdAt: now,
+    updatedAt: now,
+  })))
+
   await prisma.user.createMany({
-    data: users.map((u, i) => ({
-      id: i + 1,
-      name: u.name,
-      email: u.email,
-      password: u.password,
-      role: u.role,
-      phone: u.phone,
-      address: u.address,
-      isActive: true,
-      createdAt: now,
-      updatedAt: now,
-    })),
+    data: hashedUsers,
     skipDuplicates: true,
   })
   await prisma.$executeRawUnsafe(`SELECT setval('"User_id_seq"', (SELECT MAX(id) FROM "User"))`)

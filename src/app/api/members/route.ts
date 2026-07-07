@@ -58,8 +58,11 @@ export const POST = withSupabaseRoute({ auth: 'user' }, async (req, ctx) => {
   if (authError) return Response.json({ error: authError.message }, { status: 400 })
 
   try {
+    const bcrypt = await import('bcryptjs')
+    const hashedPassword = await bcrypt.hash(password, 10)
+
     const member = await prisma.user.create({
-      data: { name, email, role: 'member', phone, address },
+      data: { name, email, password: hashedPassword, role: 'member', phone, address },
       select: { id: true, name: true, email: true, role: true, phone: true, address: true },
     })
 

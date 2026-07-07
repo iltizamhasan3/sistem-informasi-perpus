@@ -22,11 +22,6 @@ export default function LoginPage() {
     e.preventDefault()
     setError('')
     
-    if (!form.email.toLowerCase().endsWith('@gmail.com')) {
-      setError('Harap gunakan alamat email @gmail.com')
-      return
-    }
-    
     setLoading(true)
     try {
       const res = await fetch('/api/auth/login', {
@@ -75,11 +70,11 @@ export default function LoginPage() {
           )}
 
           <div className="space-y-2">
-            <label className="text-[14px] font-[500] text-[var(--color-ink)] pl-4">Email Address (Gmail)</label>
+            <label className="text-[14px] font-[500] text-[var(--color-ink)] pl-4">Email Address</label>
             <input
               type="email" required value={form.email}
               onChange={(e) => setForm({ ...form, email: e.target.value })}
-              placeholder="contoh@gmail.com"
+              placeholder="contoh@email.com"
               className="w-full px-6 py-4 bg-white border border-black/5 rounded-full text-[15px] font-[450] text-[var(--color-ink)] placeholder:text-[var(--color-slate)]/50 focus:outline-none focus:ring-2 focus:ring-[var(--color-ink)] focus:border-transparent transition-all shadow-sm" />
           </div>
 

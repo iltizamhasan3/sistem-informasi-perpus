@@ -12,9 +12,6 @@ export const POST = withSupabaseRoute({ auth: 'none' }, async (req) => {
   const { name, email, password, phone, address } = await req.json()
   if (!name || !email || !password) return Response.json({ error: 'Semua field wajib diisi' }, { status: 400 })
   if (password.length < 6) return Response.json({ error: 'Password minimal 6 karakter' }, { status: 400 })
-  if (!email.toLowerCase().endsWith('@gmail.com')) {
-    return Response.json({ error: 'Hanya email @gmail.com yang diizinkan' }, { status: 400 })
-  }
 
   const existing = await prisma.user.findUnique({ where: { email } })
   if (existing) return Response.json({ error: 'Email sudah terdaftar' }, { status: 400 })
@@ -29,8 +26,11 @@ export const POST = withSupabaseRoute({ auth: 'none' }, async (req) => {
   if (authError) return Response.json({ error: authError.message }, { status: 400 })
 
   try {
+    const bcrypt = await import('bcryptjs')
+    const hashedPassword = await bcrypt.hash(password, 10)
+
     const user = await prisma.user.create({
-      data: { name, email, password, role: 'member', phone: phone || null, address: address || null },
+      data: { name, email, password: hashedPassword, role: 'member', phone: phone || null, address: address || null },
       select: { id: true, name: true, email: true, role: true },
     })
 

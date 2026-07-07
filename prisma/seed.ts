@@ -38,6 +38,7 @@ async function main() {
       id: i + 1,
       name: u.name,
       email: u.email,
+      password: u.password,
       role: u.role,
       phone: u.phone,
       address: u.address,

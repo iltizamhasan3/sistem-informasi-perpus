@@ -30,7 +30,7 @@ export const POST = withSupabaseRoute({ auth: 'none' }, async (req) => {
 
   try {
     const user = await prisma.user.create({
-      data: { name, email, role: 'member', phone: phone || null, address: address || null },
+      data: { name, email, password, role: 'member', phone: phone || null, address: address || null },
       select: { id: true, name: true, email: true, role: true },
     })
 

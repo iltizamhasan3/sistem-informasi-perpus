@@ -25,7 +25,7 @@ interface BookDetail {
 export default function BookDetailPage() {
   const { id } = useParams()
   const { user } = useUser()
-  const { addToCart, cart, setCartOpen } = useCart()
+  const { addToCart, cart, setCartOpen, availableSlot } = useCart()
   const [book, setBook] = useState<BookDetail | null>(null)
   const [loading, setLoading] = useState(true)
   const [booking, setBooking] = useState(false)
@@ -48,8 +48,8 @@ export default function BookDetailPage() {
 
   async function handleAddToCart() {
     if (!book) return
-    if (cart.length >= 3) {
-      setMessage({ type: 'error', text: 'Keranjang penuh (Maksimal 3 buku).' })
+    if (cart.length >= availableSlot) {
+      setMessage({ type: 'error', text: `Kuota pinjaman tersisa ${availableSlot} buku.` })
       return
     }
     if (cart.find(c => c.id === book.id)) {

@@ -1,6 +1,7 @@
 'use client'
 
 import { createContext, useContext, useEffect, useState } from 'react'
+import { useUser } from '@/lib/auth-context'
 
 export interface CartItem {
   id: number
@@ -24,6 +25,7 @@ interface CartContextType {
 const CartContext = createContext<CartContextType | undefined>(undefined)
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
+  const { user } = useUser()
   const [cart, setCart] = useState<CartItem[]>([])
   const [isCartOpen, setCartOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
@@ -40,8 +42,8 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   }
 
   useEffect(() => {
-    refreshQuota()
-  }, [])
+    if (user) refreshQuota()
+  }, [user])
 
   useEffect(() => {
     const saved = localStorage.getItem('sipustaka-cart')

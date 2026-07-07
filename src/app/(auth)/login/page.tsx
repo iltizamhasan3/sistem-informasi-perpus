@@ -1,21 +1,29 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useUser } from '@/lib/auth-context'
 
 export default function LoginPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { refresh } = useUser()
   const [form, setForm] = useState({ email: '', password: '' })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
+  function getRedirect() {
+    const r = searchParams.get('redirect')
+    if (!r || r === '/login' || r === '/register') return null
+    return r
+  }
+
   useEffect(() => {
     fetch('/api/auth/me').then(r => r.json()).then(data => {
       if (data.user) {
-        router.replace(data.user.role === 'admin' ? '/dashboard' : '/catalog')
+        const redirect = getRedirect()
+        router.replace(redirect || (data.user.role === 'admin' ? '/dashboard' : '/catalog'))
       }
     }).catch(() => {})
   }, [router])
@@ -40,7 +48,8 @@ export default function LoginPage() {
       
       await refresh()
       router.refresh()
-      router.replace(data.user.role === 'admin' ? '/dashboard' : '/catalog')
+      const redirect = getRedirect()
+      router.replace(redirect || (data.user.role === 'admin' ? '/dashboard' : '/catalog'))
     } catch {
       setError('Terjadi kesalahan, silakan coba lagi')
       setLoading(false)

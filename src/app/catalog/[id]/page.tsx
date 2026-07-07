@@ -185,7 +185,7 @@ export default function BookDetailPage() {
                     </button>
                   )}
                   {book.stock > 0 && !user && (
-                    <Link href="/login" className="mc-btn-secondary px-6">
+                    <Link href={`/login?redirect=/catalog/${book.id}`} className="mc-btn-secondary px-6">
                       Masuk untuk booking
                     </Link>
                   )}
@@ -217,7 +217,7 @@ export default function BookDetailPage() {
                         {renting ? 'Memproses...' : 'Sewa E-book'}
                       </button>
                     ) : !user ? (
-                      <Link href="/login" className="mc-btn-secondary px-6 inline-block text-center">
+                      <Link href={`/login?redirect=/catalog/${book.id}`} className="mc-btn-secondary px-6 inline-block text-center">
                         Masuk untuk baca E-book
                       </Link>
                     ) : null}

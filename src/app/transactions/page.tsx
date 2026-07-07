@@ -8,14 +8,14 @@ import { ConfirmModal } from '@/components/confirm-modal'
 import { LoadingSpinner } from '@/components/loading-spinner'
 
 interface Transaction {
-  id: number
+  id: number | string
   borrowDate: string
   dueDate: string
   returnDate: string | null
   fine: number
   status: string
   user: { id: number; name: string; email: string }
-  book: { id: number; title: string; author: string }
+  book: { id: number; title: string; author: string; isEbook?: boolean }
 }
 
 export default function TransactionsPage() {
@@ -27,7 +27,7 @@ export default function TransactionsPage() {
   const [pageLoading, setPageLoading] = useState(true)
   const [error, setError] = useState('')
   const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
-  const [returningId, setReturningId] = useState<number | null>(null)
+  const [returningId, setReturningId] = useState<number | string | null>(null)
 
   useEffect(() => {
     fetchTransactions().finally(() => setPageLoading(false))
@@ -63,7 +63,7 @@ export default function TransactionsPage() {
     fetchTransactions(filter || undefined, p)
   }
 
-  async function handleReturn(transactionId: number) {
+  async function handleReturn(transactionId: number | string) {
     try {
       const res = await fetch('/api/transactions/return', {
         method: 'POST',
@@ -186,8 +186,13 @@ export default function TransactionsPage() {
                         </div>
                      </div>
                      <div className="flex flex-col overflow-hidden sm:w-1/2">
-                        <span className="mc-eyebrow text-[var(--color-slate)] mb-1">Buku</span>
-                        <span className="text-[16px] font-[500] text-[var(--color-ink)] line-clamp-1">{t.book.title}</span>
+                        <span className="mc-eyebrow text-[var(--color-slate)] mb-1">Buku & Tipe</span>
+                        <span className="text-[16px] font-[500] text-[var(--color-ink)] line-clamp-1">
+                           {t.book.title}
+                        </span>
+                        <span className={`inline-flex self-start mt-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-[600] tracking-wide ${t.book.isEbook ? 'bg-blue-500/10 text-blue-700' : 'bg-emerald-500/10 text-emerald-700'}`}>
+                           {t.book.isEbook ? 'DIGITAL (E-BOOK)' : 'BUKU FISIK'}
+                        </span>
                      </div>
                   </div>
 
@@ -203,9 +208,13 @@ export default function TransactionsPage() {
                      </div>
                      <div className="flex flex-col items-center text-center">
                         <span className="mc-eyebrow text-[var(--color-slate)] mb-1">Denda</span>
-                        <span className={`text-[16px] font-[500] ${t.fine > 0 ? 'text-[var(--color-signal)]' : 'text-[var(--color-ink)]'}`}>
-                           Rp {t.fine.toLocaleString()}
-                        </span>
+                        {t.book.isEbook ? (
+                           <span className="text-[16px] font-[500] text-[var(--color-slate)]">-</span>
+                        ) : (
+                           <span className={`text-[16px] font-[500] ${t.fine > 0 ? 'text-[var(--color-signal)]' : 'text-[var(--color-ink)]'}`}>
+                              Rp {t.fine.toLocaleString()}
+                           </span>
+                        )}
                      </div>
                      <div className="flex flex-col items-center text-center">
                         <span className="mc-eyebrow text-[var(--color-slate)] mb-2">Status</span>
@@ -214,9 +223,15 @@ export default function TransactionsPage() {
                   </div>
 
                   {/* Action */}
-                  <div className="flex items-center justify-end lg:w-[15%]">
-                     {(t.status === 'borrowed' || t.status === 'overdue') ? (
-                        <button onClick={() => setReturningId(t.id)} className="mc-btn-primary px-6 py-2 w-full text-center">
+                  <div className="flex items-center justify-end lg:w-[15%] shrink-0">
+                     {t.book.isEbook && t.status === 'borrowed' ? (
+                        <button onClick={() => setReturningId(t.id)} className="mc-btn-primary px-4 py-1.5 text-[13px] font-[500] whitespace-nowrap">
+                           Selesaikan
+                        </button>
+                     ) : t.book.isEbook && t.status !== 'borrowed' ? (
+                        <div className="w-full text-right text-[14px] font-[450] text-[var(--color-slate)]">Expired</div>
+                     ) : (t.status === 'borrowed' || t.status === 'overdue') ? (
+                        <button onClick={() => setReturningId(t.id)} className="mc-btn-primary px-4 py-1.5 text-[13px] font-[500] whitespace-nowrap">
                            Kembalikan
                         </button>
                      ) : (
@@ -236,8 +251,8 @@ export default function TransactionsPage() {
 
       <ConfirmModal
         open={returningId !== null}
-        title="Kembalikan Buku"
-        message="Yakin ingin mengembalikan buku ini?"
+        title={typeof returningId === 'string' && returningId.startsWith('ebook-') ? 'Selesaikan Sewa E-Book' : 'Kembalikan Buku'}
+        message={typeof returningId === 'string' && returningId.startsWith('ebook-') ? 'Yakin ingin menyelesaikan masa sewa e-book ini sekarang?' : 'Yakin ingin mengembalikan buku ini?'}
         onConfirm={() => handleReturn(returningId!)}
         onCancel={() => setReturningId(null)}
       />

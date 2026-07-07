@@ -224,7 +224,7 @@ export default function BookDetailPage() {
                   ) : user?.role === 'member' ? (
                     <button onClick={handleRentEbook} disabled={renting}
                       className="mc-btn-primary px-8">
-                      {renting ? 'Memproses...' : 'Sewa E-book (Bebas Biaya)'}
+                      {renting ? 'Memproses...' : 'Sewa E-book'}
                     </button>
                   ) : !user ? (
                     <Link href="/login" className="mc-btn-secondary px-6 inline-block">

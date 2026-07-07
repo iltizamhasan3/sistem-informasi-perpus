@@ -10,6 +10,34 @@ export const POST = withSupabaseRoute({ auth: 'user' }, async (req, ctx) => {
   }
 
   const { transactionId } = await req.json()
+  const now = new Date()
+
+  if (typeof transactionId === 'string' && transactionId.startsWith('ebook-')) {
+    const ebookRentalId = Number(transactionId.replace('ebook-', ''))
+    const rental = await prisma.ebookRental.findUnique({
+      where: { id: ebookRentalId },
+      include: { book: true, user: true },
+    })
+    
+    if (!rental) return Response.json({ error: 'Sewa e-book tidak ditemukan' }, { status: 404 })
+    if (rental.status === 'expired' || rental.expiresAt < now) {
+      return Response.json({ error: 'Sewa e-book sudah selesai atau kedaluwarsa' }, { status: 400 })
+    }
+
+    const updated = await prisma.ebookRental.update({
+      where: { id: ebookRentalId },
+      data: { status: 'expired', expiresAt: now },
+      include: {
+        user: { select: { id: true, name: true } },
+        book: { select: { id: true, title: true } },
+      }
+    })
+
+    await notifyUser(rental.userId, 'Sewa E-book Selesai', `Masa sewa e-book "${updated.book.title}" telah diselesaikan.`)
+    await notifyAdmins('Sewa E-book Selesai', `${updated.user.name} menyelesaikan sewa e-book "${updated.book.title}".`)
+
+    return Response.json({ transaction: { ...updated, fine: 0 } })
+  }
 
   const transaction = await prisma.transaction.findUnique({
     where: { id: Number(transactionId) },
@@ -18,7 +46,6 @@ export const POST = withSupabaseRoute({ auth: 'user' }, async (req, ctx) => {
   if (!transaction) return Response.json({ error: 'Transaksi tidak ditemukan' }, { status: 404 })
   if (transaction.status === 'returned') return Response.json({ error: 'Buku sudah dikembalikan' }, { status: 400 })
 
-  const now = new Date()
   const fine = calculateFine(transaction.dueDate, now)
 
   const [updated] = await prisma.$transaction([

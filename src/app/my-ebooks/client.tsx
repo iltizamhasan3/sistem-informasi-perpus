@@ -94,15 +94,15 @@ export function MyEbooksClient({ user }: { user: { name: string; role: string } 
                       </div>
 
                       {/* Timer & Action */}
-                      <div className="flex items-center justify-between md:w-[50%] gap-6">
-                         <div className="flex flex-col items-center text-center">
+                      <div className="flex flex-col md:flex-row items-start md:items-center justify-between md:w-[50%] gap-4 md:gap-6 w-full mt-2 md:mt-0">
+                         <div className="flex flex-col items-start md:items-center text-left md:text-center w-full md:w-auto border-b md:border-b-0 border-black/5 pb-4 md:pb-0">
                             <span className="mc-eyebrow text-[var(--color-slate)] mb-1">Sisa Waktu Baca</span>
                             <span className="text-[18px] font-[500] text-[var(--color-ink)] font-mono tracking-tight">
                                {h}j {m}m
                             </span>
                          </div>
                          
-                         <div className="flex justify-end">
+                         <div className="flex justify-start md:justify-end w-full md:w-auto">
                             <button onClick={() => router.push(`/reader/${r.id}`)}
                                className="mc-btn-primary px-8 py-3 w-full md:w-auto text-center rounded-full shadow-md group">
                                Mulai Membaca

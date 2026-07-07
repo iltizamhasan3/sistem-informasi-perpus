@@ -152,29 +152,30 @@ export function MyBookingsClient({ user }: { user: { name: string; role: string 
                          </div>
                       </div>
 
-                      <div className="flex items-center justify-between md:w-[55%] gap-4">
-                         <div className="flex flex-col items-center text-center bg-white px-5 py-3 rounded-[16px] shadow-sm border border-black/5">
+                      <div className="flex flex-wrap md:flex-nowrap items-center justify-between md:justify-end md:w-[55%] gap-4 md:gap-6 w-full mt-2 md:mt-0">
+                         <div className="flex flex-col items-start md:items-center bg-white px-4 md:px-5 py-3 rounded-[16px] shadow-sm border border-black/5 w-full md:w-auto">
                             <span className="mc-eyebrow text-[var(--color-slate)] mb-1">Kode Booking</span>
-                            <div className="flex items-center justify-center gap-3">
-                               <span className="text-[20px] font-mono font-bold tracking-[0.2em] text-[var(--color-ink)]">{b.code}</span>
+                            <div className="flex items-center justify-between md:justify-center w-full gap-3">
+                               <span className="text-[18px] md:text-[20px] font-mono font-bold tracking-[0.2em] text-[var(--color-ink)]">{b.code}</span>
                                <button onClick={() => copyCode(b.code)} className="text-[var(--color-slate)] hover:text-[var(--color-ink)] transition-colors p-1" title="Salin Kode">
                                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
                                </button>
                             </div>
                          </div>
                          
-                         <div className="flex flex-col items-center text-center">
-                            <span className="mc-eyebrow text-[var(--color-slate)] mb-2">Batas Pengambilan</span>
-                            <span className="text-[14px] font-[500] text-[var(--color-ink)]">
-                               {new Date(b.expiresAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}<br/>
+                         <div className="flex flex-col items-start md:items-center w-full md:w-auto border-t md:border-t-0 border-black/5 pt-3 md:pt-0">
+                            <span className="mc-eyebrow text-[var(--color-slate)] mb-1 md:mb-2">Batas Pengambilan</span>
+                            <span className="text-[13px] md:text-[14px] font-[500] text-[var(--color-ink)]">
+                               {new Date(b.expiresAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}<br className="hidden md:block"/>
+                               <span className="hidden md:inline"> </span>
                                <span className="text-[12px] font-normal text-[var(--color-slate)]">{new Date(b.expiresAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}</span>
                             </span>
                          </div>
                          
-                         <div className="flex justify-end">
+                         <div className="flex justify-end absolute md:relative top-6 right-6 md:top-auto md:right-auto">
                             <button onClick={() => setCancelTarget(b)}
-                              className="w-12 h-12 rounded-full bg-white flex items-center justify-center text-[var(--color-signal)] shadow-sm hover:bg-[var(--color-signal)] hover:text-white transition-all border border-black/5" title="Batalkan Booking">
-                              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                               className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white flex items-center justify-center text-[var(--color-signal)] shadow-sm hover:bg-[var(--color-signal)] hover:text-white transition-all border border-black/5" title="Batalkan Booking">
+                               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                             </button>
                          </div>
                       </div>
@@ -214,10 +215,10 @@ export function MyBookingsClient({ user }: { user: { name: string; role: string 
                          </div>
                       </div>
 
-                      <div className="flex items-center justify-between md:w-[50%] gap-4">
-                         <div className="flex flex-col items-center text-center">
-                            <span className="text-[14px] font-[450] text-[var(--color-ink)]">{new Date(b.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
-                            {b.code && <span className="text-[12px] font-mono text-[var(--color-slate)]">{b.code}</span>}
+                      <div className="flex items-center justify-between md:w-[50%] gap-4 w-full mt-2 md:mt-0 pt-3 md:pt-0 border-t md:border-t-0 border-black/5">
+                         <div className="flex flex-col items-start md:items-center">
+                            <span className="text-[13px] md:text-[14px] font-[450] text-[var(--color-ink)]">{new Date(b.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                            {b.code && <span className="text-[11px] md:text-[12px] font-mono text-[var(--color-slate)]">{b.code}</span>}
                          </div>
                          
                          <div>

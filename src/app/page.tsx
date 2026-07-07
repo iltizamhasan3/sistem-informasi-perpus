@@ -18,24 +18,24 @@ export default async function HomePage() {
 
       {/* Navbar */}
       <header className="fixed top-6 left-0 right-0 z-50 flex justify-center px-4">
-        <nav className="mc-nav-pill flex items-center justify-between w-full max-w-[1200px]">
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-9 h-9 rounded-full bg-[var(--color-ink)] flex items-center justify-center shadow-md group-hover:scale-105 transition-transform duration-300">
-              <svg className="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <nav className="mc-nav-pill flex items-center justify-between w-full max-w-[1200px] gap-2">
+          <Link href="/" className="flex items-center gap-2 md:gap-3 group shrink-0">
+            <div className="w-8 h-8 md:w-9 md:h-9 shrink-0 rounded-full bg-[var(--color-ink)] flex items-center justify-center shadow-md group-hover:scale-105 transition-transform duration-300">
+              <svg className="w-4 h-4 md:w-5 md:h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M12 6v13" /><path d="M12 6a4 4 0 0 0-4-4H2v16h6a4 4 0 0 1 4 4" /><path d="M12 6a4 4 0 0 1 4-4h6v16h-6a4 4 0 0 0-4 4" />
               </svg>
             </div>
             <div className="flex flex-col">
-              <span className="font-[500] text-xl tracking-tight leading-none text-[var(--color-ink)]">SiPustaka</span>
-              <span className="text-[12px] text-[var(--color-slate)] font-[450] leading-none mt-1">by Perpustakaan AA</span>
+              <span className="font-[500] text-[16px] md:text-xl tracking-tight leading-none text-[var(--color-ink)] whitespace-nowrap">SiPustaka</span>
+              <span className="text-[10px] md:text-[12px] text-[var(--color-slate)] font-[450] leading-none mt-1 whitespace-nowrap">by Perpustakaan AA</span>
             </div>
           </Link>
-          <div className="flex items-center gap-2 md:gap-4">
-            <Link href="/login" className="text-[14px] md:text-[15px] font-[500] text-[var(--color-slate)] hover:text-[var(--color-ink)] transition-colors px-3 md:px-4">
+          <div className="flex items-center gap-1 md:gap-4 shrink-0">
+            <Link href="/login" className="text-[13px] md:text-[15px] font-[500] text-[var(--color-slate)] hover:text-[var(--color-ink)] transition-colors px-2 md:px-4">
               Masuk
             </Link>
-            <Link href="/register" className="mc-btn-primary px-4 md:px-6 py-2.5 text-[13px] md:text-[14px]">
-              Daftar Sekarang
+            <Link href="/register" className="mc-btn-primary px-3 md:px-6 py-2 md:py-2.5 text-[12px] md:text-[14px] whitespace-nowrap">
+              Daftar <span className="hidden sm:inline">Sekarang</span>
             </Link>
           </div>
         </nav>

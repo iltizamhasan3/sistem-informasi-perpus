@@ -81,17 +81,17 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
       
       {/* FLOATING NAV PILL */}
       <div className="fixed top-6 left-0 right-0 z-50 flex justify-center px-4">
-        <nav className="mc-nav-pill flex items-center justify-between w-full max-w-[1200px]">
+        <nav className="mc-nav-pill flex items-center justify-between w-full max-w-[1200px] gap-2">
           
-          <Link href="/dashboard" className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-full bg-[var(--color-ink)] flex items-center justify-center">
-               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5 text-white">
+          <Link href="/dashboard" className="flex items-center gap-2 md:gap-3 shrink-0">
+            <div className="w-8 h-8 md:w-9 md:h-9 shrink-0 rounded-full bg-[var(--color-ink)] flex items-center justify-center">
+               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4 md:w-5 md:h-5 text-white">
                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
                </svg>
             </div>
             <div className="flex flex-col">
-              <span className="font-[500] text-xl tracking-tight leading-none text-[var(--color-ink)]">SiPustaka</span>
-              <span className="text-[12px] text-black/50 font-[450] leading-none mt-1">by Perpustakaan AA</span>
+              <span className="font-[500] text-[16px] md:text-xl tracking-tight leading-none text-[var(--color-ink)] whitespace-nowrap">SiPustaka</span>
+              <span className="text-[10px] md:text-[12px] text-black/50 font-[450] leading-none mt-1 whitespace-nowrap">by Perpustakaan AA</span>
             </div>
           </Link>
           
@@ -111,10 +111,10 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
             })}
           </div>
 
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-3 md:gap-6 shrink-0">
              {/* Notif */}
              {user && (
-               <div className="relative flex items-center gap-6" ref={notifRef}>
+               <div className="relative flex items-center gap-3 md:gap-6" ref={notifRef}>
                   <button onClick={() => { setShowNotif(!showNotif); if (!showNotif) markAsRead() }}
                     className="relative p-2 rounded-full hover:bg-black/5 transition flex items-center">
                     <svg className="w-5 h-5 text-black/70" fill="none" viewBox="0 0 24 24" stroke="currentColor">

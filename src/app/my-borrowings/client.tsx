@@ -94,22 +94,22 @@ export function MyBorrowingsClient({ user }: { user: { name: string; role: strin
                          </div>
                       </div>
 
-                      <div className="flex items-center justify-between md:w-[55%] gap-6">
-                         <div className="flex flex-col items-center text-center">
+                      <div className="flex flex-wrap md:flex-nowrap items-center justify-between md:justify-end md:w-[55%] gap-4 md:gap-8 w-full mt-2 md:mt-0">
+                         <div className="flex flex-col items-start md:items-center">
                             <span className="mc-eyebrow text-[var(--color-slate)] mb-1">Tanggal Pinjam</span>
-                            <span className="text-[16px] font-[450] text-[var(--color-ink)]">{new Date(t.borrowDate).toLocaleDateString('id-ID')}</span>
+                            <span className="text-[14px] md:text-[16px] font-[450] text-[var(--color-ink)]">{new Date(t.borrowDate).toLocaleDateString('id-ID')}</span>
                          </div>
                          
-                         <div className="flex flex-col items-center text-center">
+                         <div className="flex flex-col items-start md:items-center">
                             <span className="mc-eyebrow text-[var(--color-slate)] mb-1">Jatuh Tempo</span>
-                            <span className={`text-[16px] font-[500] ${overdue ? 'text-[var(--color-signal)]' : 'text-[var(--color-ink)]'}`}>
+                            <span className={`text-[14px] md:text-[16px] font-[500] ${overdue ? 'text-[var(--color-signal)]' : 'text-[var(--color-ink)]'}`}>
                                {due.toLocaleDateString('id-ID')}
                             </span>
                          </div>
 
-                         <div className="flex flex-col items-center text-center">
-                            <span className="mc-eyebrow text-[var(--color-slate)] mb-2">Status</span>
-                            <span className={`inline-flex px-4 py-1.5 rounded-full text-[13px] font-[500] whitespace-nowrap border ${
+                         <div className="flex flex-col items-start md:items-center w-full md:w-auto mt-2 md:mt-0">
+                            <span className="mc-eyebrow text-[var(--color-slate)] mb-2 md:mb-1">Status</span>
+                            <span className={`inline-flex px-4 py-1.5 rounded-full text-[12px] md:text-[13px] font-[500] whitespace-nowrap border ${
                                overdue 
                                   ? 'border-[var(--color-signal)] text-white bg-[var(--color-signal)] shadow-sm' 
                                   : 'border-[var(--color-ink)]/20 text-[var(--color-ink)] bg-white'

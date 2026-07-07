@@ -109,17 +109,17 @@ export default function CatalogPage() {
                </button>
              </form>
              
-             <div className="flex flex-row gap-3 md:gap-4 w-full">
+             <div className="flex flex-col sm:flex-row gap-3 md:gap-4 w-full">
                <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)}
-                 className="flex-1 min-w-[140px] md:min-w-[180px] shrink-0 px-5 md:px-6 py-3.5 md:py-4 bg-white border border-[var(--color-ink)]/10 rounded-full text-[14px] md:text-[16px] font-[450] text-[var(--color-ink)] focus:outline-none focus:border-[var(--color-ink)]/40 transition-shadow shadow-sm appearance-none cursor-pointer whitespace-nowrap"
-                 style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%23141413\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'1.5\' d=\'M19 9l-7 7-7-7\'/%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1.2rem center', backgroundSize: '1.2em', paddingRight: '2.8rem' }}>
+                 className="flex-1 w-full shrink-0 px-4 md:px-6 py-3.5 md:py-4 bg-white border border-[var(--color-ink)]/10 rounded-2xl md:rounded-full text-[13px] md:text-[16px] font-[450] text-[var(--color-ink)] focus:outline-none focus:border-[var(--color-ink)]/40 transition-shadow shadow-sm appearance-none cursor-pointer whitespace-nowrap text-ellipsis overflow-hidden"
+                 style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%23141413\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'1.5\' d=\'M19 9l-7 7-7-7\'/%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center', backgroundSize: '1.2em', paddingRight: '2.5rem' }}>
                  <option value="">Semua Kategori</option>
                  {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
                </select>
                
                <select value={type} onChange={(e) => setType(e.target.value)}
-                 className="flex-1 min-w-[140px] md:min-w-[180px] shrink-0 px-5 md:px-6 py-3.5 md:py-4 bg-white border border-[var(--color-ink)]/10 rounded-full text-[14px] md:text-[16px] font-[450] text-[var(--color-ink)] focus:outline-none focus:border-[var(--color-ink)]/40 transition-shadow shadow-sm appearance-none cursor-pointer whitespace-nowrap"
-                 style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%23141413\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'1.5\' d=\'M19 9l-7 7-7-7\'/%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1.2rem center', backgroundSize: '1.2em', paddingRight: '2.8rem' }}>
+                 className="flex-1 w-full shrink-0 px-4 md:px-6 py-3.5 md:py-4 bg-white border border-[var(--color-ink)]/10 rounded-2xl md:rounded-full text-[13px] md:text-[16px] font-[450] text-[var(--color-ink)] focus:outline-none focus:border-[var(--color-ink)]/40 transition-shadow shadow-sm appearance-none cursor-pointer whitespace-nowrap text-ellipsis overflow-hidden"
+                 style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%23141413\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'1.5\' d=\'M19 9l-7 7-7-7\'/%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1rem center', backgroundSize: '1.2em', paddingRight: '2.5rem' }}>
                  <option value="">Semua Format</option>
                  <option value="physical">Buku Fisik</option>
                  <option value="ebook">E-Book</option>
@@ -201,21 +201,21 @@ export default function CatalogPage() {
       
       {/* Navbar for Guest */}
       <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-black/5">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-full bg-[var(--color-signal)] flex items-center justify-center">
-               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5 text-white">
+        <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 md:py-4 flex items-center justify-between gap-2">
+          <Link href="/" className="flex items-center gap-2 md:gap-3 shrink-0">
+            <div className="w-8 h-8 md:w-9 md:h-9 shrink-0 rounded-full bg-[var(--color-signal)] flex items-center justify-center">
+               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4 md:w-5 md:h-5 text-white">
                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
                </svg>
             </div>
             <div className="flex flex-col">
-              <span className="font-[500] text-xl tracking-tight leading-none text-[var(--color-ink)]">SiPustaka</span>
-              <span className="text-[12px] text-[var(--color-slate)] font-[450] leading-none mt-1">by Perpustakaan AA</span>
+              <span className="font-[500] text-[16px] md:text-xl tracking-tight leading-none text-[var(--color-ink)] whitespace-nowrap">SiPustaka</span>
+              <span className="text-[10px] md:text-[12px] text-[var(--color-slate)] font-[450] leading-none mt-1 whitespace-nowrap">by Perpustakaan AA</span>
             </div>
           </Link>
-          <div className="flex items-center gap-4">
-            <Link href="/login" className="text-[15px] font-[500] text-[var(--color-ink)] hover:text-[var(--color-signal)] transition-colors">Masuk</Link>
-            <Link href="/register" className="mc-btn-primary px-6 py-2">Daftar</Link>
+          <div className="flex items-center gap-1 md:gap-4 shrink-0">
+            <Link href="/login" className="text-[13px] md:text-[15px] font-[500] text-[var(--color-ink)] hover:text-[var(--color-signal)] transition-colors px-2 md:px-0">Masuk</Link>
+            <Link href="/register" className="mc-btn-primary px-3 md:px-6 py-2 text-[12px] md:text-[16px] whitespace-nowrap">Daftar <span className="hidden sm:inline">Sekarang</span></Link>
           </div>
         </div>
       </nav>

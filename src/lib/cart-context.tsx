@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from 'react'
 import { useUser } from '@/lib/auth-context'
+import { MAX_BORROW } from '@/lib/utils'
 
 export interface CartItem {
   id: number
@@ -65,7 +66,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setCart((prev) => {
       if (prev.find((p) => p.id === item.id)) return prev
       if (prev.length >= availableSlot) {
-         alert(`Gagal menambah buku. Kuota pinjaman kamu tersisa ${availableSlot} buku lagi (maksimal 3 peminjaman aktif).`)
+         alert(`Gagal menambah buku. Kuota pinjaman kamu tersisa ${availableSlot} buku lagi (maksimal ${MAX_BORROW} peminjaman aktif).`)
          return prev
       }
       return [...prev, item]

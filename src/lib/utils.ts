@@ -28,5 +28,6 @@ export function calculateFine(dueDate: Date, returnDate?: Date | null) {
   return diffDays > 0 ? diffDays * fineRate : 0
 }
 
+export const MAX_BORROW = 3
 export const BORROW_DURATION_DAYS = 7
 

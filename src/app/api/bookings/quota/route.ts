@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma'
 import { withSupabaseRoute } from '@/lib/supabase-server'
+import { MAX_BORROW } from '@/lib/utils'
 
 export const dynamic = 'force-dynamic'
 
@@ -16,7 +17,7 @@ export const GET = withSupabaseRoute({ auth: 'user' }, async (req, ctx) => {
     where: { userId, status: 'borrowed' },
   })
 
-  const maxSlot = 3
+  const maxSlot = MAX_BORROW
   const usedSlot = activeCount + borrowedCount
   const availableSlot = Math.max(0, maxSlot - usedSlot)
 

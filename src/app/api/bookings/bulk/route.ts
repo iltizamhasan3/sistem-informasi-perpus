@@ -2,6 +2,7 @@ import { prisma } from '@/lib/prisma'
 import { withSupabaseRoute } from '@/lib/supabase-server'
 import { generateBookingCode } from '@/lib/booking'
 import { notifyUser } from '@/lib/notifications'
+import { MAX_BORROW } from '@/lib/utils'
 
 export const POST = withSupabaseRoute({ auth: 'user' }, async (req, ctx) => {
   if (!ctx.user) return Response.json({ error: 'Unauthorized' }, { status: 401 })
@@ -13,8 +14,8 @@ export const POST = withSupabaseRoute({ auth: 'user' }, async (req, ctx) => {
     return Response.json({ error: 'Tidak ada buku yang dipilih' }, { status: 400 })
   }
   
-  if (bookIds.length > 3) {
-    return Response.json({ error: 'Maksimal meminjam 3 buku sekaligus' }, { status: 400 })
+  if (bookIds.length > MAX_BORROW) {
+    return Response.json({ error: `Maksimal meminjam ${MAX_BORROW} buku sekaligus` }, { status: 400 })
   }
 
   const baseCode = await generateBookingCode()
@@ -32,8 +33,8 @@ export const POST = withSupabaseRoute({ auth: 'user' }, async (req, ctx) => {
       where: { userId, status: 'borrowed' },
     })
     
-    if (activeCount + borrowedCount + bookIds.length > 3) {
-      return { error: `Batas maksimal 3 buku. Kamu sudah memiliki ${activeCount + borrowedCount} buku aktif.`, status: 400 }
+    if (activeCount + borrowedCount + bookIds.length > MAX_BORROW) {
+      return { error: `Batas maksimal ${MAX_BORROW} buku. Kamu sudah memiliki ${activeCount + borrowedCount} buku aktif.`, status: 400 }
     }
 
     const createdBookings = []

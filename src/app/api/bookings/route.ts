@@ -3,6 +3,7 @@ import { withSupabaseRoute } from '@/lib/supabase-server'
 import { generateBookingCode } from '@/lib/booking'
 import { notifyUser, notifyAdmins } from '@/lib/notifications'
 import type { Prisma } from '@/generated/prisma/client'
+import { MAX_BORROW } from '@/lib/utils'
 
 export const POST = withSupabaseRoute({ auth: 'user' }, async (req, ctx) => {
   if (!ctx.user) return Response.json({ error: 'Unauthorized' }, { status: 401 })
@@ -30,8 +31,8 @@ export const POST = withSupabaseRoute({ auth: 'user' }, async (req, ctx) => {
     const borrowedCount = await tx.transaction.count({
       where: { userId, status: 'borrowed' },
     })
-    if (activeCount + borrowedCount >= 3) {
-      return { error: 'Kamu sudah mencapai batas maksimal 3 buku (booking + pinjaman)', status: 400 }
+    if (activeCount + borrowedCount >= MAX_BORROW) {
+      return { error: `Kamu sudah mencapai batas maksimal ${MAX_BORROW} buku (booking + pinjaman)`, status: 400 }
     }
 
     const { count } = await tx.book.updateMany({

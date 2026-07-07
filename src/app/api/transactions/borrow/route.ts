@@ -1,6 +1,6 @@
 import { prisma } from '@/lib/prisma'
 import { withSupabaseRoute } from '@/lib/supabase-server'
-import { BORROW_DURATION_DAYS } from '@/lib/utils'
+import { BORROW_DURATION_DAYS, MAX_BORROW } from '@/lib/utils'
 import { notifyUser, notifyAdmins } from '@/lib/notifications'
 
 export const POST = withSupabaseRoute({ auth: 'user' }, async (req, ctx) => {
@@ -16,10 +16,15 @@ export const POST = withSupabaseRoute({ auth: 'user' }, async (req, ctx) => {
     const userDb = await tx.user.findUnique({ where: { id: targetUserId } })
     if (!userDb || !userDb.isActive) return { error: 'Anggota tidak aktif' }
 
-    const activeCount = await tx.transaction.count({
+    const borrowedCount = await tx.transaction.count({
       where: { userId: targetUserId, status: 'borrowed' },
     })
-    if (activeCount >= 3) return { error: 'Anggota sudah meminjam maksimal 3 buku' }
+    const bookingCount = await tx.booking.count({
+      where: { userId: targetUserId, status: 'active' },
+    })
+    if (borrowedCount + bookingCount >= MAX_BORROW) {
+      return { error: `Anggota sudah mencapai batas maksimal ${MAX_BORROW} buku (booking + pinjaman)` }
+    }
 
     const { count } = await tx.book.updateMany({
       where: { id: Number(bookId), stock: { gt: 0 } },

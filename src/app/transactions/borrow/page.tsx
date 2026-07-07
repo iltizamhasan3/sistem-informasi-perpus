@@ -23,7 +23,7 @@ export default function BorrowPage() {
   const [toast, setToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
 
   const [bookingCode, setBookingCode] = useState('')
-  const [bookingData, setBookingData] = useState<{ id: number; code: string; user: { name: string; email: string }; book: { title: string }; expiresAt: string } | null>(null)
+  const [bookingData, setBookingData] = useState<{ baseCode: string; user: { name: string; email: string }; books: string[]; expiresAt: string } | null>(null)
   const [bookingError, setBookingError] = useState('')
   const [bookingSearching, setBookingSearching] = useState(false)
   const [confirmBooking, setConfirmBooking] = useState(false)
@@ -52,12 +52,25 @@ export default function BorrowPage() {
     try {
       const res = await fetch(`/api/bookings?status=active`)
       const data = await res.json()
-      const found = (data.bookings ?? []).find((b: { code: string }) => b.code === bookingCode.trim().toUpperCase())
-      if (!found) {
+      
+      const inputCode = bookingCode.trim().toUpperCase()
+      const searchCodes = [inputCode, `${inputCode}-2`, `${inputCode}-3`]
+      
+      const foundBookings = (data.bookings ?? []).filter((b: { code: string }) => searchCodes.includes(b.code))
+      
+      if (foundBookings.length === 0) {
         setBookingError('Kode booking tidak ditemukan atau sudah tidak aktif')
         return
       }
-      setBookingData({ id: found.id, code: found.code, user: found.user, book: found.book, expiresAt: found.expiresAt })
+      
+      const first = foundBookings[0]
+      
+      setBookingData({ 
+         baseCode: inputCode, 
+         user: first.user, 
+         books: foundBookings.map((b: any) => b.book.title), 
+         expiresAt: first.expiresAt 
+      })
     } catch {
       setBookingError('Gagal mencari booking')
     } finally {
@@ -71,7 +84,7 @@ export default function BorrowPage() {
       const res = await fetch('/api/transactions/confirm', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ bookingCode: bookingData!.code }),
+        body: JSON.stringify({ bookingCode: bookingData!.baseCode }),
       })
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Gagal konfirmasi booking')
@@ -151,10 +164,10 @@ export default function BorrowPage() {
 
                 {bookingData && (
                   <div className="bg-white p-6 rounded-[24px] space-y-4 shadow-sm border border-black/5 mt-6">
-                    <p className="text-xl tracking-widest font-mono font-bold text-center text-[var(--color-ink)]">{bookingData.code}</p>
+                    <p className="text-xl tracking-widest font-mono font-bold text-center text-[var(--color-ink)]">{bookingData.baseCode}</p>
                     <div className="text-[14px] font-[450] text-[var(--color-ink)] space-y-2 border-t border-black/5 pt-4">
                       <p><span className="text-[var(--color-slate)]">Anggota:</span> {bookingData.user.name} ({bookingData.user.email})</p>
-                      <p><span className="text-[var(--color-slate)]">Buku:</span> {bookingData.book.title}</p>
+                      <p><span className="text-[var(--color-slate)]">Buku:</span> {bookingData.books.join(', ')}</p>
                       <p><span className="text-[var(--color-slate)]">Batas Waktu:</span> {new Date(bookingData.expiresAt).toLocaleDateString('id-ID', { hour: '2-digit', minute: '2-digit' })}</p>
                     </div>
                     <button onClick={() => setConfirmBooking(true)} disabled={confirming}
@@ -218,7 +231,7 @@ export default function BorrowPage() {
       <ConfirmModal
         open={confirmBooking && bookingData !== null}
         title="Konfirmasi Booking"
-        message={`Yakin ingin mengkonfirmasi booking ${bookingData?.code} untuk ${bookingData?.user?.name}? Transaksi akan tercatat dengan masa pinjam 5 hari.`}
+        message={`Yakin ingin mengkonfirmasi booking ${bookingData?.baseCode} untuk ${bookingData?.user?.name}? Transaksi untuk ${bookingData?.books.length} buku akan tercatat dengan masa pinjam 5 hari.`}
         onConfirm={handleConfirmBooking}
         onCancel={() => setConfirmBooking(false)}
       />

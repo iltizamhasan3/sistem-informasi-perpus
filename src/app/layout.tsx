@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Inter, Outfit } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth-context";
+import { CartProvider } from "@/lib/cart-context";
+import { CartSidebar } from "@/components/cart-sidebar";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -22,7 +24,12 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
   return (
     <html lang="id" className="h-full">
       <body className={`${inter.variable} ${outfit.variable} min-h-full flex flex-col font-sans antialiased`}>
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          <CartProvider>
+            {children}
+            <CartSidebar />
+          </CartProvider>
+        </AuthProvider>
       </body>
     </html>
   );

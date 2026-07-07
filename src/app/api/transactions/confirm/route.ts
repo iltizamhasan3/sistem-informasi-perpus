@@ -13,58 +13,77 @@ export const POST = withSupabaseRoute({ auth: 'user' }, async (req, ctx) => {
   const { bookingCode } = await req.json()
   if (!bookingCode) return Response.json({ error: 'Kode booking wajib diisi' }, { status: 400 })
 
-  const booking = await prisma.booking.findUnique({
-    where: { code: bookingCode },
-    include: { book: { select: { title: true } } },
+  // Find the exact base code, and up to 3 suffixes if it was a bulk cart checkout
+  const searchCodes = [bookingCode, `${bookingCode}-2`, `${bookingCode}-3`]
+
+  const bookings = await prisma.booking.findMany({
+    where: { code: { in: searchCodes } },
+    include: { book: { select: { title: true } }, user: { select: { id: true, name: true } } },
   })
-  if (!booking) return Response.json({ error: 'Kode booking tidak ditemukan' }, { status: 404 })
-  if (booking.status !== 'active') {
-    if (booking.status === 'expired') return Response.json({ error: 'Booking sudah expired' }, { status: 400 })
-    if (booking.status === 'completed') return Response.json({ error: 'Booking sudah digunakan' }, { status: 400 })
-    return Response.json({ error: `Booking sudah ${booking.status}` }, { status: 400 })
+
+  if (bookings.length === 0) {
+    return Response.json({ error: 'Kode booking tidak ditemukan' }, { status: 404 })
   }
-  if (booking.expiresAt < new Date()) {
-    await prisma.booking.update({ where: { id: booking.id }, data: { status: 'expired' } })
-    await prisma.book.update({ where: { id: booking.bookId }, data: { stock: { increment: 1 } } })
-    return Response.json({ error: 'Booking sudah expired' }, { status: 400 })
+
+  const activeBookings = bookings.filter(b => b.status === 'active' && b.expiresAt >= new Date())
+  
+  if (activeBookings.length === 0) {
+    // Determine the error from the first booking found
+    const b = bookings[0]
+    if (b.status === 'expired' || b.expiresAt < new Date()) {
+       if (b.status !== 'expired') {
+          await prisma.booking.update({ where: { id: b.id }, data: { status: 'expired' } })
+          await prisma.book.update({ where: { id: b.bookId }, data: { stock: { increment: 1 } } })
+       }
+       return Response.json({ error: 'Booking sudah expired' }, { status: 400 })
+    }
+    if (b.status === 'completed') return Response.json({ error: 'Booking sudah digunakan' }, { status: 400 })
+    return Response.json({ error: `Booking sudah ${b.status}` }, { status: 400 })
   }
 
   const result = await prisma.$transaction(async (tx) => {
+    const activeIds = activeBookings.map(b => b.id)
+    
     const { count } = await tx.booking.updateMany({
-      where: { id: booking.id, status: 'active' },
+      where: { id: { in: activeIds }, status: 'active' },
       data: { status: 'completed' },
     })
-    if (count === 0) return { error: 'Booking sudah tidak aktif' }
+    
+    if (count !== activeBookings.length) return { error: 'Gagal mengkonfirmasi sebagian booking' }
 
     const now = new Date()
     const dueDate = new Date(now.getTime() + BORROW_DURATION_DAYS * 24 * 60 * 60 * 1000)
 
-    const [transaction] = await Promise.all([
-      tx.transaction.create({
-        data: {
-          userId: booking.userId,
-          bookId: booking.bookId,
-          bookingId: booking.id,
-          borrowDate: now,
-          dueDate,
-        },
-        include: {
-          user: { select: { id: true, name: true } },
-          book: { select: { id: true, title: true } },
-        },
-      }),
-    ])
+    const transactions = await Promise.all(
+      activeBookings.map(b => 
+        tx.transaction.create({
+          data: {
+            userId: b.userId,
+            bookId: b.bookId,
+            bookingId: b.id,
+            borrowDate: now,
+            dueDate,
+          },
+          include: {
+            user: { select: { id: true, name: true } },
+            book: { select: { id: true, title: true } },
+          },
+        })
+      )
+    )
 
-    return { transaction, dueDate }
+    return { transactions, dueDate }
   })
 
   if ('error' in result) {
-    const status = result.error === 'Booking sudah tidak aktif' ? 400 : 500
-    return Response.json({ error: result.error }, { status })
+    return Response.json({ error: result.error }, { status: 500 })
   }
 
-  await notifyUser(booking.userId, 'Peminjaman Berhasil', `"${booking.book.title}" berhasil dipinjam. Kembalikan sebelum ${result.dueDate.toLocaleDateString('id-ID')}.`)
-  await notifyAdmins('Transaksi Baru', `Booking ${bookingCode} dikonfirmasi, "${booking.book.title}" dipinjam oleh ${result.transaction.user.name}.`)
+  const user = activeBookings[0].user
+  const bookTitles = activeBookings.map(b => b.book.title).join(', ')
+  
+  await notifyUser(user.id, 'Peminjaman Berhasil', `${activeBookings.length} buku (${bookTitles}) berhasil dipinjam. Kembalikan sebelum ${result.dueDate.toLocaleDateString('id-ID')}.`)
+  await notifyAdmins('Transaksi Baru', `Booking ${bookingCode} dikonfirmasi, ${activeBookings.length} buku dipinjam oleh ${user.name}.`)
 
-  return Response.json({ transaction: result.transaction }, { status: 201 })
+  return Response.json({ transactions: result.transactions }, { status: 201 })
 })

@@ -6,6 +6,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { AdminLayout } from '@/components/admin-layout'
 import { useUser } from '@/lib/auth-context'
+import { useCart } from '@/lib/cart-context'
 import { Skeleton } from '@/components/skeleton'
 
 interface BookDetail {
@@ -24,6 +25,7 @@ interface BookDetail {
 export default function BookDetailPage() {
   const { id } = useParams()
   const { user } = useUser()
+  const { addToCart, cart, setCartOpen } = useCart()
   const [book, setBook] = useState<BookDetail | null>(null)
   const [loading, setLoading] = useState(true)
   const [booking, setBooking] = useState(false)
@@ -44,30 +46,24 @@ export default function BookDetailPage() {
     }).catch(() => {}).finally(() => setLoading(false))
   }, [id])
 
-  async function handleBooking() {
+  async function handleAddToCart() {
     if (!book) return
-    setBooking(true)
-    setMessage(null)
-    setBookingCode(null)
-    try {
-      const res = await fetch('/api/bookings', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ bookId: book.id }),
-      })
-      const data = await res.json()
-      if (!res.ok) {
-        setMessage({ type: 'error', text: data.error || 'Gagal booking' })
-      } else {
-        setBookingCode(data.booking.code)
-        setMessage({ type: 'success', text: 'Booking berhasil!' })
-        setBook((prev) => prev ? { ...prev, stock: prev.stock - 1 } : prev)
-      }
-    } catch {
-      setMessage({ type: 'error', text: 'Terjadi kesalahan' })
-    } finally {
-      setBooking(false)
+    if (cart.length >= 3) {
+      setMessage({ type: 'error', text: 'Keranjang penuh (Maksimal 3 buku).' })
+      return
     }
+    if (cart.find(c => c.id === book.id)) {
+      setCartOpen(true)
+      return
+    }
+    addToCart({
+      id: book.id,
+      title: book.title,
+      author: book.author,
+      coverImage: book.coverImage,
+      stock: book.stock,
+    })
+    setMessage({ type: 'success', text: 'Buku berhasil ditambahkan ke keranjang!' })
   }
 
   async function handleRentEbook() {
@@ -167,19 +163,6 @@ export default function BookDetailPage() {
                   message.type === 'success' ? 'bg-[#c8e6cd] text-[#1e4b26]' : 'bg-[#fff5f2] text-[var(--color-signal)] border border-[var(--color-signal)]/10'
                 }`}>
                   {message.text}
-                  {bookingCode && (
-                    <div className="mt-4 bg-white/60 p-4 rounded-[12px]">
-                      <span className="inline-block px-4 py-2 bg-white rounded-full text-[18px] font-mono font-bold tracking-widest text-[var(--color-ink)] shadow-sm">
-                        {bookingCode}
-                      </span>
-                      <p className="mt-3 text-[14px] text-black/70 font-[450] leading-relaxed">
-                        Tunjukkan kode ini ke admin perpustakaan untuk mengambil buku fisik Anda. Batas pengambilan 24 jam.
-                      </p>
-                      <Link href="/my-bookings" className="mt-3 inline-block text-[14px] font-[500] text-[var(--color-ink)] hover:underline transition">
-                        Lihat di Riwayat &rarr;
-                      </Link>
-                    </div>
-                  )}
                 </div>
               )}
 
@@ -194,9 +177,9 @@ export default function BookDetailPage() {
                 </div>
                 
                 {book.stock > 0 && user?.role === 'member' && (
-                  <button onClick={handleBooking} disabled={booking}
+                  <button onClick={handleAddToCart}
                     className="mc-btn-primary px-8">
-                    {booking ? 'Memproses...' : 'Booking Fisik'}
+                    Tambah ke Keranjang
                   </button>
                 )}
                 {book.stock > 0 && !user && (

@@ -50,10 +50,21 @@ export default function CreateBookPage() {
     if (isEbook && ebookFile) {
       setUploadStatus('Mengunggah e-book...')
       tasks.push((async () => {
-        const fd = new FormData(); fd.append('file', ebookFile)
-        const res = await fetch('/api/ebooks/upload', { method: 'POST', body: fd })
+        const res = await fetch('/api/ebooks/upload', { 
+          method: 'POST', 
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ fileName: ebookFile.name, contentType: ebookFile.type })
+        })
         const d = await res.json()
-        if (!res.ok) throw new Error(d.error || 'Gagal upload e-book')
+        if (!res.ok) throw new Error(d.error || 'Gagal mendapatkan url upload e-book')
+        
+        const uploadRes = await fetch(d.uploadUrl, {
+          method: 'PUT',
+          body: ebookFile,
+          headers: { 'Content-Type': ebookFile.type }
+        })
+        if (!uploadRes.ok) throw new Error('Gagal mengunggah e-book ke server storage')
+        
         ebookPath = d.path
       })())
     }

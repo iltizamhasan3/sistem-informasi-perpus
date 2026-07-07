@@ -13,6 +13,9 @@ export const POST = withSupabaseRoute({ auth: 'user' }, async (req, ctx) => {
   const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000)
 
   const result = await prisma.$transaction(async (tx) => {
+    const userDb = await tx.user.findUnique({ where: { id: userId } })
+    if (!userDb || !userDb.isActive) return { error: 'Akun kamu tidak aktif', status: 403 }
+
     const book = await tx.book.findUnique({ where: { id: Number(bookId) } })
     if (!book) return { error: 'Buku tidak ditemukan', status: 404 }
 

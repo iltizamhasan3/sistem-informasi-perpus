@@ -60,8 +60,10 @@ export default function BooksPage() {
   async function fetchBooks(q?: string, cat?: string, p?: number) {
     try {
       const params = new URLSearchParams()
-      if (q || search) params.set('search', q || search)
-      if (cat || categoryFilter) params.set('category', cat || categoryFilter)
+      const finalSearch = q !== undefined ? q : search
+      const finalCat = cat !== undefined ? cat : categoryFilter
+      if (finalSearch) params.set('search', finalSearch)
+      if (finalCat) params.set('categoryId', finalCat)
       params.set('page', String(p || page))
       const res = await fetch(`/api/books?${params}`, { cache: 'no-cache' })
       const data = await res.json()
@@ -150,7 +152,7 @@ export default function BooksPage() {
                style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%23141413\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'1.5\' d=\'M19 9l-7 7-7-7\'/%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1.2rem center', backgroundSize: '1.2em' }}
             >
                <option value="">Semua Kategori</option>
-               {categories.map(c => <option key={c.id} value={c.name}>{c.name}</option>)}
+               {categories.map(c => <option key={c.id} value={c.id.toString()}>{c.name}</option>)}
             </select>
          </div>
          
@@ -197,10 +199,10 @@ export default function BooksPage() {
                    </div>
                 </td>
                 <td className="px-6 py-4">
-                   <span className="px-3 py-1 bg-[var(--color-ink)]/5 text-[var(--color-ink)] rounded-full text-[13px] font-[450]">{book.category.name}</span>
+                   <span className="px-3 py-1 bg-[var(--color-ink)]/5 text-[var(--color-ink)] rounded-full text-[13px] font-[450] whitespace-nowrap">{book.category.name}</span>
                 </td>
                 <td className="px-6 py-4 text-center">
-                   <span className={`text-[14px] font-[500] ${book.stock <= 2 ? 'text-[var(--color-signal)]' : 'text-[var(--color-ink)]'}`}>{book.stock}</span>
+                   <span className={`text-[14px] font-[500] ${book.stock < 5 ? 'text-[var(--color-signal)]' : 'text-[var(--color-ink)]'}`}>{book.stock}</span>
                 </td>
                 <td className="px-6 py-4 text-center">
                    <span className="text-[14px] font-[450] text-[var(--color-slate)]">{book._count.transactions}</span>

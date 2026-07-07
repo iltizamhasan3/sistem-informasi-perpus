@@ -28,6 +28,8 @@ export default function MembersPage() {
   const [exporting, setExporting] = useState(false)
   const [deleteId, setDeleteId] = useState<number | null>(null)
   const [deleting, setDeleting] = useState(false)
+  const [toggleData, setToggleData] = useState<{ id: number; current: boolean } | null>(null)
+  const [toggling, setToggling] = useState(false)
 
   useEffect(() => {
     fetchMembers().finally(() => setPageLoading(false))
@@ -85,6 +87,7 @@ export default function MembersPage() {
   }
 
   async function toggleActive(id: number, current: boolean) {
+    setToggling(true)
     try {
       const res = await fetch(`/api/members/${id}`, {
         method: 'PUT',
@@ -97,6 +100,9 @@ export default function MembersPage() {
       fetchMembers()
     } catch (err) {
       setToast({ type: 'error', message: err instanceof Error ? err.message : 'Gagal mengubah status' })
+    } finally {
+      setToggling(false)
+      setToggleData(null)
     }
   }
 
@@ -189,7 +195,7 @@ export default function MembersPage() {
                      </div>
                      <div className="flex flex-col items-center text-center">
                         <span className="mc-eyebrow text-[var(--color-slate)] mb-2">Status</span>
-                        <button onClick={() => toggleActive(m.id, m.isActive)}
+                        <button onClick={() => m.isActive ? setToggleData({ id: m.id, current: m.isActive }) : toggleActive(m.id, m.isActive)}
                            className={`inline-flex px-4 py-1.5 rounded-full text-[13px] font-[500] border transition-colors ${
                               m.isActive ? 'border-[var(--color-ink)]/20 text-[var(--color-ink)] hover:bg-[var(--color-ink)] hover:text-white' : 'border-[var(--color-signal)] text-[var(--color-signal)] hover:bg-[var(--color-signal)] hover:text-white'
                            }`}>
@@ -230,6 +236,15 @@ export default function MembersPage() {
         loading={deleting}
         onConfirm={() => deleteId !== null && handleDelete(deleteId)}
         onCancel={() => setDeleteId(null)}
+      />
+
+      <ConfirmModal
+        open={toggleData !== null}
+        title="Nonaktifkan Anggota"
+        message="Yakin ingin menonaktifkan anggota ini? Mereka tidak akan bisa meminjam buku atau menyewa e-book."
+        loading={toggling}
+        onConfirm={() => toggleData !== null && toggleActive(toggleData.id, toggleData.current)}
+        onCancel={() => setToggleData(null)}
       />
 
       {toast && <Toast type={toast.type} message={toast.message} onClose={() => setToast(null)} />}

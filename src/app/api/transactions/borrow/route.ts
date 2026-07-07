@@ -13,6 +13,9 @@ export const POST = withSupabaseRoute({ auth: 'user' }, async (req, ctx) => {
   const targetUserId = memberId || ctx.user.id
 
   const result = await prisma.$transaction(async (tx) => {
+    const userDb = await tx.user.findUnique({ where: { id: targetUserId } })
+    if (!userDb || !userDb.isActive) return { error: 'Anggota tidak aktif' }
+
     const activeCount = await tx.transaction.count({
       where: { userId: targetUserId, status: 'borrowed' },
     })

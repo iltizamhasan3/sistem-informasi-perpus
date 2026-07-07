@@ -8,6 +8,9 @@ export const POST = withSupabaseRoute({ auth: 'user' }, async (req, ctx) => {
 
   const { bookId } = await req.json()
 
+  const user = await prisma.user.findUnique({ where: { id: ctx.user.id } })
+  if (!user || !user.isActive) return Response.json({ error: 'Akun kamu tidak aktif' }, { status: 403 })
+
   const book = await prisma.book.findUnique({ where: { id: Number(bookId) } })
   if (!book) return Response.json({ error: 'Buku tidak ditemukan' }, { status: 404 })
   if (!book.isEbook || !book.ebookFile) return Response.json({ error: 'Buku ini tidak memiliki e-book' }, { status: 400 })

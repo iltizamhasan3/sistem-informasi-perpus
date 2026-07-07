@@ -11,7 +11,7 @@ export const GET = withSupabaseRoute({ auth: 'user' }, async (_req, ctx) => {
     prisma.user.count({ where: { role: 'member', isActive: true, deletedAt: null } }),
     prisma.transaction.count({ where: { status: 'borrowed' } }),
     prisma.transaction.count({ where: { createdAt: { gte: today } } }),
-    prisma.book.findMany({ where: { stock: { lte: 2 }, deletedAt: null }, select: { id: true, title: true, stock: true }, orderBy: { stock: 'asc' }, take: 5 }),
+    prisma.book.findMany({ where: { stock: { lt: 5 }, deletedAt: null }, select: { id: true, title: true, stock: true }, orderBy: { stock: 'asc' }, take: 5 }),
     prisma.transaction.groupBy({
       by: ['bookId'],
       _count: { id: true },

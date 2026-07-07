@@ -5,7 +5,7 @@ async function generateBookingCode(): Promise<string> {
   for (let attempt = 0; attempt < 20; attempt++) {
     let code = ''
     for (let i = 0; i < 6; i++) code += chars[Math.floor(Math.random() * chars.length)]
-    const existing = await prisma.booking.findUnique({ where: { code } })
+    const existing = await prisma.booking.findFirst({ where: { code } })
     if (!existing) return code
   }
   throw new Error('Gagal menghasilkan kode booking')

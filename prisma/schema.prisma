@@ -91,7 +91,7 @@ model Transaction {
 
 model Booking {
   id        Int      @id @default(autoincrement())
-  code      String   @unique
+  code      String
   userId    Int
   bookId    Int
   status    String   @default("active")

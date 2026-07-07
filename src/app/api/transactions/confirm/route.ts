@@ -13,11 +13,8 @@ export const POST = withSupabaseRoute({ auth: 'user' }, async (req, ctx) => {
   const { bookingCode } = await req.json()
   if (!bookingCode) return Response.json({ error: 'Kode booking wajib diisi' }, { status: 400 })
 
-  // Find the exact base code, and up to 3 suffixes if it was a bulk cart checkout
-  const searchCodes = [bookingCode, `${bookingCode}-2`, `${bookingCode}-3`]
-
   const bookings = await prisma.booking.findMany({
-    where: { code: { in: searchCodes } },
+    where: { code: bookingCode },
     include: { book: { select: { title: true } }, user: { select: { id: true, name: true } } },
   })
 

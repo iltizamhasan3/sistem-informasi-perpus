@@ -54,9 +54,8 @@ export default function BorrowPage() {
       const data = await res.json()
       
       const inputCode = bookingCode.trim().toUpperCase()
-      const searchCodes = [inputCode, `${inputCode}-2`, `${inputCode}-3`]
       
-      const foundBookings = (data.bookings ?? []).filter((b: { code: string }) => searchCodes.includes(b.code))
+      const foundBookings = (data.bookings ?? []).filter((b: { code: string }) => b.code === inputCode)
       
       if (foundBookings.length === 0) {
         setBookingError('Kode booking tidak ditemukan atau sudah tidak aktif')

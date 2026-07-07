@@ -55,10 +55,8 @@ export const POST = withSupabaseRoute({ auth: 'user' }, async (req, ctx) => {
       })
       if (count === 0) return { error: `Stok buku "${book.title}" habis`, status: 400 }
 
-      const code = i === 0 ? baseCode : `${baseCode}-${i + 1}`
-
       const booking = await tx.booking.create({
-        data: { code, userId, bookId, expiresAt },
+        data: { code: baseCode, userId, bookId, expiresAt },
         include: { book: { select: { title: true } } }
       })
       

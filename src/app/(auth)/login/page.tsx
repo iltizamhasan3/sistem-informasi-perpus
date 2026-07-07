@@ -3,9 +3,11 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { useUser } from '@/lib/auth-context'
 
 export default function LoginPage() {
   const router = useRouter()
+  const { refresh } = useUser()
   const [form, setForm] = useState({ email: '', password: '' })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
@@ -36,6 +38,7 @@ export default function LoginPage() {
         return 
       }
       
+      await refresh()
       router.refresh()
       router.replace(data.user.role === 'admin' ? '/dashboard' : '/catalog')
     } catch {

@@ -80,6 +80,7 @@ export default function CatalogPage() {
 
   function onPageChange(p: number) {
     fetchBooks(search, p)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   const content = (

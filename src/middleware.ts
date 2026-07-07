@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
-const publicPaths = ['/login', '/register', '/catalog', '/api/auth/login', '/api/auth/register']
+const publicPaths = ['/login', '/register', '/catalog', '/api/auth/login-step-1', '/api/auth/login-step-2', '/api/auth/register']
 
 export function middleware(request: NextRequest) {
   if (request.headers.get('RSC')) return NextResponse.next()

@@ -6,9 +6,10 @@ import Link from 'next/link'
 
 export default function LoginPage() {
   const router = useRouter()
-  const [form, setForm] = useState({ email: '', password: '' })
+  const [form, setForm] = useState({ email: '', password: '', otp: '' })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [step, setStep] = useState<1 | 2>(1)
 
   useEffect(() => {
     fetch('/api/auth/me').then(r => r.json()).then(data => {
@@ -21,20 +22,46 @@ export default function LoginPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError('')
-    setLoading(true)
-    try {
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
-      })
-      const data = await res.json()
-      if (!res.ok) { setError(data.error || 'Terjadi kesalahan'); return }
-      window.location.href = data.user.role === 'admin' ? '/dashboard' : '/catalog'
-    } catch {
-      setError('Terjadi kesalahan, silakan coba lagi')
-    } finally {
-      setLoading(false)
+    
+    if (step === 1) {
+      if (!form.email.toLowerCase().endsWith('@gmail.com')) {
+        setError('Harap gunakan alamat email @gmail.com')
+        return
+      }
+      
+      setLoading(true)
+      try {
+        const res = await fetch('/api/auth/login-step-1', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: form.email, password: form.password }),
+        })
+        const data = await res.json()
+        if (!res.ok) { setError(data.error || 'Terjadi kesalahan'); return }
+        
+        setStep(2)
+      } catch {
+        setError('Terjadi kesalahan, silakan coba lagi')
+      } finally {
+        setLoading(false)
+      }
+    } else {
+      setLoading(true)
+      try {
+        const res = await fetch('/api/auth/login-step-2', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: form.email, otp: form.otp }),
+        })
+        const data = await res.json()
+        if (!res.ok) { setError(data.error || 'OTP tidak valid atau kadaluarsa'); return }
+        
+        window.location.href = data.user.role === 'admin' ? '/dashboard' : '/catalog'
+      } catch {
+        setError('Terjadi kesalahan, silakan coba lagi')
+      } finally {
+        setLoading(false)
+      }
     }
   }
 
@@ -67,30 +94,47 @@ export default function LoginPage() {
             </div>
           )}
 
-          <div className="space-y-2">
-            <label className="text-[14px] font-[500] text-[var(--color-ink)] pl-4">Email Address</label>
-            <input
-              type="email" required value={form.email}
-              onChange={(e) => setForm({ ...form, email: e.target.value })}
-              placeholder="Masukkan email Anda"
-              className="w-full px-6 py-4 bg-white border border-black/5 rounded-full text-[15px] font-[450] text-[var(--color-ink)] placeholder:text-[var(--color-slate)]/50 focus:outline-none focus:ring-2 focus:ring-[var(--color-ink)] focus:border-transparent transition-all shadow-sm" />
-          </div>
+          {step === 1 ? (
+            <>
+              <div className="space-y-2">
+                <label className="text-[14px] font-[500] text-[var(--color-ink)] pl-4">Email Address (Gmail)</label>
+                <input
+                  type="email" required value={form.email}
+                  onChange={(e) => setForm({ ...form, email: e.target.value })}
+                  placeholder="contoh@gmail.com"
+                  className="w-full px-6 py-4 bg-white border border-black/5 rounded-full text-[15px] font-[450] text-[var(--color-ink)] placeholder:text-[var(--color-slate)]/50 focus:outline-none focus:ring-2 focus:ring-[var(--color-ink)] focus:border-transparent transition-all shadow-sm" />
+              </div>
 
-          <div className="space-y-2">
-            <label className="text-[14px] font-[500] text-[var(--color-ink)] pl-4">Password</label>
-            <input
-              type="password" required value={form.password}
-              onChange={(e) => setForm({ ...form, password: e.target.value })}
-              placeholder="Masukkan password"
-              className="w-full px-6 py-4 bg-white border border-black/5 rounded-full text-[15px] font-[450] text-[var(--color-ink)] placeholder:text-[var(--color-slate)]/50 focus:outline-none focus:ring-2 focus:ring-[var(--color-ink)] focus:border-transparent transition-all shadow-sm" />
-          </div>
+              <div className="space-y-2">
+                <label className="text-[14px] font-[500] text-[var(--color-ink)] pl-4">Password</label>
+                <input
+                  type="password" required value={form.password}
+                  onChange={(e) => setForm({ ...form, password: e.target.value })}
+                  placeholder="Masukkan password"
+                  className="w-full px-6 py-4 bg-white border border-black/5 rounded-full text-[15px] font-[450] text-[var(--color-ink)] placeholder:text-[var(--color-slate)]/50 focus:outline-none focus:ring-2 focus:ring-[var(--color-ink)] focus:border-transparent transition-all shadow-sm" />
+              </div>
+            </>
+          ) : (
+            <div className="space-y-2">
+              <label className="text-[14px] font-[500] text-[var(--color-ink)] pl-4">Kode OTP</label>
+              <p className="text-[13px] text-[var(--color-slate)] pl-4 mb-2">
+                Kode 6 digit telah dikirim ke {form.email}.
+              </p>
+              <input
+                type="text" required value={form.otp}
+                onChange={(e) => setForm({ ...form, otp: e.target.value })}
+                placeholder="Masukkan 6 digit OTP"
+                maxLength={6}
+                className="w-full px-6 py-4 bg-white border border-black/5 rounded-full text-[15px] font-[450] text-[var(--color-ink)] placeholder:text-[var(--color-slate)]/50 focus:outline-none focus:ring-2 focus:ring-[var(--color-ink)] focus:border-transparent transition-all shadow-sm text-center tracking-widest font-mono text-xl" />
+            </div>
+          )}
 
           <div className="pt-4">
              <button type="submit" disabled={loading}
                className="mc-btn-primary w-full py-4 text-[16px] shadow-md disabled:opacity-50 flex justify-center items-center">
                {loading ? (
                   <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-               ) : 'Masuk ke Sistem'}
+               ) : step === 1 ? 'Lanjutkan' : 'Verifikasi & Masuk'}
              </button>
           </div>
 

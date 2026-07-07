@@ -8,23 +8,20 @@ export async function POST(req: Request) {
     const { allowed } = checkRateLimit(ip)
     if (!allowed) return Response.json({ error: 'Terlalu banyak percobaan. Coba lagi nanti.' }, { status: 429 })
 
-    const { email, password } = await req.json()
-    if (!email || !password) return Response.json({ error: 'Email dan password wajib diisi' }, { status: 400 })
+    const { email, otp } = await req.json()
+    if (!email || !otp) return Response.json({ error: 'Email dan OTP wajib diisi' }, { status: 400 })
 
-    const supabase = (await import('@supabase/supabase-js')).createClient(
-      process.env.SUPABASE_URL!,
-      process.env.SUPABASE_PUBLISHABLE_KEY!,
-    )
-
-    const { data: authData, error: authError } = await supabase.auth.signInWithPassword({ email, password })
-    if (authError) return Response.json({ error: 'Email atau password salah' }, { status: 401 })
+    const otpRecord = await prisma.otp.findUnique({ where: { email } })
+    
+    if (!otpRecord) return Response.json({ error: 'OTP tidak valid atau tidak ditemukan' }, { status: 400 })
+    if (otpRecord.code !== otp) return Response.json({ error: 'OTP salah' }, { status: 400 })
+    if (new Date() > otpRecord.expiresAt) return Response.json({ error: 'OTP telah kadaluarsa' }, { status: 400 })
 
     const user = await prisma.user.findUnique({ where: { email } })
     if (!user) return Response.json({ error: 'User tidak ditemukan' }, { status: 404 })
-    if (!user.isActive) return Response.json({ error: 'Akun Anda telah dinonaktifkan' }, { status: 403 })
 
     const cookieStore = await cookies()
-    cookieStore.set('token', authData.session!.access_token, {
+    cookieStore.set('token', otpRecord.accessToken!, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
@@ -32,13 +29,16 @@ export async function POST(req: Request) {
       path: '/',
     })
 
+    // Remove OTP record since it has been used
+    await prisma.otp.delete({ where: { id: otpRecord.id } })
+
     return Response.json({
       message: 'Login berhasil',
-      session: { access_token: authData.session!.access_token },
+      session: { access_token: otpRecord.accessToken },
       user: { id: user.id, name: user.name, email: user.email, role: user.role },
     })
   } catch (err) {
-    console.error('Login error:', err)
+    console.error('Login step 2 error:', err)
     return Response.json({ error: 'Terjadi kesalahan server' }, { status: 500 })
   }
 }

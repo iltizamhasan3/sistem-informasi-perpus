@@ -57,7 +57,8 @@
 | Ikon | Fitur | Deskripsi |
 |:---:|---|---|
 | 🔍 | **Katalog Buku** | Eksplorasi koleksi dengan filter, animasi hover, dan desain sampul yang menonjol. |
-| 🛒 | **Booking 24 Jam** | Pesan buku dari rumah, berlaku 24 jam. Jika lewat, sistem batalkan otomatis via cron. |
+| 🛒 | **Keranjang (Cart)** | Checkout masal hingga 3 buku sekaligus dengan batas dinamis dan satu kode booking. |
+| ⏳ | **Booking 24 Jam** | Pesan buku dari rumah, berlaku 24 jam. Jika lewat, sistem batalkan otomatis via cron. |
 | 📖 | **E-Book Reader** | Baca buku digital langsung di browser, lengkap dengan navigasi halaman, tanpa opsi download. |
 | 💾 | **Last Page Saved** | Sistem menyimpan halaman terakhir yang dibaca, sinkron otomatis ke cloud. |
 | 📋 | **Status Peminjaman** | Pantau buku yang sedang dipinjam, riwayat, dan denda. |

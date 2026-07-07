@@ -11,7 +11,7 @@ model User {
   id        Int      @id @default(autoincrement())
   name      String
   email     String   @unique
-  password  String?
+  password  String
   deletedAt DateTime?
   role      String   @default("member")
   phone     String?
@@ -117,11 +117,3 @@ model Notification {
   user User @relation(fields: [userId], references: [id])
 }
 
-model Otp {
-  id          Int      @id @default(autoincrement())
-  email       String   @unique
-  code        String
-  accessToken String?  
-  expiresAt   DateTime
-  createdAt   DateTime @default(now())
-}

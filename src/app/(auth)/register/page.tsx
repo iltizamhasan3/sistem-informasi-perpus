@@ -27,6 +27,11 @@ export default function RegisterPage() {
       return
     }
 
+    if (!form.email.toLowerCase().endsWith('@gmail.com')) {
+      setError('Hanya email @gmail.com yang diizinkan')
+      return
+    }
+
     setLoading(true)
 
     try {
@@ -87,7 +92,7 @@ export default function RegisterPage() {
             <div className="space-y-2">
               <label className="text-[14px] font-[500] text-[var(--color-ink)] pl-4">Email <span className="text-[var(--color-signal)]">*</span></label>
               <input type="email" required value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })}
-                placeholder="contoh@email.com"
+                placeholder="contoh@gmail.com"
                 className="w-full px-6 py-4 bg-white border border-black/5 rounded-full text-[15px] font-[450] text-[var(--color-ink)] placeholder:text-[var(--color-slate)]/50 focus:outline-none focus:ring-2 focus:ring-[var(--color-ink)] focus:border-transparent transition-all shadow-sm" />
             </div>
             <div className="space-y-2">

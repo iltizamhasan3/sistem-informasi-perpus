@@ -36,7 +36,8 @@ export default function LoginPage() {
         return 
       }
       
-      window.location.href = data.user.role === 'admin' ? '/dashboard' : '/catalog'
+      router.refresh()
+      router.replace(data.user.role === 'admin' ? '/dashboard' : '/catalog')
     } catch {
       setError('Terjadi kesalahan, silakan coba lagi')
       setLoading(false)

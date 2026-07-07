@@ -3,7 +3,7 @@
   <h1 align="center" style="margin: 0; font-size: 2.8rem;">📚 SiPustaka</h1>
   <p align="center"><strong>Sistem Informasi Perpustakaan Premium & Modern</strong></p>
   <p align="center">
-    Aplikasi manajemen perpustakaan berbasis web yang mengusung desain elegan, minimalis, dan sangat responsif—ditenagai oleh Next.js, Supabase, dan PostgreSQL.
+    Aplikasi manajemen perpustakaan berbasis web yang mengusung desain elegan, minimalis, dan sangat responsif, ditenagai oleh Next.js, Supabase, dan PostgreSQL.
   </p>
   <p align="center">
     <a href="https://sistem-informasi-perpus.vercel.app" target="_blank">
@@ -25,7 +25,6 @@
 
 ## 📋 Daftar Isi
 
-- [Tentang Project](#-tentang-project)
 - [Fitur Lengkap](#-fitur-lengkap)
 - [Teknologi](#-teknologi)
 - [Struktur Rute](#-struktur-rute)
@@ -38,29 +37,6 @@
 
 ---
 
-## 🎯 Tentang Project
-
-**SiPustaka** adalah sistem informasi perpustakaan digital modern yang dikembangkan untuk mengotomatisasi manajemen perpustakaan—mulai dari katalogisasi buku, peminjaman & pengembalian, booking buku, hingga penyewaan e-book digital. Aplikasi ini dirancang dengan filosofi desain **Mastercard-inspired UI/UX** yang memberikan kesan premium, bersih, dan memukau.
-
-### 📊 Database Stats Saat Ini
-
-| Statistik | Jumlah |
-|:---|---:|
-| 📚 Total Buku | **13** |
-| 👥 Anggota Terdaftar | **2** |
-| 🏷️ Kategori | **4** |
-| 📋 Riwayat Transaksi | **1** |
-| 📖 Peminjaman Aktif | **0** |
-
-### 🎨 Filosofi Desain
-
-- **Estetika Premium:** Kombinasi warna *Lifted Cream* (#FAF9F5) dan *Ink Black* (#0A0A0A) dengan *ghost watermark background* yang dinamis.
-- **Stadium Cards Layout:** Seluruh kontainer informasi menggunakan radius elips yang elegan, menciptakan pengalaman visual yang *flowy*.
-- **Mobile-First & Responsif:** Tipografi menggunakan fungsi `clamp()` sehingga proporsional di semua layar.
-- **Micro-animations:** Efek hover, transisi halus, dan watermark animasi yang memperkaya pengalaman pengguna.
-
----
-
 ## ✨ Fitur Lengkap
 
 ### 👨‍💼 Panel Admin
@@ -70,7 +46,7 @@
 | 📊 | **Dashboard Analitik** | Statistik real-time, grafik buku terpopuler, peringatan stok menipis, dan ringkasan aktivitas harian. |
 | 👥 | **Manajemen Anggota** | CRUD anggota perpustakaan, lihat riwayat peminjaman, dan status akun. |
 | 📚 | **Manajemen Buku** | Kelola koleksi buku fisik lengkap dengan upload sampul via Supabase Storage, edit, dan soft-delete. |
-| 📄 | **Manajemen E-Book** | Upload file PDF digital yang dilindungi — tidak bisa di-download, hanya dibaca via in-app reader. |
+| 📄 | **Manajemen E-Book** | Upload file PDF digital yang dilindungi, tidak bisa di-download, hanya dibaca via in-app reader. |
 | 🔀 | **Transaksi Peminjaman** | Proses peminjaman & pengembalian buku fisik dengan auto-validasi stok (maks 3 buku/member). |
 | 🔁 | **Transaksi Pengembalian** | Catat pengembalian dengan kalkulasi denda otomatis (Rp 2.000/hari keterlambatan). |
 | 🗂️ | **Kategori Buku** | Kelola label kategori untuk memudahkan kurasi dan pencarian. |
@@ -82,7 +58,7 @@
 |:---:|---|---|
 | 🔍 | **Katalog Buku** | Eksplorasi koleksi dengan filter, animasi hover, dan desain sampul yang menonjol. |
 | 🛒 | **Booking 24 Jam** | Pesan buku dari rumah, berlaku 24 jam. Jika lewat, sistem batalkan otomatis via cron. |
-| 📖 | **E-Book Reader** | Baca buku digital langsung di browser — lengkap dengan navigasi halaman, tanpa opsi download. |
+| 📖 | **E-Book Reader** | Baca buku digital langsung di browser, lengkap dengan navigasi halaman, tanpa opsi download. |
 | 💾 | **Last Page Saved** | Sistem menyimpan halaman terakhir yang dibaca, sinkron otomatis ke cloud. |
 | 📋 | **Status Peminjaman** | Pantau buku yang sedang dipinjam, riwayat, dan denda. |
 | 🎫 | **Status Booking** | Lihat booking aktif, riwayat booking, dan status (aktif/batal/selesai). |
@@ -91,8 +67,7 @@
 
 ### 🔐 Autentikasi & Keamanan
 
-- **Login 2 Langkah:** Email/password diverifikasi via Supabase Auth, dilanjutkan verifikasi OTP 6 digit yang dikirim ke email.
-- **OTP via Resend:** Kode OTP dikirim secara real-time menggunakan Resend API.
+- **Login Terenkripsi:** Email dan password di-hash secara aman menggunakan bcrypt.
 - **JWT Token:** Session dikelola via httpOnly cookie dengan Supabase JWT.
 - **Rate Limiting:** Proteksi brute-force dengan rate limiter per IP (10 percobaan/menit).
 - **Role-based Access:** Pemisahan akses Admin vs Member dengan middleware dan route protection.
@@ -106,15 +81,14 @@
 
 | Teknologi | Versi | Fungsi |
 |:---|---:|---|
-| ⚛️ **Next.js** | 16.2.9 | Framework utama (App Router, SSR, API Routes) |
-| 🟦 **TypeScript** | 5 | Type safety di seluruh stack |
-| 🎨 **Tailwind CSS** | 4 | Utility-first CSS framework |
-| 🗄️ **Prisma** | 7.8.0 | ORM untuk database PostgreSQL |
-| 🐘 **PostgreSQL** | - | Database relasional (via Supabase) |
-| 🔥 **Supabase** | - | Autentikasi, Storage, dan hosting database |
-| 📧 **Resend** | - | Email service untuk pengiriman OTP |
-| 📄 **react-pdf** | 10.4.1 | PDF viewer untuk e-book reader |
-| 🚀 **Vercel** | - | Hosting & deployment |
+| <img src="https://img.shields.io/badge/Next.js-000000?style=flat&logo=next.js" alt="Next.js" width="80"/> | 16.2.9 | Framework utama (App Router, SSR, API Routes) |
+| <img src="https://img.shields.io/badge/TypeScript-3178C6?style=flat&logo=typescript" alt="TypeScript" width="80"/> | 5 | Type safety di seluruh stack |
+| <img src="https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=flat&logo=tailwindcss" alt="Tailwind CSS" width="80"/> | 4 | Utility-first CSS framework |
+| <img src="https://img.shields.io/badge/Prisma-2D3748?style=flat&logo=prisma" alt="Prisma" width="80"/> | 7.8.0 | ORM untuk database PostgreSQL |
+| <img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=flat&logo=postgresql" alt="PostgreSQL" width="80"/> | - | Database relasional (via Supabase) |
+| <img src="https://img.shields.io/badge/Supabase-3ECF8E?style=flat&logo=supabase" alt="Supabase" width="80"/> | - | Autentikasi, Storage, dan hosting database |
+| <img src="https://img.shields.io/badge/react--pdf-E53935?style=flat&logo=adobeacrobatreader&logoColor=white" alt="react-pdf" width="80"/> | 10.4.1 | PDF viewer untuk e-book reader |
+| <img src="https://img.shields.io/badge/Vercel-000000?style=flat&logo=vercel" alt="Vercel" width="80"/> | - | Hosting & deployment |
 
 ### Package Lainnya
 
@@ -122,6 +96,7 @@
 |---|---|
 | `@supabase/supabase-js` | Client SDK untuk Supabase Auth |
 | `@supabase/server` | Supabase server-side context helper |
+| `bcryptjs` | Library untuk hashing password secara aman |
 | `pg` | PostgreSQL driver untuk Prisma adapter |
 | `dotenv` | Environment variable loader |
 | `tsx` | TypeScript executor untuk script dan seed |
@@ -136,7 +111,7 @@
 | Route | Deskripsi | Akses |
 |:---|---|:---:|
 | `/` | Halaman landing dengan ghost watermark "LIBRARY" | Publik |
-| `/login` | Halaman login 2 langkah (email/password → OTP) | Publik |
+| `/login` | Halaman login dengan email dan password | Publik |
 | `/register` | Pendaftaran anggota baru | Publik |
 | `/catalog` | Katalog publik tanpa login | Publik |
 | `/catalog/[id]` | Detail buku | Publik |
@@ -170,9 +145,8 @@
 
 | Endpoint | Method | Deskripsi |
 |:---|---:|---|
-| `/api/auth/register` | POST | Registrasi user baru (via Supabase Admin API) |
-| `/api/auth/login-step-1` | POST | Verifikasi email/password + kirim OTP |
-| `/api/auth/login-step-2` | POST | Verifikasi OTP + set session cookie |
+| `/api/auth/register` | POST | Registrasi user baru |
+| `/api/auth/login` | POST | Verifikasi email/password dan set session cookie |
 | `/api/auth/logout` | POST | Hapus session cookie |
 | `/api/auth/me` | GET | Cek user saat ini dari cookie |
 | `/api/books` | GET/POST | CRUD buku |
@@ -184,7 +158,7 @@
 | `/api/transactions` | GET | Riwayat transaksi |
 | `/api/transactions/borrow` | POST | Peminjaman buku |
 | `/api/transactions/return` | POST | Pengembalian buku |
-| `/api/transactions/confirm` | POST | Konfirmasi booking → transaksi |
+| `/api/transactions/confirm` | POST | Konfirmasi booking menjadi transaksi |
 | `/api/bookings` | GET/POST | CRUD booking |
 | `/api/bookings/expire` | POST | Cron: expired booking otomatis |
 | `/api/dashboard` | GET | Data statistik dashboard |
@@ -204,26 +178,25 @@
 ### Entity Relationship
 
 ```
-User (1) ──< Transaction >── (1) Book
-User (1) ──< Booking     >── (1) Book
-User (1) ──< EbookRental >── (1) Book
-User (1) ──< Notification
-Category (1) ──< Book
-Booking (1) ──< Transaction  (opsional)
+User (1) --< Transaction >-- (1) Book
+User (1) --< Booking     >-- (1) Book
+User (1) --< EbookRental >-- (1) Book
+User (1) --< Notification
+Category (1) --< Book
+Booking (1) --< Transaction  (opsional)
 ```
 
 ### Models
 
 | Model | Fields Utama | Relasi |
 |:---|---:|---|
-| **User** | id, name, email, password?, role, phone?, address, isActive | transactions, notifications, bookings, ebookRentals |
+| **User** | id, name, email, password, role, phone, address, isActive | transactions, notifications, bookings, ebookRentals |
 | **Book** | id, title, author, publisher, year, stock, coverImage, description, isEbook, ebookFile, deletedAt | category, transactions, bookings, ebookRentals |
 | **Category** | id, name | books |
-| **Transaction** | id, borrowDate, dueDate, returnDate?, fine, status | user, book, booking? |
-| **Booking** | id, code, status, expiresAt | user, book, transaction? |
+| **Transaction** | id, borrowDate, dueDate, returnDate, fine, status | user, book, booking |
+| **Booking** | id, code, status, expiresAt | user, book, transaction |
 | **EbookRental** | id, status, currentPage, rentedAt, expiresAt | user, book |
 | **Notification** | id, title, message, isRead, type, readAt | user |
-| **Otp** | id, email (unique), code, accessToken?, expiresAt | — |
 
 ---
 
@@ -268,12 +241,9 @@ npm install
 # Buat file .env di root project:
 cat > .env << EOF
 DATABASE_URL="postgresql://[USER]:[PASSWORD]@[HOST]:5432/[DB_NAME]"
-JWT_SECRET="your-jwt-secret"
 SUPABASE_URL="https://[PROJECT].supabase.co"
 SUPABASE_PUBLISHABLE_KEY="your-anon-key"
 SUPABASE_SECRET_KEY="your-service-role-key"
-SUPABASE_JWKS_URL="https://[PROJECT].supabase.co/auth/v1/.well-known/jwks.json"
-RESEND_API_KEY="re_xxx"  # Optional, untuk OTP email
 EOF
 
 # 4. Generate Prisma client & sync database
@@ -308,7 +278,7 @@ Buka [http://localhost:3000](http://localhost:3000) di browser.
 
 ## 📄 Lisensi
 
-© 2026 **Iltizam Hasan** — Dikembangkan dengan dedikasi untuk kemajuan literasi digital.
+© 2026 **Iltizam Hasan** . Dikembangkan dengan dedikasi untuk kemajuan literasi digital.
 
 > Dibuat dengan ❤️ menggunakan Next.js, Supabase, dan kopi tanpa batas.
 

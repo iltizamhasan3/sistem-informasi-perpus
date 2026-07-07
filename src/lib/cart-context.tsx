@@ -31,7 +31,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const refreshQuota = async () => {
     try {
-      const res = await fetch('/api/bookings/quota')
+      const res = await fetch('/api/bookings/quota', { cache: 'no-store' })
       if (res.ok) {
         const data = await res.json()
         setAvailableSlot(data.availableSlot ?? 3)

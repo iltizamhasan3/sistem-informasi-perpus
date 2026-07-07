@@ -9,6 +9,7 @@ interface DashboardData {
   stats: { totalBooks: number; totalMembers: number; activeBorrows: number; todayTransactions: number }
   lowStockBooks: { id: number; title: string; stock: number }[]
   popularBooks: ({ id: number; title: string; author: string } & { borrowCount: number })[]
+  popularEbooks: ({ id: number; title: string; author: string } & { rentCount: number })[]
   recentTransactions: { id: number; status: string; borrowDate: string; user: { name: string }; book: { title: string } }[]
 }
 
@@ -83,8 +84,8 @@ export function DashboardClient({ user }: { user: { name: string; role: string }
           ))}
         </div>
 
-        {/* 2 Cols Lists */}
-        <div className="grid md:grid-cols-2 gap-8">
+        {/* 3 Cols Lists */}
+        <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-8">
           
           {/* Low Stock Books */}
           <div className="bg-transparent">
@@ -124,6 +125,27 @@ export function DashboardClient({ user }: { user: { name: string; role: string }
                   </div>
                )) : (
                   <div className="px-6 py-8 text-center bg-[var(--color-lifted-cream)] rounded-[24px] text-[var(--color-slate)]">Belum ada data peminjaman</div>
+               )}
+            </div>
+          </div>
+
+          {/* Popular E-Books */}
+          <div className="bg-transparent">
+            <div className="flex items-center justify-between mb-6 px-4">
+              <h3 className="mc-heading-3 text-[var(--color-ink)]">E-Book Populer</h3>
+            </div>
+            
+            <div className="space-y-3">
+               {data && data.popularEbooks.length > 0 ? data.popularEbooks.map((b, i) => (
+                  <div key={b.id} className="flex items-center gap-4 px-6 py-5 bg-[var(--color-lifted-cream)] rounded-[24px] shadow-sm hover:shadow-md transition-shadow">
+                    <span className={`shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-[15px] font-[500] ${
+                       i === 0 ? 'bg-[var(--color-signal)] text-white shadow-lg' : 'bg-white text-[var(--color-ink)] shadow-sm'
+                    }`}>{i + 1}</span>
+                    <span className="text-[16px] font-[500] text-[var(--color-ink)] line-clamp-1">{b.title}</span>
+                    <span className="ml-auto shrink-0 text-[14px] font-[450] text-[var(--color-slate)]">{b.rentCount}x disewa</span>
+                  </div>
+               )) : (
+                  <div className="px-6 py-8 text-center bg-[var(--color-lifted-cream)] rounded-[24px] text-[var(--color-slate)]">Belum ada penyewaan e-book</div>
                )}
             </div>
           </div>

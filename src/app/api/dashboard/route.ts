@@ -6,7 +6,7 @@ export const GET = withSupabaseRoute({ auth: 'user' }, async (_req, ctx) => {
   const today = new Date()
   today.setHours(0, 0, 0, 0)
 
-  const [totalBooks, totalMembers, activeBorrows, todayTransactions, lowStockBooks, popularBooks, recentTransactions] = await Promise.all([
+  const [totalBooks, totalMembers, activeBorrows, todayTransactions, lowStockBooks, popularBooks, recentTransactions, popularEbooks] = await Promise.all([
     prisma.book.count({ where: { deletedAt: null } }),
     prisma.user.count({ where: { role: 'member', isActive: true, deletedAt: null } }),
     prisma.transaction.count({ where: { status: 'borrowed' } }),
@@ -36,10 +36,29 @@ export const GET = withSupabaseRoute({ auth: 'user' }, async (_req, ctx) => {
       orderBy: { createdAt: 'desc' },
       include: { user: { select: { name: true } }, book: { select: { title: true } } },
     }),
+    prisma.ebookRental.groupBy({
+      by: ['bookId'],
+      _count: { id: true },
+      orderBy: { _count: { id: 'desc' } },
+      take: 3,
+    }).then(async (groups) => {
+      if (groups.length === 0) return []
+      const books = await prisma.book.findMany({
+        where: { id: { in: groups.map((g) => g.bookId) } },
+        select: { id: true, title: true, author: true },
+      })
+      return groups
+        .map((g) => {
+          const book = books.find((b) => b.id === g.bookId)
+          if (!book) return null
+          return { ...book, rentCount: g._count.id }
+        })
+        .filter((b): b is NonNullable<typeof b> => b !== null)
+    }),
   ])
 
   return Response.json({
     stats: { totalBooks, totalMembers, activeBorrows, todayTransactions },
-    lowStockBooks, popularBooks, recentTransactions,
+    lowStockBooks, popularBooks, recentTransactions, popularEbooks,
   })
 })

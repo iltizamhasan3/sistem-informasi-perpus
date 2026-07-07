@@ -53,14 +53,6 @@ export default async function HomePage() {
           <p className="text-[16px] md:text-[20px] font-[450] text-[var(--color-slate)] max-w-2xl leading-relaxed mb-10 md:mb-12">
             Fasilitas sistem informasi perpustakaan resmi yang dirancang eksklusif untuk memberikan pelayanan peminjaman dan akses e-book bagi seluruh anggota Perpustakaan AA.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center w-full sm:w-auto">
-            <Link href="/register" className="mc-btn-primary px-10 py-4 text-[16px] shadow-md hover:-translate-y-1 transition-transform w-full sm:w-auto">
-              Mulai Eksplorasi
-            </Link>
-            <Link href="/login" className="mc-btn-secondary px-10 py-4 text-[16px] w-full sm:w-auto">
-              Pelajari Fitur
-            </Link>
-          </div>
         </section>
 
         {/* Feature Grid */}

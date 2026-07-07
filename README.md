@@ -1,7 +1,7 @@
 <div align="center">
   <img src="https://img.icons8.com/fluency/144/book.png" alt="SiPustaka Logo" width="100"/>
-  <h1 align="center" style="margin: 0; font-size: 2.8rem;">📚 SiPustaka</h1>
-  <p align="center"><strong>Sistem Informasi Perpustakaan Premium & Modern</strong></p>
+  <h1 align="center" style="margin: 0; font-size: 2.8rem;">📚 SiPustaka by Perpustakaan AA</h1>
+  <p align="center"><strong>Sistem Informasi Perpustakaan AA</strong></p>
   <p align="center">
     Aplikasi manajemen perpustakaan berbasis web yang mengusung desain elegan, minimalis, dan sangat responsif, ditenagai oleh Next.js, Supabase, dan PostgreSQL.
   </p>

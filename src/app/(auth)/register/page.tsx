@@ -68,7 +68,7 @@ export default function RegisterPage() {
               <path d="M12 6a4 4 0 0 1 4-4h6v16h-6a4 4 0 0 0-4 4" />
             </svg>
           </Link>
-          <p className="mc-eyebrow text-[var(--color-slate)] mb-3">Selamat Datang di SiPustaka</p>
+          <p className="mc-eyebrow text-[var(--color-slate)] mb-3">Selamat Datang di SiPustaka by Perpustakaan AA</p>
           <h1 className="mc-heading-2 text-[var(--color-ink)]">Daftar Akun Baru</h1>
         </div>
 

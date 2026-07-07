@@ -254,7 +254,10 @@ export default function BookDetailPage() {
                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
                </svg>
             </div>
-            <span className="font-[500] text-xl tracking-tight text-[var(--color-ink)]">SiPustaka</span>
+            <div className="flex flex-col">
+              <span className="font-[500] text-xl tracking-tight leading-none text-[var(--color-ink)]">SiPustaka</span>
+              <span className="text-[12px] text-[var(--color-slate)] font-[450] leading-none mt-1">by Perpustakaan AA</span>
+            </div>
           </Link>
           <div className="flex items-center gap-4">
             <Link href="/login" className="text-[15px] font-[500] text-[var(--color-ink)] hover:text-[var(--color-signal)] transition-colors">Masuk</Link>

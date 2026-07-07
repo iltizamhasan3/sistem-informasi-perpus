@@ -13,7 +13,7 @@ export default async function HomePage() {
       
       {/* Ghost Watermark Background */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 z-[-1] pointer-events-none w-[150%] text-center mt-12 md:mt-0">
-         <h1 className="mc-ghost-watermark select-none text-[180px] md:text-[300px]">LIBRARY</h1>
+         <h1 className="mc-ghost-watermark select-none text-[150px] md:text-[250px]">PERPUS AA</h1>
       </div>
 
       {/* Navbar */}
@@ -25,7 +25,10 @@ export default async function HomePage() {
                 <path d="M12 6v13" /><path d="M12 6a4 4 0 0 0-4-4H2v16h6a4 4 0 0 1 4 4" /><path d="M12 6a4 4 0 0 1 4-4h6v16h-6a4 4 0 0 0-4 4" />
               </svg>
             </div>
-            <span className="font-[500] text-xl tracking-tight text-[var(--color-ink)]">SiPustaka</span>
+            <div className="flex flex-col">
+              <span className="font-[500] text-xl tracking-tight leading-none text-[var(--color-ink)]">SiPustaka</span>
+              <span className="text-[12px] text-[var(--color-slate)] font-[450] leading-none mt-1">by Perpustakaan AA</span>
+            </div>
           </Link>
           <div className="flex items-center gap-2 md:gap-4">
             <Link href="/login" className="text-[14px] md:text-[15px] font-[500] text-[var(--color-slate)] hover:text-[var(--color-ink)] transition-colors px-3 md:px-4">
@@ -43,12 +46,12 @@ export default async function HomePage() {
         
         {/* Hero Section */}
         <section className="mc-card-stadium p-8 md:p-20 text-center w-full flex flex-col items-center mb-12 md:mb-16 shadow-[0_24px_48px_-12px_rgba(0,0,0,0.05)]">
-          <p className="mc-eyebrow text-[var(--color-slate)] mb-4 md:mb-6">Masa Depan Literasi Digital</p>
+          <p className="mc-eyebrow text-[var(--color-slate)] mb-4 md:mb-6">Selamat Datang di SiPustaka by Perpustakaan AA</p>
           <h1 className="mc-heading-1 text-[var(--color-ink)] max-w-4xl mb-6 md:mb-8 leading-[1.1]">
             Membuka Gerbang<br/>Pengetahuan Tanpa Batas
           </h1>
           <p className="text-[16px] md:text-[20px] font-[450] text-[var(--color-slate)] max-w-2xl leading-relaxed mb-10 md:mb-12">
-            Kelola peminjaman buku, akses e-book eksklusif, dan pantau sirkulasi perpustakaan dengan pendekatan yang elegan dan modern.
+            Fasilitas sistem informasi perpustakaan resmi yang dirancang eksklusif untuk memberikan pelayanan peminjaman dan akses e-book bagi seluruh anggota Perpustakaan AA.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center w-full sm:w-auto">
             <Link href="/register" className="mc-btn-primary px-10 py-4 text-[16px] shadow-md hover:-translate-y-1 transition-transform w-full sm:w-auto">
@@ -105,7 +108,7 @@ export default async function HomePage() {
       </main>
 
       <footer className="w-full pb-10 text-center">
-         <p className="text-[13px] font-[450] text-[var(--color-slate)]/50">&copy; {new Date().getFullYear()} SiPustaka. All rights reserved.</p>
+         <p className="text-[13px] font-[450] text-[var(--color-slate)]/50">&copy; {new Date().getFullYear()} SiPustaka by Perpustakaan AA. Hak cipta dilindungi.</p>
       </footer>
     </div>
   )

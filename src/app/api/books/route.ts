@@ -6,6 +6,7 @@ export const GET = withSupabaseRoute({ auth: ['user', 'none'] }, async (req) => 
   const { searchParams } = new URL(req.url)
   const search = searchParams.get('search') || ''
   const categoryId = searchParams.get('categoryId')
+  const type = searchParams.get('type')
   const page = searchParams.get('page')
 
   const where: Prisma.BookWhereInput = { deletedAt: null }
@@ -16,6 +17,8 @@ export const GET = withSupabaseRoute({ auth: ['user', 'none'] }, async (req) => 
     ]
   }
   if (categoryId) where.categoryId = Number(categoryId)
+  if (type === 'ebook') where.isEbook = true
+  else if (type === 'physical') where.isEbook = false
 
   if (page) {
     const limit = 20

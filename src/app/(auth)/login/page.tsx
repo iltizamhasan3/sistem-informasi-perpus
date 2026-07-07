@@ -66,7 +66,7 @@ export default function LoginPage() {
             </svg>
           </Link>
           <p className="mc-eyebrow text-[var(--color-slate)] mb-3">Selamat Datang Kembali</p>
-          <h1 className="mc-heading-2 text-[var(--color-ink)]">Masuk ke SiPustaka</h1>
+          <h1 className="mc-heading-2 text-[var(--color-ink)]">Portal SiPustaka by Perpustakaan AA</h1>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">

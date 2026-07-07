@@ -89,7 +89,10 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
                </svg>
             </div>
-            <span className="font-[500] text-xl tracking-tight text-[var(--color-ink)]">SiPustaka</span>
+            <div className="flex flex-col">
+              <span className="font-[500] text-xl tracking-tight leading-none text-[var(--color-ink)]">SiPustaka</span>
+              <span className="text-[12px] text-black/50 font-[450] leading-none mt-1">by Perpustakaan AA</span>
+            </div>
           </Link>
           
           {/* Main Links */}
@@ -228,7 +231,7 @@ export function AdminLayout({ children }: { children: React.ReactNode }) {
           <div className="h-[1px] w-full bg-white/20 mb-8" />
           
           <div className="flex flex-col md:flex-row items-center justify-between gap-6 text-[13px] font-[450] text-white/50">
-             <p>© 2026 SiPustaka. All rights reserved.</p>
+             <p>© 2026 SiPustaka by Perpustakaan AA. Hak cipta dilindungi.</p>
           </div>
         </div>
       </footer>

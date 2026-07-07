@@ -14,8 +14,8 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: "SiPustaka - Sistem Informasi Perpustakaan Digital",
-  description: "Sistem Informasi Peminjaman Buku Perpustakaan Berbasis Web",
+  title: "SiPustaka by Perpustakaan AA - Sistem Informasi Resmi",
+  description: "Sistem Informasi Peminjaman Buku Resmi Perpustakaan AA",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

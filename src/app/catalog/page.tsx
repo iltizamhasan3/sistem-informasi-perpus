@@ -29,6 +29,7 @@ export default function CatalogPage() {
   const [categories, setCategories] = useState<Category[]>([])
   const [search, setSearch] = useState('')
   const [categoryId, setCategoryId] = useState('')
+  const [type, setType] = useState('')
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(0)
   const [total, setTotal] = useState(0)
@@ -47,12 +48,13 @@ export default function CatalogPage() {
   useEffect(() => {
     fetchBooks()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [categoryId])
+  }, [categoryId, type])
 
   async function fetchBooks(q?: string, p?: number) {
     const params = new URLSearchParams()
     if (q || search) params.set('search', q || search)
     if (categoryId) params.set('categoryId', categoryId)
+    if (type) params.set('type', type)
     params.set('page', String(p || page))
 
     try {
@@ -84,21 +86,21 @@ export default function CatalogPage() {
     <div className="relative w-full z-10 px-4 max-w-7xl mx-auto">
       {/* Ghost Watermark */}
       <div className="absolute -top-16 -left-10 md:-left-24 z-[-1] pointer-events-none overflow-hidden w-[150%] whitespace-nowrap">
-         <h1 className="mc-ghost-watermark select-none text-[120px] md:text-[240px]">CATALOG</h1>
+         <h1 className="mc-ghost-watermark select-none text-[120px] md:text-[240px]">PERPUS AA</h1>
       </div>
 
       <div className="mc-card-stadium p-6 md:p-12 mb-16 mt-8 relative overflow-hidden flex items-end min-h-[250px] md:min-h-[300px]">
         <div className="absolute -top-10 -right-10 opacity-10 md:opacity-5 pointer-events-none">
-          <h1 className="text-[100px] md:text-[200px] font-bold tracking-tighter leading-none" style={{ fontFamily: 'var(--font-display)' }}>CATALOG</h1>
+          <h1 className="text-[100px] md:text-[200px] font-bold tracking-tighter leading-none" style={{ fontFamily: 'var(--font-display)' }}>PERPUS AA</h1>
         </div>
         <div className="relative z-10 w-full flex flex-col md:flex-row justify-between md:items-end gap-6">
            <div>
-              <p className="mc-eyebrow text-[var(--color-slate)] mb-4">Jelajahi Dunia</p>
-              <h1 className="mc-heading-1 text-[var(--color-ink)]">Katalog<br/>Perpustakaan</h1>
+              <p className="mc-eyebrow text-[var(--color-slate)] mb-4">Jelajahi Koleksi Resmi</p>
+              <h1 className="mc-heading-1 text-[var(--color-ink)]">Katalog<br/>Perpustakaan AA</h1>
            </div>
            
-           <div className="flex flex-row items-center gap-3 md:gap-4 max-w-full overflow-x-auto no-scrollbar pb-2 md:pb-0">
-             <form onSubmit={handleSearch} className="relative flex items-center min-w-[220px] md:w-[320px]">
+           <div className="flex flex-col gap-3 md:gap-4 max-w-full w-full md:w-auto pb-2 md:pb-0">
+             <form onSubmit={handleSearch} className="relative flex items-center w-full shrink-0">
                <input type="text" value={search} onChange={e => setSearch(e.target.value)}
                  placeholder="Cari buku..."
                  className="w-full pl-6 pr-14 py-3.5 md:py-4 bg-white border border-[var(--color-ink)]/10 rounded-full text-[15px] md:text-[16px] font-[450] text-[var(--color-ink)] placeholder:text-[var(--color-slate)]/50 focus:outline-none focus:border-[var(--color-ink)]/40 transition-shadow shadow-sm" />
@@ -107,12 +109,22 @@ export default function CatalogPage() {
                </button>
              </form>
              
-             <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)}
-               className="min-w-[160px] md:w-auto px-5 md:px-6 py-3.5 md:py-4 bg-white border border-[var(--color-ink)]/10 rounded-full text-[14px] md:text-[16px] font-[450] text-[var(--color-ink)] focus:outline-none focus:border-[var(--color-ink)]/40 transition-shadow shadow-sm appearance-none cursor-pointer whitespace-nowrap"
-               style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%23141413\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'1.5\' d=\'M19 9l-7 7-7-7\'/%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1.2rem center', backgroundSize: '1.2em', paddingRight: '2.8rem' }}>
-               <option value="">Semua Kategori</option>
-               {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
-             </select>
+             <div className="flex flex-row gap-3 md:gap-4 w-full">
+               <select value={categoryId} onChange={(e) => setCategoryId(e.target.value)}
+                 className="flex-1 min-w-[140px] md:min-w-[180px] shrink-0 px-5 md:px-6 py-3.5 md:py-4 bg-white border border-[var(--color-ink)]/10 rounded-full text-[14px] md:text-[16px] font-[450] text-[var(--color-ink)] focus:outline-none focus:border-[var(--color-ink)]/40 transition-shadow shadow-sm appearance-none cursor-pointer whitespace-nowrap"
+                 style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%23141413\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'1.5\' d=\'M19 9l-7 7-7-7\'/%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1.2rem center', backgroundSize: '1.2em', paddingRight: '2.8rem' }}>
+                 <option value="">Semua Kategori</option>
+                 {categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+               </select>
+               
+               <select value={type} onChange={(e) => setType(e.target.value)}
+                 className="flex-1 min-w-[140px] md:min-w-[180px] shrink-0 px-5 md:px-6 py-3.5 md:py-4 bg-white border border-[var(--color-ink)]/10 rounded-full text-[14px] md:text-[16px] font-[450] text-[var(--color-ink)] focus:outline-none focus:border-[var(--color-ink)]/40 transition-shadow shadow-sm appearance-none cursor-pointer whitespace-nowrap"
+                 style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0 0 24 24\' stroke=\'%23141413\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'1.5\' d=\'M19 9l-7 7-7-7\'/%3E%3C/svg%3E")', backgroundRepeat: 'no-repeat', backgroundPosition: 'right 1.2rem center', backgroundSize: '1.2em', paddingRight: '2.8rem' }}>
+                 <option value="">Semua Format</option>
+                 <option value="physical">Buku Fisik</option>
+                 <option value="ebook">E-Book</option>
+               </select>
+             </div>
            </div>
         </div>
       </div>
@@ -196,7 +208,10 @@ export default function CatalogPage() {
                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
                </svg>
             </div>
-            <span className="font-[500] text-xl tracking-tight text-[var(--color-ink)]">SiPustaka</span>
+            <div className="flex flex-col">
+              <span className="font-[500] text-xl tracking-tight leading-none text-[var(--color-ink)]">SiPustaka</span>
+              <span className="text-[12px] text-[var(--color-slate)] font-[450] leading-none mt-1">by Perpustakaan AA</span>
+            </div>
           </Link>
           <div className="flex items-center gap-4">
             <Link href="/login" className="text-[15px] font-[500] text-[var(--color-ink)] hover:text-[var(--color-signal)] transition-colors">Masuk</Link>

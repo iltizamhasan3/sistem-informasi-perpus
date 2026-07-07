@@ -10,6 +10,7 @@ import { LoadingSpinner } from '@/components/loading-spinner'
 interface EbookRental {
   id: number
   expiresAt: string
+  currentPage: number
   book: { id: number; title: string; author: string; coverImage: string | null }
 }
 
@@ -87,9 +88,12 @@ export function MyEbooksClient({ user }: { user: { name: string; role: string } 
                          <div className="flex flex-col">
                             <span className="text-[18px] font-[500] text-[var(--color-ink)] line-clamp-1 mb-1">{r.book.title}</span>
                             <span className="text-[15px] font-[450] text-[var(--color-slate)] mb-2">{r.book.author}</span>
-                            <span className="inline-flex self-start px-3 py-1 rounded-full text-[11px] font-[500] border border-[var(--color-ink)]/20 text-[var(--color-ink)] uppercase tracking-wider">
-                               Tersedia Online
-                            </span>
+                             <div className="flex items-center gap-3">
+                               <span className="inline-flex self-start px-3 py-1 rounded-full text-[11px] font-[500] border border-[var(--color-ink)]/20 text-[var(--color-ink)] uppercase tracking-wider">
+                                  Tersedia Online
+                               </span>
+                               <span className="text-[13px] font-[450] text-[var(--color-slate)] bg-black/5 px-3 py-1 rounded-full">Halaman {r.currentPage}</span>
+                             </div>
                          </div>
                       </div>
 

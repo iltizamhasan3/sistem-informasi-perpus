@@ -6,15 +6,22 @@ import Image from 'next/image'
 import { useState } from 'react'
 
 export function CartSidebar() {
-  const { cart, removeFromCart, isCartOpen, setCartOpen, clearCart } = useCart()
+  const { cart, removeFromCart, isCartOpen, setCartOpen, clearCart, availableSlot, refreshQuota } = useCart()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
 
   if (!isCartOpen) return null
 
+  // We should refresh quota every time cart is opened to make sure we have the latest.
+  // We can do it inside useEffect but since the function doesn't run infinitely we can just call it when checkout happens.
+
   const handleCheckout = async () => {
     if (cart.length === 0) return
+    if (cart.length > availableSlot) {
+       setError(`Kamu hanya bisa meminjam maksimal ${availableSlot} buku lagi saat ini.`)
+       return
+    }
     setLoading(true)
     setError('')
     setSuccess('')
@@ -29,6 +36,7 @@ export function CartSidebar() {
       
       setSuccess(`Booking berhasil! Kode: ${data.bookingCode}`)
       clearCart()
+      refreshQuota()
     } catch (err: any) {
       setError(err.message)
     } finally {
@@ -79,7 +87,7 @@ export function CartSidebar() {
             </div>
           ) : (
             <div className="space-y-4">
-              <p className="text-[14px] font-[500] text-[var(--color-slate)] mb-2">Buku yang akan dipinjam ({cart.length}/3)</p>
+              <p className="text-[14px] font-[500] text-[var(--color-slate)] mb-2">Buku yang akan dipinjam ({cart.length}/{availableSlot})</p>
               {error && <div className="p-4 rounded-[12px] bg-[#fff5f2] text-[var(--color-signal)] border border-[var(--color-signal)]/10 text-[14px] font-[500]">{error}</div>}
               {cart.map((item) => (
                 <div key={item.id} className="flex gap-4 p-4 rounded-[20px] bg-white border border-black/5 shadow-sm relative group">
@@ -111,7 +119,7 @@ export function CartSidebar() {
             </div>
             <button 
               onClick={handleCheckout} 
-              disabled={loading || cart.length === 0}
+              disabled={loading || cart.length === 0 || cart.length > availableSlot}
               className="mc-btn-primary w-full py-4 text-[16px] flex justify-center disabled:opacity-50"
             >
               {loading ? 'Memproses...' : 'Checkout Sekarang'}

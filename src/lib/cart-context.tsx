@@ -17,6 +17,8 @@ interface CartContextType {
   clearCart: () => void
   isCartOpen: boolean
   setCartOpen: (open: boolean) => void
+  availableSlot: number
+  refreshQuota: () => Promise<void>
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined)
@@ -25,6 +27,21 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [cart, setCart] = useState<CartItem[]>([])
   const [isCartOpen, setCartOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const [availableSlot, setAvailableSlot] = useState(3)
+
+  const refreshQuota = async () => {
+    try {
+      const res = await fetch('/api/bookings/quota')
+      if (res.ok) {
+        const data = await res.json()
+        setAvailableSlot(data.availableSlot ?? 3)
+      }
+    } catch (e) {}
+  }
+
+  useEffect(() => {
+    refreshQuota()
+  }, [])
 
   useEffect(() => {
     const saved = localStorage.getItem('sipustaka-cart')
@@ -45,7 +62,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const addToCart = (item: CartItem) => {
     setCart((prev) => {
       if (prev.find((p) => p.id === item.id)) return prev
-      if (prev.length >= 3) return prev
+      if (prev.length >= availableSlot) {
+         alert(`Gagal menambah buku. Kuota pinjaman kamu tersisa ${availableSlot} buku lagi (maksimal 3 peminjaman aktif).`)
+         return prev
+      }
       return [...prev, item]
     })
     setCartOpen(true)
@@ -58,7 +78,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const clearCart = () => setCart([])
 
   return (
-    <CartContext.Provider value={{ cart, addToCart, removeFromCart, clearCart, isCartOpen, setCartOpen }}>
+    <CartContext.Provider value={{ cart, addToCart, removeFromCart, clearCart, isCartOpen, setCartOpen, availableSlot, refreshQuota }}>
       {children}
     </CartContext.Provider>
   )

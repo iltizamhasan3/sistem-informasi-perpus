@@ -274,15 +274,6 @@ Buka [http://localhost:3000](http://localhost:3000) di browser.
 | `npx prisma db push` | 📤 Sync schema ke database tanpa migrasi |
 | `npx prisma studio` | 🖥️ Buka Prisma Studio (GUI database) |
 
----
-
-## 📄 Lisensi
-
-© 2026 **Iltizam Hasan** . Dikembangkan dengan dedikasi untuk kemajuan literasi digital.
-
-> Dibuat dengan ❤️ menggunakan Next.js, Supabase, dan kopi tanpa batas.
-
----
 
 <div align="center">
   <p>

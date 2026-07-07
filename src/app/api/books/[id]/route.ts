@@ -30,7 +30,7 @@ export const PUT = withSupabaseRoute<{ id: string }>({ auth: 'user' }, async (re
       publisher: publisher || null,
       year: year ? Number(year) : null,
       categoryId: Number(categoryId),
-      stock: Number(stock) || 1,
+      stock: (stock !== undefined && stock !== null && stock !== '') ? Number(stock) : 1,
       description: description || null,
       coverImage: coverImage || null,
       isEbook: isEbook !== undefined ? Boolean(isEbook) : undefined,

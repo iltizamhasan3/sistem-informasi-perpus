@@ -138,40 +138,40 @@ export default function CatalogPage() {
             <p className="text-[16px] text-[var(--color-slate)]/70 mt-2">Coba gunakan kata kunci lain.</p>
          </div>
       ) : (
-         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-8 gap-y-16 mb-24 mt-16 relative">
+         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-x-4 md:gap-x-8 gap-y-10 md:gap-y-16 mb-24 mt-10 md:mt-16 relative px-2 md:px-0">
             {books.map((book, idx) => (
               <Link href={`/catalog/${book.id}`} key={book.id} className="flex flex-col items-center group relative cursor-pointer">
                  
-                 <div className="relative mb-8 z-10">
+                 <div className="relative mb-4 md:mb-8 z-10 w-full flex justify-center">
                     {/* Rectangular Card Portrait */}
-                    <div className="w-[180px] md:w-[220px] aspect-[3/4] rounded-[24px] overflow-hidden bg-white shadow-[0_16px_32px_rgba(0,0,0,0.06)] group-hover:shadow-[0_24px_48px_rgba(0,0,0,0.12)] transition-shadow duration-500 relative flex items-center justify-center">
+                    <div className="w-full max-w-[150px] sm:max-w-[180px] md:max-w-[220px] aspect-[3/4] rounded-[16px] md:rounded-[24px] overflow-hidden bg-white shadow-[0_16px_32px_rgba(0,0,0,0.06)] group-hover:shadow-[0_24px_48px_rgba(0,0,0,0.12)] transition-shadow duration-500 relative flex items-center justify-center">
                        {book.coverImage ? (
-                          <Image src={book.coverImage} alt={book.title} fill className="object-cover object-center transition-transform duration-700 group-hover:scale-105" sizes="(max-width: 768px) 180px, 220px" />
+                          <Image src={book.coverImage} alt={book.title} fill className="object-cover object-center transition-transform duration-700 group-hover:scale-105" sizes="(max-width: 768px) 150px, 220px" />
                        ) : (
-                          <span className="text-[var(--color-slate)]/20 font-bold text-6xl" style={{ fontFamily: 'var(--font-display)' }}>?</span>
+                          <span className="text-[var(--color-slate)]/20 font-bold text-4xl md:text-6xl" style={{ fontFamily: 'var(--font-display)' }}>?</span>
                        )}
-                       <div className="absolute inset-0 rounded-[24px] border border-black/5 pointer-events-none"></div>
+                       <div className="absolute inset-0 rounded-[16px] md:rounded-[24px] border border-black/5 pointer-events-none"></div>
                     </div>
                  </div>
 
                  {/* Info Buku */}
-                 <div className="flex flex-col items-center text-center max-w-[240px]">
-                   <div className="flex items-center gap-2 mb-3">
-                      <span className="w-1.5 h-1.5 rounded-full bg-[var(--color-signal-light)]"></span>
-                      <span className="mc-eyebrow text-[var(--color-slate)]">{book.category.name}</span>
+                 <div className="flex flex-col items-center text-center w-full px-1 md:px-0">
+                   <div className="flex items-center justify-center gap-1.5 md:gap-2 mb-2 md:mb-3">
+                      <span className="w-1 h-1 md:w-1.5 md:h-1.5 rounded-full bg-[var(--color-signal-light)] shrink-0"></span>
+                      <span className="mc-eyebrow text-[9px] md:text-[11px] text-[var(--color-slate)] line-clamp-1">{book.category.name}</span>
                    </div>
 
-                   <h3 className="text-[18px] font-bold tracking-tight text-[var(--color-ink)] line-clamp-2 mb-2 leading-snug group-hover:text-[var(--color-signal)] transition-colors">{book.title}</h3>
-                   <p className="text-[15px] font-[450] text-[var(--color-slate)] mb-4">{book.author}</p>
+                   <h3 className="text-[13px] md:text-[18px] font-bold tracking-tight text-[var(--color-ink)] line-clamp-2 mb-1 md:mb-2 leading-snug group-hover:text-[var(--color-signal)] transition-colors">{book.title}</h3>
+                   <p className="text-[11px] md:text-[15px] font-[450] text-[var(--color-slate)] mb-3 md:mb-4 line-clamp-1">{book.author}</p>
 
                    {/* Status Label */}
                    {book.stock > 0 ? (
-                      <span className="px-4 py-1.5 rounded-full text-[13px] font-[500] border border-[var(--color-ink)]/15 text-[var(--color-ink)] bg-white/50">
-                         Tersedia ({book.stock})
+                      <span className="px-3 md:px-4 py-1 md:py-1.5 rounded-full text-[10px] md:text-[13px] font-[500] border border-[var(--color-ink)]/15 text-[var(--color-ink)] bg-white/50 whitespace-nowrap">
+                         Tersedia <span className="hidden md:inline">({book.stock})</span>
                       </span>
                    ) : (
-                      <span className="px-4 py-1.5 rounded-full text-[13px] font-[500] border border-[var(--color-signal)] text-[var(--color-signal)] bg-white/50">
-                         Stok Habis
+                      <span className="px-3 md:px-4 py-1 md:py-1.5 rounded-full text-[10px] md:text-[13px] font-[500] border border-[var(--color-signal)] text-[var(--color-signal)] bg-white/50 whitespace-nowrap">
+                         Habis
                       </span>
                    )}
                  </div>

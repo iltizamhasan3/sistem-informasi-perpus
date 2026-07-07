@@ -8,7 +8,7 @@ export const GET = withSupabaseRoute<{ id: string }>({ auth: 'user' }, async (_r
     include: { category: true },
   })
   if (!book || book.deletedAt) return Response.json({ error: 'Buku tidak ditemukan' }, { status: 404 })
-  return Response.json({ book }, { headers: { 'Cache-Control': 'public, max-age=30, stale-while-revalidate=120' } })
+  return Response.json({ book })
 })
 
 export const PUT = withSupabaseRoute<{ id: string }>({ auth: 'user' }, async (req, ctx) => {

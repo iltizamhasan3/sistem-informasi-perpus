@@ -30,7 +30,7 @@ export const GET = withSupabaseRoute({ auth: ['user', 'none'] }, async (req) => 
       }),
       prisma.book.count({ where }),
     ])
-    return Response.json({ books, meta: { page: Number(page), total, totalPages: Math.ceil(total / limit) } }, { headers: { 'Cache-Control': 'public, max-age=30, stale-while-revalidate=120' } })
+    return Response.json({ books, meta: { page: Number(page), total, totalPages: Math.ceil(total / limit) } })
   }
 
   const books = await prisma.book.findMany({
@@ -38,7 +38,7 @@ export const GET = withSupabaseRoute({ auth: ['user', 'none'] }, async (req) => 
     include: { category: true, _count: { select: { transactions: true } } },
     orderBy: { createdAt: 'desc' },
   })
-  return Response.json({ books }, { headers: { 'Cache-Control': 'public, max-age=30, stale-while-revalidate=120' } })
+  return Response.json({ books })
 })
 
 export const POST = withSupabaseRoute({ auth: 'user' }, async (req, ctx) => {

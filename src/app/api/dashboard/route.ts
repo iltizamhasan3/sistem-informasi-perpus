@@ -41,5 +41,5 @@ export const GET = withSupabaseRoute({ auth: 'user' }, async (_req, ctx) => {
   return Response.json({
     stats: { totalBooks, totalMembers, activeBorrows, todayTransactions },
     lowStockBooks, popularBooks, recentTransactions,
-  }, { headers: { 'Cache-Control': 'private, max-age=30, stale-while-revalidate=120' } })
+  })
 })

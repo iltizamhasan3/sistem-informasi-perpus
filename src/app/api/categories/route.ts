@@ -6,7 +6,7 @@ export const GET = withSupabaseRoute({ auth: ['user', 'none'] }, async () => {
     orderBy: { name: 'asc' },
     include: { _count: { select: { books: true } } },
   })
-  return Response.json({ categories }, { headers: { 'Cache-Control': 'public, max-age=120, stale-while-revalidate=300' } })
+  return Response.json({ categories })
 })
 
 export const POST = withSupabaseRoute({ auth: 'user' }, async (req, ctx) => {

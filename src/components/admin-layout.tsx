@@ -31,7 +31,7 @@ const memberNavItems = [
 export function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const router = useRouter()
-  const { user, loading } = useUser()
+  const { user, loading, refresh } = useUser()
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [showNotif, setShowNotif] = useState(false)
   const [showMobileMenu, setShowMobileMenu] = useState(false)

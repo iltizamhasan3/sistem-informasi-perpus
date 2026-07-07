@@ -166,27 +166,30 @@ export default function BookDetailPage() {
                 </div>
               )}
 
-              <div className="flex flex-col sm:flex-row sm:items-center gap-4 mt-8 pt-8 border-t border-[var(--color-ink)]/5">
-                <div className="flex-1">
-                  <span className="text-[15px] font-[500] text-[var(--color-ink)]">Sisa stok fisik: <span className="text-[var(--color-slate)]">{book.stock}</span></span>
-                  {book.stock <= 0 && (
-                    <span className="ml-3 inline-flex px-3 py-1 rounded-full text-[12px] font-[500] bg-[var(--color-signal)]/10 text-[var(--color-signal)]">
-                      Kosong
-                    </span>
+              <div className="mt-8 pt-8 border-t border-[var(--color-ink)]/5">
+                <h3 className="text-[16px] font-[500] text-[var(--color-ink)] mb-4">Buku Fisik</h3>
+                <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                  <div className="flex-1">
+                    <span className="text-[15px] font-[500] text-[var(--color-ink)]">Sisa stok fisik: <span className="text-[var(--color-slate)]">{book.stock}</span></span>
+                    {book.stock <= 0 && (
+                      <span className="ml-3 inline-flex px-3 py-1 rounded-full text-[12px] font-[500] bg-[var(--color-signal)]/10 text-[var(--color-signal)]">
+                        Kosong
+                      </span>
+                    )}
+                  </div>
+                  
+                  {book.stock > 0 && user?.role === 'member' && (
+                    <button onClick={handleAddToCart}
+                      className="mc-btn-primary px-8">
+                      Tambah ke Keranjang
+                    </button>
+                  )}
+                  {book.stock > 0 && !user && (
+                    <Link href="/login" className="mc-btn-secondary px-6">
+                      Masuk untuk booking
+                    </Link>
                   )}
                 </div>
-                
-                {book.stock > 0 && user?.role === 'member' && (
-                  <button onClick={handleAddToCart}
-                    className="mc-btn-primary px-8">
-                    Tambah ke Keranjang
-                  </button>
-                )}
-                {book.stock > 0 && !user && (
-                  <Link href="/login" className="mc-btn-secondary px-6">
-                    Masuk untuk booking
-                  </Link>
-                )}
               </div>
 
               {book.isEbook && (
@@ -199,21 +202,26 @@ export default function BookDetailPage() {
                       {rentMsg.text}
                     </div>
                   )}
-                  {activeRental ? (
-                    <Link href={`/reader/${activeRental.id}`}
-                      className="mc-btn-primary px-8 inline-block">
-                      Mulai Membaca E-book
-                    </Link>
-                  ) : user?.role === 'member' ? (
-                    <button onClick={handleRentEbook} disabled={renting}
-                      className="mc-btn-primary px-8">
-                      {renting ? 'Memproses...' : 'Sewa E-book'}
-                    </button>
-                  ) : !user ? (
-                    <Link href="/login" className="mc-btn-secondary px-6 inline-block">
-                      Masuk untuk baca E-book
-                    </Link>
-                  ) : null}
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                    <div className="flex-1">
+                       <span className="text-[15px] font-[500] text-[var(--color-ink)]">Akses versi digital 24/7</span>
+                    </div>
+                    {activeRental ? (
+                      <Link href={`/reader/${activeRental.id}`}
+                        className="mc-btn-primary px-8 inline-block text-center">
+                        Mulai Membaca E-book
+                      </Link>
+                    ) : user?.role === 'member' ? (
+                      <button onClick={handleRentEbook} disabled={renting}
+                        className="mc-btn-primary px-8 text-center">
+                        {renting ? 'Memproses...' : 'Sewa E-book'}
+                      </button>
+                    ) : !user ? (
+                      <Link href="/login" className="mc-btn-secondary px-6 inline-block text-center">
+                        Masuk untuk baca E-book
+                      </Link>
+                    ) : null}
+                  </div>
                 </div>
               )}
             </div>

@@ -30,12 +30,15 @@ export default function LoginPage() {
         body: JSON.stringify({ email: form.email, password: form.password }),
       })
       const data = await res.json()
-      if (!res.ok) { setError(data.error || 'Terjadi kesalahan'); return }
+      if (!res.ok) { 
+        setError(data.error || 'Terjadi kesalahan')
+        setLoading(false)
+        return 
+      }
       
       window.location.href = data.user.role === 'admin' ? '/dashboard' : '/catalog'
     } catch {
       setError('Terjadi kesalahan, silakan coba lagi')
-    } finally {
       setLoading(false)
     }
   }

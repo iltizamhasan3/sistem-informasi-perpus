@@ -37,12 +37,15 @@ export default function RegisterPage() {
       })
 
       const data = await res.json()
-      if (!res.ok) { setError(data.error); return }
+      if (!res.ok) { 
+        setError(data.error)
+        setLoading(false)
+        return 
+      }
 
       router.replace('/login')
     } catch {
       setError('Terjadi kesalahan, silakan coba lagi')
-    } finally {
       setLoading(false)
     }
   }
